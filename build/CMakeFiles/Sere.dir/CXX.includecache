@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/workspaces/Sere/errors.hpp
+string
+-
+iostream
+-
+
+/workspaces/Sere/main.cpp
+iostream
+-
+stdint.h
+-
+fstream
+-
+vector
+-
+stdexcept
+-
+errors.hpp
+/workspaces/Sere/errors.hpp
+
