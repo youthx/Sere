@@ -1,0 +1,18 @@
+
+expr    : literal
+        | unary 
+        | binary
+        | group 
+        ;
+
+literal : NUMBER | STRING | "True" | "False" | "None" ;
+group   : "(" expr ")"
+unary   : "( "-" | "!" ) expr ;
+binary  : expr OP expr ;
+
+OP  : "==" | "!=" | "<" | "<=" | ">" | ">="
+    | "+"  | "-"  | "*" | "/"  | ;
+
+NUMBER  : INTEGER | FLOAT ;
+INTEGER : [0-9]+ ;
+FLOAT   : [0-9]* ( '.' [0-9]+ ) ;

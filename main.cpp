@@ -3,6 +3,8 @@
 #include <fstream>
 #include <vector>
 #include <stdexcept>
+#include <string> 
+#include <cstring>
 
 #include "errors.hpp"
 #include "Parser/Scanner/Token.hpp"
@@ -46,6 +48,11 @@ int main(int argc, char *argv[])
         {
             std::cerr << "Usage: \n\t" << argv[0] << " <input_file>" << std::endl;
             return 64;
+        }
+        
+        if (std::strcmp(argv[1], "--generate")) {
+            // TODO: handle 
+            return 0;
         }
 
         const char *filepath = argv[1];
