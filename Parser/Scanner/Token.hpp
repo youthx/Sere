@@ -10,6 +10,21 @@
 
 namespace SereLexer {
 
+    class TokenValue {
+        public:
+
+            TokenValue() = default;
+            TokenValue(int value) : INTEGER(value), FLOAT(0), STRING("") {}
+            TokenValue(float value) : FLOAT(value), INTEGER(0), STRING("") {}
+            TokenValue(const std::string& value) : STRING(value), INTEGER(0), FLOAT(0) {}
+        
+
+        private:
+            const int INTEGER;
+            const float FLOAT;
+            const std::string STRING;
+    };
+
     class TokenBase {
         public:
             const TokenType type;
@@ -17,8 +32,11 @@ namespace SereLexer {
             const int column;
             const int line;
 
-            TokenBase(TokenType type, const std::string& lexeme, int line, int col)
-                : type(type), lexeme(lexeme), line(line), column(col) {}
+            const TokenValue literal;
+
+            TokenBase() = default;
+            TokenBase(TokenType type, const std::string& lexeme, const TokenValue& literal, int line, int col)
+                : type(type), lexeme(lexeme), literal(literal), line(line), column(col) {}
 
             virtual ~TokenBase() = default;
     };
@@ -26,13 +44,11 @@ namespace SereLexer {
     template <typename T>
     class Token : public TokenBase {
         public:
-            const T value;
-
-            Token(TokenType type, const std::string& lexeme, T value, int line, int col)
-                : TokenBase(type, lexeme, line, col), value(value) {}
+            Token(TokenType type, const std::string& lexeme, T literal, int line, int col)
+                : TokenBase(type, lexeme, TokenValue(literal), line, col) {}
 
             Token(TokenType type, const std::string& lexeme, int line, int col)
-                : TokenBase(type, lexeme, line, col), value(T()) {}
+                : TokenBase(type, lexeme, TokenValue(0), line, col) {}            
     };
 
     class TokenList {
