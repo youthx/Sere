@@ -6,140 +6,183 @@
 #include "Token.hpp"
 #include "../errors.hpp"
 
-namespace SereLexer {
+namespace SereLexer
+{
 
-class Scanner {
-public:
-    Scanner() = delete; // Disable default constructor to enforce proper initialization
+    class Scanner
+    {
+    public:
+        Scanner() = delete; // Disable default constructor to enforce proper initialization
 
-    explicit Scanner(const char* input_buffer) 
-        : start(0), current(0), line(1), column(1), buffer(input_buffer ? input_buffer : "") {}
+        explicit Scanner(const char *input_buffer)
+            : start(0), current(0), line(1), column(1), buffer(input_buffer ? input_buffer : "") {}
 
-    TokenList tokenize() {
-        reset_position();
+        TokenList tokenize()
+        {
+            reset_position();
 
-        while (!is_at_end()) {
-            start = current;
-            scan_one();
+            while (!is_at_end())
+            {
+                start = current;
+                scan_one();
+            }
+
+            // Add EOF token safely
+            token_list.add_token<int>(Token<int>(TOKEN_EOF, "", line, column));
+            return token_list; // Return a copy of the token list
         }
 
-        // Add EOF token safely
-        token_list.add_token<void>(Token<void>(TOKEN_EOF, "", line, column));
-        return token_list; // Return a copy of the token list
-    }
+    private:
+        // Member variables
+        std::string buffer;   // Use std::string for safer and more flexible string handling
+        TokenList token_list; // Assuming TokenList is a valid type and properly defined
 
-private:
-    std::string buffer; // Use std::string for safer and more flexible string handling
-    TokenList token_list; // Assuming TokenList is a valid type and properly defined
+        int line;
+        int column;
 
-    int line;
-    int column;
+        int current;
+        int start;
 
-    int current;
-    int start;
+        int current_indent = 0;        // Track the current indentation level
+        std::vector<int> indent_stack; // Stack to manage indentation levels
 
-    int current_indent = 0; // Track the current indentation level
-    std::vector<int> indent_stack; // Stack to manage indentation levels
+        const std::map<std::string, TokenType> Tok_keywords {
+            {"and", TOKEN_AND},
+            // {"as", TOKEN_AS}, // Undefined token type
+            // {"assert", TOKEN_ASSERT}, // Undefined token type
+            // {"break", TOKEN_BREAK}, // Undefined token type
+            {"class", TOKEN_CLASS},
+            // {"continue", TOKEN_CONTINUE}, // Undefined token type
+            {"def", TOKEN_DEF},
+            // {"del", TOKEN_DEL}, // Undefined token type
+            {"elif", TOKEN_ELIF}, // Undefined token type
+            {"else", TOKEN_ELSE},
+            // {"except", TOKEN_EXCEPT}, // Undefined token type
+            {"False", TOKEN_FALSE},
+            // {"finally", TOKEN_FINALLY}, // Undefined token type
+            {"for", TOKEN_FOR},
+            // {"from", TOKEN_FROM}, // Undefined token type
+            // {"global", TOKEN_GLOBAL}, // Undefined token type
+            {"if", TOKEN_IF},
+            // {"import", TOKEN_IMPORT}, // Undefined token type
+            // {"in", TOKEN_IN}, // Undefined token type
+            // {"is", TOKEN_IS}, // Undefined token type
+            // {"lambda", TOKEN_LAMBDA}, // Undefined token type
+            {"None", TOKEN_NONE},
+            // {"nonlocal", TOKEN_NONLOCAL}, // Undefined token type
+            {"not", TOKEN_NOT}, // Undefined token type
+            {"or", TOKEN_OR},
+            // {"pass", TOKEN_PASS}, // Undefined token type
+            // {"raise", TOKEN_RAISE}, // Undefined token type
+            {"return", TOKEN_RETURN},
+            {"self", TOKEN_SELF},
+            {"super", TOKEN_SUPER},
+            {"True", TOKEN_TRUE},
+            // {"try", TOKEN_TRY}, // Undefined token type
+            {"while", TOKEN_WHILE}, // Undefined token type
+            // {"with", TOKEN_WITH}, // Undefined token type
+            // {"yield", TOKEN_YIELD} // Undefined token type
+        };    
 
-    void reset_position() {
-        line = 1;
-        column = 1;
-        current = 0;
-        start = 0;
-    }
-
-    bool is_at_end() const {
-        return current >= buffer.length();
-    }
-
-    char advance() {
-        if (is_at_end()) {
-            return '\0'; // Return null character if at end of buffer
-        }
-        char c = buffer[current++];
-        if (c == '\n') {
-            line++;
+        // Utility methods
+        void reset_position()
+        {
+            line = 1;
             column = 1;
-        } else {
+            current = 0;
+            start = 0;
+        }
+
+        bool is_at_end() const
+        {
+            return current >= buffer.length();
+        }
+
+        char advance()
+        {
+            if (is_at_end())
+            {
+                return '\0'; // Return null character if at end of buffer
+            }
+            char c = buffer[current++];
+            if (c == '\n')
+            {
+                line++;
+                column = 1;
+            }
+            else
+            {
+                column++;
+            }
+            return c;
+        }
+
+        char peek() const
+        {
+            if (is_at_end())
+            {
+                return '\0'; // Return null character if at end of buffer
+            }
+            return buffer[current];
+        }
+
+        char peek_next() const
+        {
+            if (current + 1 >= buffer.length())
+            {
+                return '\0'; // Return null character if at end of buffer
+            }
+            return buffer[current + 1];
+        }
+
+        bool match(char expected_char)
+        {
+            if (is_at_end() || buffer[current] != expected_char)
+            {
+                return false;
+            }
+            current++;
             column++;
-        }
-        return c;
-    }
-
-    char peek() const {
-        if (is_at_end()) {
-            return '\0'; // Return null character if at end of buffer
-        }
-        return buffer[current];
-    }
-
-    bool match(char expected_char) {
-        if (is_at_end() || buffer[current] != expected_char) {
-            return false;
-        }
-        current++;
-        column++;
-        return true;
-    }
-
-    void add_token(TokenType type) {
-        std::string text = buffer.substr(start, current - start);
-        token_list.add_token<void>(Token<void>(type, text, line, column));
-    }
-
-    template <typename T>
-    void add_token(TokenType type, T literal) {
-        std::string text = buffer.substr(start, current - start);
-        token_list.add_token<T>(Token<T>(type, text, literal, line, column));
-    }
-
-    void scan_indent() {
-        int spaces = 0;
-
-        // Count spaces or tabs at the start of the line
-        while (!is_at_end() && (buffer[current] == ' ' || buffer[current] == '\t')) {
-            if (buffer[current] == ' ') {
-                spaces++;
-            } else if (buffer[current] == '\t') {
-                spaces += 4; // Assuming a tab equals 4 spaces
-            }
-            advance();
+            return true;
         }
 
-        // Compare the current indentation level with the previous one
-        if (spaces > current_indent) {
-            add_token(TOKEN_INDENT);
-            indent_stack.push_back(spaces);
-        } else if (spaces < current_indent) {
-            while (!indent_stack.empty() && spaces < indent_stack.back()) {
-                add_token(TOKEN_DEDENT);
-                indent_stack.pop_back();
-            }
+        // Token management
+        void add_token(TokenType type)
+        {
+            std::string text = buffer.substr(start, current - start);
+            token_list.add_token<int>(Token<int>(type, text, line, column));
         }
 
-        current_indent = spaces;
-    }
+        template <typename T>
+        void add_token(TokenType type, T literal)
+        {
+            std::string text = buffer.substr(start, current - start);
+            token_list.add_token<T>(Token<T>(type, text, literal, line, column));
+        }
 
-    void scan_one() {
-        char c = advance();
+        // Scanning methods
+        void scan_one()
+        {
+            char c = advance();
 
-        switch (c) {
+            switch (c)
+            {
+            case '\0': break;
             case ' ':
+            case '\r':
             case '\t':
-                // Skip whitespace but scan for indentation at the start of a line
-                if (column == 1) {
+            case '\n':
+                // Handle indentation at the start of a line
+                if (column == 1)
+                {
+                    
                     scan_indent();
                 }
                 break;
-
-            case '\n':
-                // Reset column for new line
-                column = 1;
-                break;
-
             case '#':
                 // Skip comments until the end of the line
-                while (peek() != '\n' && !is_at_end()) {
+                while (peek() != '\n' && !is_at_end())
+                {
                     advance();
                 }
                 break;
@@ -178,11 +221,13 @@ private:
             default:
                 scan_two(c);
                 break;
+            }
         }
-    }
 
-    void scan_two(char c) {
-        switch (c) {
+        void scan_two(char c)
+        {
+            switch (c)
+            {
             case '!':
                 add_token(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
                 break;
@@ -196,13 +241,117 @@ private:
                 add_token(match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
                 break;
 
-            default:
-                Error::error(line, "Unexpected character.");
+            case '"':
+                scan_string();
                 break;
-        }
-    }
-};
 
-} // namespace SereLexer
+            default:
+                if (isdigit(c))
+                {
+                    scan_number();
+                }
+                else if (isalpha(c) || c == '_')
+                {
+                    scan_identifier();
+                }
+                else
+                {
+                    Error::error(line, "Unexpected character.");
+                }
+                break;
+            }
+        }
+
+        void scan_indent()
+        {
+            int spaces = 0;
+
+            // Count spaces or tabs at the start of the line
+            while (!is_at_end() && (buffer[current] == ' ' || buffer[current] == '\t'))
+            {
+                if (buffer[current] == ' ')
+                {
+                    spaces++;
+                }
+                else if (buffer[current] == '\t')
+                {
+                    spaces += 4; // Assuming a tab equals 4 spaces
+                }
+                advance();
+            }
+
+            // Compare the current indentation level with the previous one
+            if (spaces > current_indent)
+            {
+                add_token(TOKEN_INDENT);
+                indent_stack.push_back(spaces);
+            }
+            else if (spaces < current_indent)
+            {
+                while (!indent_stack.empty() && spaces < indent_stack.back())
+                {
+                    add_token(TOKEN_DEDENT);
+                    indent_stack.pop_back();
+                }
+            }
+
+            current_indent = spaces;
+        }
+
+        void scan_number()
+        {
+            while (isdigit(peek()))
+                advance();
+            if (peek() == '.' && isdigit(peek_next()))
+            {
+                advance(); // '.'
+                while (isdigit(peek()))
+                    advance();
+                goto SCANNED_FLOAT;
+            }
+
+        SCANNED_INTEGER:
+            add_token<int>(TOKEN_INTEGER, std::stoi(buffer.substr(start, current - start)));
+            return;
+
+        SCANNED_FLOAT:
+            add_token<float>(TOKEN_FLOAT, std::stof(buffer.substr(start, current - start)));
+            return;
+        }
+
+        void scan_string()
+        {
+            while (peek() != '"' && !is_at_end())
+            {
+                if (peek() == '\n')
+                {
+                    line++;
+                    column = 1;
+                }
+                advance();
+            }
+            if (is_at_end())
+            {
+                Error::error(line, "Unterminated string.");
+                return;
+            }
+            advance(); // Consume the closing '"'
+            std::string value = buffer.substr(start + 1, current - start - 1); // Exclude quotes
+            add_token<std::string>(TOKEN_STRING, value);
+        }
+
+        void scan_identifier()
+        {
+            while (isalnum(peek()))
+                advance();
+            std::string text = buffer.substr(start, current - start);
+            auto it = Tok_keywords.find(text);
+            TokenType type = (it != Tok_keywords.end()) ? it->second : TOKEN_IDENTIFIER;
+            add_token(type);
+        }
+
+    }; // End of Scanner class
+
+}; // End of SereLexer namespace
 
 #endif // SCANNER_HPP

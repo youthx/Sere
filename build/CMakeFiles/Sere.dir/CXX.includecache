@@ -6,6 +6,38 @@
 
 #IncludeRegexTransform: 
 
+../errors.hpp
+string
+-
+iostream
+-
+
+/workspaces/Sere/Parser/Scanner/Scanner.hpp
+vector
+-
+string
+-
+Token.hpp
+/workspaces/Sere/Parser/Scanner/Token.hpp
+../errors.hpp
+/workspaces/Sere/Parser/errors.hpp
+
+/workspaces/Sere/Parser/Scanner/Token.hpp
+TokenType.hpp
+/workspaces/Sere/Parser/Scanner/TokenType.hpp
+vector
+-
+variant
+-
+memory
+-
+any
+-
+
+/workspaces/Sere/Parser/Scanner/TokenType.hpp
+map
+-
+
 /workspaces/Sere/errors.hpp
 string
 -
@@ -25,4 +57,8 @@ stdexcept
 -
 errors.hpp
 /workspaces/Sere/errors.hpp
+Parser/Scanner/Token.hpp
+/workspaces/Sere/Parser/Scanner/Token.hpp
+Parser/Scanner/Scanner.hpp
+/workspaces/Sere/Parser/Scanner/Scanner.hpp
 
