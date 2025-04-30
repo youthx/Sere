@@ -14,11 +14,19 @@ namespace SereParser {
             int INTEGER;
             float FLOAT;
             std::string STRING;
-            SereObject() : INTEGER(0), FLOAT(0.0f), STRING("") {}
+            bool BOOLEAN;
 
-            SereObject(int integerValue) : INTEGER(integerValue), FLOAT(0.0f), STRING("") {}
-            SereObject(float floatValue) : INTEGER(0), FLOAT(floatValue), STRING("") {}
-            SereObject(const std::string& stringValue) : INTEGER(0), FLOAT(0.0f), STRING(stringValue) {}
+            bool isNone () const {
+                return INTEGER == 0 && FLOAT == 0.0f && STRING.empty() && !BOOLEAN;
+            }
+            
+            SereObject() : INTEGER(0), FLOAT(0.0f), STRING(""), BOOLEAN(false) {}
+
+            SereObject(int integerValue) : INTEGER(integerValue), FLOAT(0.0f), STRING(""), BOOLEAN(false) {}
+            SereObject(float floatValue) : INTEGER(0), FLOAT(floatValue), STRING(""), BOOLEAN(false) {}
+            SereObject(bool boolValue) : INTEGER(0), FLOAT(0.0f), STRING(""), BOOLEAN(boolValue) {}
+            SereObject(const std::string& stringValue) : INTEGER(0), FLOAT(0.0f), STRING(stringValue), BOOLEAN(false) {}
+            
             virtual ~SereObject() = default;
     };
 

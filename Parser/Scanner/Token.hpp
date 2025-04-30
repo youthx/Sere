@@ -18,8 +18,6 @@ namespace SereLexer {
             TokenValue(float value) : FLOAT(value), INTEGER(0), STRING("") {}
             TokenValue(const std::string& value) : STRING(value), INTEGER(0), FLOAT(0) {}
         
-
-        private:
             const int INTEGER;
             const float FLOAT;
             const std::string STRING;
