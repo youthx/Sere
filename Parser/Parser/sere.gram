@@ -1,17 +1,25 @@
 
-expr    : literal
-        | unary 
-        | binary
-        | group 
+expr    : equality
         ;
 
-literal : NUMBER | STRING | "True" | "False" | "None" ;
-group   : "(" expr ")"
-unary   : "( "-" | "!" ) expr ;
-binary  : expr OP expr ;
+equality: comp ( ( "!=" | "==" ) comp )* ;
 
-OP  : "==" | "!=" | "<" | "<=" | ">" | ">="
-    | "+"  | "-"  | "*" | "/"  | ;
+comp    : term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+
+term    : factor ( ( "- |"+" ) factor )* ;
+
+factor  : unary ( ( "/" | "*" ) unary )* ;
+
+unary   : "( "-" | "!" ) unary 
+        | primary 
+        ;
+        
+primary : NUMBER | STRING | "True" | "False" | "None" 
+        | "(" expr ")" 
+        ;
+
+
+
 
 NUMBER  : INTEGER | FLOAT ;
 INTEGER : [0-9]+ ;

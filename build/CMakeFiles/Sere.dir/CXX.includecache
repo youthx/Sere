@@ -55,6 +55,10 @@ vector
 -
 stdexcept
 -
+string
+-
+cstring
+-
 errors.hpp
 /workspaces/Sere/errors.hpp
 Parser/Scanner/Token.hpp
