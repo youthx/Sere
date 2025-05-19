@@ -33,6 +33,9 @@ namespace SereParser {
         virtual R visit_variable(const class VariableExprAST& expr) noexcept(false);
 
         R accept_expression(const class ExprAST& expr) {
+            #ifndef SEREPARSER_AST_HPP
+                #error "SereObject is not defined."
+            #endif 
             // (Assuming ExprAST is not a pointer here)
             return expr.accept(*this);
         }
@@ -46,7 +49,32 @@ namespace SereParser {
             throw std::invalid_argument("BinaryExprAST: left or right is null.");
         }
 
-        throw std::runtime_error("visit_binary not fully implemented.");
+        R left_root = expr.left->accept(*this);
+        R right_root = expr.right->accept(*this);
+
+        /*
+        printf("BinaryExprAST: %s %s %s\n", expr.op.lexeme.c_str(), left_root.to_string().c_str(), right_root.to_string().c_str());
+        throw std::runtime_error("visit_binary not implemented any further.");
+        */
+
+        switch (expr.op.type) {
+            case SereLexer::TokenType::TOKEN_PLUS:
+                left_root.perform_add(right_root);
+                break;
+            case SereLexer::TokenType::TOKEN_MINUS:
+                left_root.perform_subtract(right_root);
+                break;
+            case SereLexer::TokenType::TOKEN_STAR:
+                left_root.perform_multiply(right_root);
+                break;
+            case SereLexer::TokenType::TOKEN_SLASH:
+                left_root.perform_divide(right_root);
+                break;
+            default:
+                throw std::invalid_argument("BinaryExprAST: Invalid operator.");
+        }
+        
+        return left_root;
     }
 
     template <typename R>
@@ -67,7 +95,25 @@ namespace SereParser {
     template <typename R>
     R ExprVisitor<R>::visit_unary(const class UnaryExprAST& expr) noexcept(false) {
         ASSERT_MUST_RETURN_SERE_OBJECT
-        throw std::runtime_error("visit_unary not implemented.");
+
+        if (!expr.operand) {
+            throw std::invalid_argument("UnaryExprAST: operand is null.");
+        }
+
+        R right_root = expr.operand->accept(*this);
+
+        switch (expr.op.type) {
+            case SereLexer::TokenType::TOKEN_MINUS:
+                right_root.perform_negate();
+                break;
+            case SereLexer::TokenType::TOKEN_BANG:
+                right_root.perform_not();
+                break;
+            default:
+                throw std::invalid_argument("UnaryExprAST: Invalid operator.");
+        }
+
+        return right_root;
     }
 
     // Optionally, provide default implementations for other visit_* methods

@@ -1,6 +1,5 @@
 #ifndef SEREPARSER_AST_HPP
 #define SEREPARSER_AST_HPP
-
 #include <memory>
 #include <vector>
 #include <string>
@@ -36,7 +35,7 @@ namespace SereParser {
         SereObjectType getType() const noexcept { return TYPE; }
         bool isNone() const noexcept { return TYPE == SereObjectType::NONE; }
 
-        void Add(const SereObject& other) {
+        void perform_add(const SereObject& other) {
             if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
                 INTEGER += other.INTEGER;
             } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
@@ -48,7 +47,7 @@ namespace SereParser {
             }
         }
 
-        void Subtract(const SereObject& other) {
+        void perform_subtract(const SereObject& other) {
             if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
                 INTEGER -= other.INTEGER;
             } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
@@ -58,7 +57,7 @@ namespace SereParser {
             }
         }
 
-        void Multiply(const SereObject& other) {
+        void perform_multiply(const SereObject& other) {
             if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
                 INTEGER *= other.INTEGER;
             } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
@@ -68,7 +67,7 @@ namespace SereParser {
             }
         }
 
-        void Divide(const SereObject& other) {
+        void perform_divide(const SereObject& other) {
             if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
                 if (other.INTEGER == 0) throw std::domain_error("Division by zero.");
                 INTEGER /= other.INTEGER;
@@ -77,6 +76,26 @@ namespace SereParser {
                 FLOAT /= other.FLOAT;
             } else {
                 throw std::invalid_argument("Invalid division operation; Mismatched types.");
+            }
+        }
+
+        void perform_negate() {
+            if (TYPE == SereObjectType::INTEGER) {
+                INTEGER = -INTEGER;
+            } else if (TYPE == SereObjectType::FLOAT) {
+                FLOAT = -FLOAT;
+            } else {
+                // throw std::invalid_argument("Invalid negation operation; Type is not numeric.");
+                return; // No-op for non-numeric types
+            }
+        }
+
+        void perform_not() {
+            if (TYPE == SereObjectType::BOOLEAN) {
+                BOOLEAN = !BOOLEAN;
+            } else {
+                // throw std::invalid_argument("Invalid NOT operation; Type is not boolean.");
+                return; // No-op for non-boolean types
             }
         }
 
@@ -109,6 +128,17 @@ namespace SereParser {
             return BOOLEAN;
         }
 
+        // String representation
+        std::string to_string() const {
+            switch (TYPE) {
+                case SereObjectType::INTEGER: return std::to_string(INTEGER);
+                case SereObjectType::FLOAT: return std::to_string(FLOAT);
+                case SereObjectType::STRING: return STRING;
+                case SereObjectType::BOOLEAN: return BOOLEAN ? "true" : "false";
+                default: return "none";
+            }
+        }
+
     private:
         int INTEGER;
         float FLOAT;
@@ -124,3 +154,5 @@ namespace SereParser {
     };
 
 }
+
+#endif // SEREPARSER_AST_HPP
