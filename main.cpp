@@ -7,8 +7,11 @@
 #include <cstring>
 
 #include "errors.hpp"
-#include "Parser/Scanner/Token.hpp"
-#include "Parser/Scanner/Scanner.hpp"
+#include "./Parser/Scanner/Token.hpp"
+#include "./Parser/Scanner/Scanner.hpp"
+#include "./Parser/Parser/Parser.hpp"
+#include "./Parser/Parser/AST/Visitor.hpp"
+#include "./Parser/Parser/AST/AST.hpp"
 
 std::vector<unsigned char> sere_read_file(const char *filepath)
 {
@@ -50,10 +53,7 @@ int main(int argc, char *argv[])
             return 64;
         }
         
-        if (std::strcmp(argv[1], "--generate")) {
-            // TODO: handle 
-            return 0;
-        }
+
 
         const char *filepath = argv[1];
         if (filepath == nullptr || filepath[0] == '\0')
@@ -65,11 +65,30 @@ int main(int argc, char *argv[])
         std::vector<unsigned char> buffer = sere_read_file(filepath);
         SereLexer::Scanner scanner(reinterpret_cast<const char *>(buffer.data()));
         SereLexer::TokenList tokens = scanner.tokenize();
+        SereParser::Parser parser(tokens);
+        auto expr = parser.parse();
+        if (expr)
+        {
+
+            std::cout << "Parsed expression successfully." << std::endl;
+            std::shared_ptr<SereParser::ExprVisitor<SereParser::SereObject>> visitor = std::make_shared<SereParser::ExprVisitor<SereParser::SereObject>>();
+            visitor.get()->accept_expression(*expr.get());
+
+            std::cout << "It fucking worked?" << std::endl;
+        }
+        else
+        {
+            std::cerr << "Failed to parse expression." << std::endl;
+            return 66;
+        }
+        
+        /*
         for (const auto &token : tokens.getTokens())
         {
             std::cout << "Token: " << token->type << ", Lexeme: " << token->lexeme << std::endl;
         }
 
+        */
         // Uncomment and implement the following lines if needed
         // SereLexer::Lexer lexer(buffer);
         // SereToken::TokenList tokens = lexer.tokenize();
