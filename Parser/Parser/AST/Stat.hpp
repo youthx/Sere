@@ -2,136 +2,155 @@
 #define PARSER_AST_STAT_HPP
 
 #include <vector>
-#include <AST.hpp>
-#include "../Scanner/Token.hpp"
+#include <memory>
 #include "./Expr.hpp"
+#include "./AST.hpp"
 
 namespace SereParser {
+
+    // Forward declaration of StatVisitor
+    template <typename R>
+    class StatVisitor;
+
+    // Base class for all statements
     class StatAST {
-        public:
-            virtual ~StatAST() = default;
-            virtual SereObject accept(StatVisitor& visitor) = 0;
+    public:
+        virtual ~StatAST() = default;
+
+        // Accept method for the visitor
+        virtual SereObject accept(StatVisitor<SereObject>& visitor) const = 0;
     };
 
+    // Visitor interface
+    template <typename R>
     class StatVisitor {
-        public:
-            virtual SereObject visit_block(BlockStatAST& stat) = 0;
-            virtual SereObject visit_class(ClassStatAST& stat) = 0;
-            virtual SereObject visit_expr(ExprStatAST& stat) = 0;
-            virtual SereObject visit_function(FunctionStatAST& stat) = 0;
-            virtual SereObject visit_if(IfStatAST& stat) = 0;
-            virtual SereObject visit_while(WhileStatAST& stat) = 0;
-            virtual SereObject visit_variable(VariableStatAST& stat) = 0;
-            virtual SereObject visit_return(ReturnStatAST& stat) = 0;
+    public:
+        virtual ~StatVisitor() = default;
+
+        virtual R visit_block(const class BlockStatAST& stat) = 0;
+        virtual R visit_class(const class ClassStatAST& stat) = 0;
+        virtual R visit_expr(const class ExprStatAST& stat) = 0;
+        virtual R visit_function(const class FunctionStatAST& stat) = 0;
+        virtual R visit_if(const class IfStatAST& stat) = 0;
+        virtual R visit_while(const class WhileStatAST& stat) = 0;
+        virtual R visit_variable(const class VariableStatAST& stat) = 0;
+        virtual R visit_return(const class ReturnStatAST& stat) = 0;
     };
 
+    // Block statement
     class BlockStatAST : public StatAST {
-        public:
-            const std::vector<std::unique_ptr<StatAST>> statements;
+    public:
+        const std::vector<std::shared_ptr<StatAST>> statements;
 
-            BlockStatAST(std::vector<std::unique_ptr<StatAST>> statements)
-                : statements(std::move(statements)) {}
+        BlockStatAST(std::vector<std::shared_ptr<StatAST>> statements)
+            : statements(std::move(statements)) {}
 
-            SereObject accept(StatVisitor& visitor) override {
-                return visitor.visit_block(*this);
-            }
+        SereObject accept(StatVisitor<SereObject>& visitor) const override {
+            return visitor.visit_block(*this);
+        }
     };
 
+    // Class statement
     class ClassStatAST : public StatAST {
-        public:
-            const SereLexer::TokenBase name;
-            const VariableExprAST superclass;
-            const std::vector<std::unique_ptr<FunctionStatAST>> methods;
+    public:
+        const SereLexer::TokenBase name;
+        const std::shared_ptr<VariableExprAST> superclass;
+        const std::vector<std::shared_ptr<FunctionStatAST>> methods;
 
-            ClassStatAST(SereLexer::TokenBase name, VariableExprAST superclass, std::vector<std::unique_ptr<FunctionStatAST>> methods)
-                : name(name), superclass(superclass), methods(std::move(methods)) {}
+        ClassStatAST(SereLexer::TokenBase* name, std::shared_ptr<VariableExprAST> superclass, std::vector<std::shared_ptr<FunctionStatAST>> methods)
+            : name(*name), superclass(std::move(superclass)), methods(std::move(methods)) {}
 
-            SereObject accept(StatVisitor& visitor) override {
-                return visitor.visit_class(*this);
-            }
+        SereObject accept(StatVisitor<SereObject>& visitor) const override {
+            return visitor.visit_class(*this);
+        }
     };
 
+    // Expression statement
     class ExprStatAST : public StatAST {
-        public:
-            const std::unique_ptr<ExprAST> expr;
+    public:
+        const std::shared_ptr<ExprAST> expr;
 
-            ExprStatAST(std::unique_ptr<ExprAST> expr)
-                : expr(std::move(expr)) {}
+        ExprStatAST(std::shared_ptr<ExprAST> expr)
+            : expr(std::move(expr)) {}
 
-            SereObject accept(StatVisitor& visitor) override {
-                return visitor.visit_expr(*this);
-            }
+        SereObject accept(StatVisitor<SereObject>& visitor) const override {
+            return visitor.visit_expr(*this);
+        }
     };
 
+    // Function statement
     class FunctionStatAST : public StatAST {
-        public:
-            const SereLexer::TokenBase name;
-            const std::vector<SereLexer::TokenBase> params;
-            const std::unique_ptr<StatAST> body;
+    public:
+        const SereLexer::TokenBase name;
+        const std::vector<SereLexer::TokenBase*> params;
+        const std::shared_ptr<StatAST> body;
 
-            FunctionStatAST(SereLexer::TokenBase name, std::vector<SereLexer::TokenBase> params, std::unique_ptr<StatAST> body)
-                : name(name), params(std::move(params)), body(std::move(body)) {}
+        FunctionStatAST(SereLexer::TokenBase* name, std::vector<SereLexer::TokenBase*> params, std::shared_ptr<StatAST> body)
+            : name(*name), params(std::move(params)), body(std::move(body)) {}
 
-            SereObject accept(StatVisitor& visitor) override {
-                return visitor.visit_function(*this);
-            }
-
+        SereObject accept(StatVisitor<SereObject>& visitor) const override {
+            return visitor.visit_function(*this);
+        }
     };
 
+    // If statement
     class IfStatAST : public StatAST {
-        public:
-            const std::unique_ptr<ExprAST> condition;
-            const std::unique_ptr<StatAST> then_branch;
-            const std::unique_ptr<StatAST> else_branch;
-            // const std::unique_ptr<StatAST> elif_branch;
-        
-            IfStatAST(std::unique_ptr<ExprAST> condition, std::unique_ptr<StatAST> then_branch, std::unique_ptr<StatAST> else_branch)
-                : condition(std::move(condition)), then_branch(std::move(then_branch)), else_branch(std::move(else_branch)) {}
+    public:
+        const std::shared_ptr<ExprAST> condition;
+        const std::shared_ptr<StatAST> then_branch;
+        const std::shared_ptr<StatAST> else_branch;
 
-            SereObject accept(StatVisitor& visitor) override {
-                return visitor.visit_if(*this);
-            }
+        IfStatAST(std::shared_ptr<ExprAST> condition, std::shared_ptr<StatAST> then_branch, std::shared_ptr<StatAST> else_branch)
+            : condition(std::move(condition)), then_branch(std::move(then_branch)), else_branch(std::move(else_branch)) {}
+
+        SereObject accept(StatVisitor<SereObject>& visitor) const override {
+            return visitor.visit_if(*this);
+        }
     };
 
+    // While statement
     class WhileStatAST : public StatAST {
-        public:
-            const std::unique_ptr<ExprAST> condition;
-            const std::unique_ptr<StatAST> body;
+    public:
+        const std::shared_ptr<ExprAST> condition;
+        const std::shared_ptr<StatAST> body;
 
-            WhileStatAST(std::unique_ptr<ExprAST> condition, std::unique_ptr<StatAST> body)
-                : condition(std::move(condition)), body(std::move(body)) {}
+        WhileStatAST(std::shared_ptr<ExprAST> condition, std::shared_ptr<StatAST> body)
+            : condition(std::move(condition)), body(std::move(body)) {}
 
-            SereObject accept(StatVisitor& visitor) override {
-                return visitor.visit_while(*this);
-            }
+        SereObject accept(StatVisitor<SereObject>& visitor) const override {
+            return visitor.visit_while(*this);
+        }
     };
 
+    // Variable statement
     class VariableStatAST : public StatAST {
-        public:
-            const SereLexer::TokenBase name;
-            const SereLexer::TokenBase type;
-            const std::unique_ptr<ExprAST> initializer;
+    public:
+        const SereLexer::TokenBase name;
+        const SereLexer::TokenBase type;
+        const std::shared_ptr<ExprAST> initializer;
 
-            VariableStatAST(SereLexer::TokenBase name, SereLexer::TokenBase type, std::unique_ptr<ExprAST> initializer)
-                : name(name), type(type), initializer(std::move(initializer)) {}
+        VariableStatAST(SereLexer::TokenBase* name, SereLexer::TokenBase* type, std::shared_ptr<ExprAST> initializer)
+            : name(*name), type(*type), initializer(std::move(initializer)) {}
 
-            SereObject accept(StatVisitor& visitor) override {
-                return visitor.visit_variable(*this);
-            }
+        SereObject accept(StatVisitor<SereObject>& visitor) const override {
+            return visitor.visit_variable(*this);
+        }
     };
 
+    // Return statement
     class ReturnStatAST : public StatAST {
-        public:
-            const SereLexer::TokenBase keyword;
-            const std::unique_ptr<ExprAST> value;
+    public:
+        const SereLexer::TokenBase keyword;
+        const std::shared_ptr<ExprAST> value;
 
-            ReturnStatAST(SereLexer::TokenBase keyword, std::unique_ptr<ExprAST> value)
-                : keyword(keyword), value(std::move(value)) {}
+        ReturnStatAST(SereLexer::TokenBase* keyword, std::shared_ptr<ExprAST> value)
+            : keyword(*keyword), value(std::move(value)) {}
 
-            SereObject accept(StatVisitor& visitor) override {
-                return visitor.visit_return(*this);
-            }
+        SereObject accept(StatVisitor<SereObject>& visitor) const override {
+            return visitor.visit_return(*this);
+        }
     };
 
-}
+} // namespace SereParser
+
 #endif // PARSER_AST_STAT_HPP

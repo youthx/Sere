@@ -1,4 +1,7 @@
 
+program : expr+
+        ;
+
 expr    : equality
         ;
 
