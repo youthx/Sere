@@ -5,6 +5,7 @@
 #include <string>
 #include <stdexcept>
 #include <utility>
+#include <type_traits>
 
 namespace SereParser {
     enum class SereObjectType {
@@ -32,14 +33,17 @@ namespace SereParser {
         explicit SereObject(std::string stringValue)
             : INTEGER(0), FLOAT(0.0f), STRING(std::move(stringValue)), BOOLEAN(false), TYPE(SereObjectType::STRING) {}
 
-        SereObjectType getType() const noexcept { return TYPE; }
-        bool isNone() const noexcept { return TYPE == SereObjectType::NONE; }
+        [[nodiscard]] SereObjectType getType() const noexcept { return TYPE; }
+        [[nodiscard]] bool isNone() const noexcept { return TYPE == SereObjectType::NONE; }
 
         void perform_add(const SereObject& other) {
-            if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
-                INTEGER += other.INTEGER;
-            } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
-                FLOAT += other.FLOAT;
+            if (isNumeric() && other.isNumeric()) {
+                if (TYPE == SereObjectType::FLOAT || other.TYPE == SereObjectType::FLOAT) {
+                    FLOAT = toFloat() + other.toFloat();
+                    TYPE = SereObjectType::FLOAT;
+                } else {
+                    INTEGER += other.INTEGER;
+                }
             } else if (TYPE == SereObjectType::STRING && other.TYPE == SereObjectType::STRING) {
                 STRING += other.STRING;
             } else {
@@ -48,54 +52,118 @@ namespace SereParser {
         }
 
         void perform_subtract(const SereObject& other) {
-            if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
-                INTEGER -= other.INTEGER;
-            } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
-                FLOAT -= other.FLOAT;
+            if (isNumeric() && other.isNumeric()) {
+                if (TYPE == SereObjectType::FLOAT || other.TYPE == SereObjectType::FLOAT) {
+                    FLOAT = toFloat() - other.toFloat();
+                    TYPE = SereObjectType::FLOAT;
+                } else {
+                    INTEGER -= other.INTEGER;
+                }
             } else {
                 throw std::invalid_argument("Invalid subtraction operation; Mismatched types.");
             }
         }
 
         void perform_multiply(const SereObject& other) {
-            if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
-                INTEGER *= other.INTEGER;
-            } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
-                FLOAT *= other.FLOAT;
+            if (isNumeric() && other.isNumeric()) {
+                if (TYPE == SereObjectType::FLOAT || other.TYPE == SereObjectType::FLOAT) {
+                    FLOAT = toFloat() * other.toFloat();
+                    TYPE = SereObjectType::FLOAT;
+                } else {
+                    INTEGER *= other.INTEGER;
+                }
             } else {
                 throw std::invalid_argument("Invalid multiplication operation; Mismatched types.");
             }
         }
 
         void perform_divide(const SereObject& other) {
-            if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
-                if (other.INTEGER == 0) throw std::domain_error("Division by zero.");
-                INTEGER /= other.INTEGER;
-            } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
-                if (other.FLOAT == 0.0f) throw std::domain_error("Division by zero.");
-                FLOAT /= other.FLOAT;
+            if (isNumeric() && other.isNumeric()) {
+                if ((TYPE == SereObjectType::FLOAT || other.TYPE == SereObjectType::FLOAT)) {
+                    float divisor = other.toFloat();
+                    if (divisor == 0.0f) throw std::domain_error("Division by zero.");
+                    FLOAT = toFloat() / divisor;
+                    TYPE = SereObjectType::FLOAT;
+                } else {
+                    if (other.INTEGER == 0) throw std::domain_error("Division by zero.");
+                    INTEGER /= other.INTEGER;
+                }
             } else {
                 throw std::invalid_argument("Invalid division operation; Mismatched types.");
             }
         }
 
-        void perform_negate() {
+        void perform_negate() noexcept {
             if (TYPE == SereObjectType::INTEGER) {
                 INTEGER = -INTEGER;
             } else if (TYPE == SereObjectType::FLOAT) {
                 FLOAT = -FLOAT;
-            } else {
-                // throw std::invalid_argument("Invalid negation operation; Type is not numeric.");
-                return; // No-op for non-numeric types
             }
         }
 
-        void perform_not() {
+        void perform_greater(const SereObject& other) {
+            if (isNumeric() && other.isNumeric()) {
+                BOOLEAN = toFloat() > other.toFloat();
+                TYPE = SereObjectType::BOOLEAN;
+            } else {
+                throw std::invalid_argument("Invalid greater operation; Mismatched types.");
+            }
+        }
+
+        void perform_greater_equal(const SereObject& other) {
+            if (isNumeric() && other.isNumeric()) {
+                BOOLEAN = toFloat() >= other.toFloat();
+                TYPE = SereObjectType::BOOLEAN;
+            } else {
+                throw std::invalid_argument("Invalid greater or equal operation; Mismatched types.");
+            }
+        }
+
+        void perform_less(const SereObject& other) {
+            if (isNumeric() && other.isNumeric()) {
+                BOOLEAN = toFloat() < other.toFloat();
+                TYPE = SereObjectType::BOOLEAN;
+            } else {
+                throw std::invalid_argument("Invalid less operation; Mismatched types.");
+            }
+        }
+
+        void perform_less_equal(const SereObject& other) {
+            if (isNumeric() && other.isNumeric()) {
+                BOOLEAN = toFloat() <= other.toFloat();
+                TYPE = SereObjectType::BOOLEAN;
+            } else {
+                throw std::invalid_argument("Invalid less or equal operation; Mismatched types.");
+            }
+        }
+
+        void perform_equalequal(const SereObject& other) {
+            if (isNumeric() && other.isNumeric()) {
+                BOOLEAN = toFloat() == other.toFloat();
+                TYPE = SereObjectType::BOOLEAN;
+            } else if (TYPE == SereObjectType::STRING && other.TYPE == SereObjectType::STRING) {
+                BOOLEAN = STRING == other.STRING;
+                TYPE = SereObjectType::BOOLEAN;
+            } else if (TYPE == SereObjectType::BOOLEAN && other.TYPE == SereObjectType::BOOLEAN) {
+                BOOLEAN = BOOLEAN == other.BOOLEAN;
+                TYPE = SereObjectType::BOOLEAN;
+            } else if (TYPE == SereObjectType::NONE && other.TYPE == SereObjectType::NONE) {
+                BOOLEAN = true;
+                TYPE = SereObjectType::BOOLEAN;
+            } else {
+                BOOLEAN = false;
+                TYPE = SereObjectType::BOOLEAN;
+            }
+        }
+
+        void perform_notequal(const SereObject& other) {
+            perform_equalequal(other);
+            BOOLEAN = !BOOLEAN;
+        }
+
+        void perform_not() noexcept {
             if (TYPE == SereObjectType::BOOLEAN) {
                 BOOLEAN = !BOOLEAN;
-            } else {
-                // throw std::invalid_argument("Invalid NOT operation; Type is not boolean.");
-                return; // No-op for non-boolean types
             }
         }
 
@@ -108,28 +176,28 @@ namespace SereParser {
         ~SereObject() = default;
 
         // Accessors
-        int getInteger() const {
+        [[nodiscard]] int getInteger() const {
             if (TYPE != SereObjectType::INTEGER) throw std::logic_error("Not an integer type.");
             return INTEGER;
         }
 
-        float getFloat() const {
+        [[nodiscard]] float getFloat() const {
             if (TYPE != SereObjectType::FLOAT) throw std::logic_error("Not a float type.");
             return FLOAT;
         }
 
-        const std::string& getString() const {
+        [[nodiscard]] const std::string& getString() const {
             if (TYPE != SereObjectType::STRING) throw std::logic_error("Not a string type.");
             return STRING;
         }
 
-        bool getBoolean() const {
+        [[nodiscard]] bool getBoolean() const {
             if (TYPE != SereObjectType::BOOLEAN) throw std::logic_error("Not a boolean type.");
             return BOOLEAN;
         }
 
         // String representation
-        std::string to_string() const {
+        [[nodiscard]] std::string to_string() const {
             switch (TYPE) {
                 case SereObjectType::INTEGER: return std::to_string(INTEGER);
                 case SereObjectType::FLOAT: return std::to_string(FLOAT);
@@ -145,6 +213,14 @@ namespace SereParser {
         std::string STRING;
         bool BOOLEAN;
         SereObjectType TYPE;
+
+        [[nodiscard]] bool isNumeric() const noexcept {
+            return TYPE == SereObjectType::INTEGER || TYPE == SereObjectType::FLOAT;
+        }
+
+        [[nodiscard]] float toFloat() const noexcept {
+            return TYPE == SereObjectType::FLOAT ? FLOAT : static_cast<float>(INTEGER);
+        }
     };
 
     class ASTNode {

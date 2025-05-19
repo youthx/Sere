@@ -66,6 +66,11 @@ int main(int argc, char *argv[])
         std::vector<unsigned char> buffer = sere_read_file(filepath);
         SereLexer::Scanner scanner(reinterpret_cast<const char *>(buffer.data()));
         SereLexer::TokenList tokens = scanner.tokenize();
+        if (tokens.getTokens()[0]->type == SereLexer::TOKEN_EOF)
+        {
+            std::cout << "File is empty or contains only skipped tokens." << std::endl;
+            return 0;
+        }
         SereParser::Parser parser(tokens);
         auto expr = parser.parse();
         if (expr)

@@ -70,6 +70,25 @@ namespace SereParser {
             case SereLexer::TokenType::TOKEN_SLASH:
                 left_root.perform_divide(right_root);
                 break;
+            
+            case SereLexer::TokenType::TOKEN_GREATER:
+                left_root.perform_greater(right_root);
+                break;
+            case SereLexer::TokenType::TOKEN_GREATER_EQUAL:
+                left_root.perform_greater_equal(right_root);
+                break;
+            case SereLexer::TokenType::TOKEN_LESS:
+                left_root.perform_less(right_root);
+                break;
+            case SereLexer::TokenType::TOKEN_LESS_EQUAL:
+                left_root.perform_less_equal(right_root);
+                break;
+            case SereLexer::TokenType::TOKEN_EQUAL_EQUAL:
+                left_root.perform_equalequal(right_root);
+                break;
+            case SereLexer::TokenType::TOKEN_BANG_EQUAL:
+                left_root.perform_notequal(right_root);
+                break;
             default:
                 throw std::invalid_argument("BinaryExprAST: Invalid operator.");
         }
