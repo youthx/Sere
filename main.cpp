@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string> 
 #include <cstring>
+#include <assert.h>
 
 #include "errors.hpp"
 #include "./Parser/Scanner/Token.hpp"
@@ -69,12 +70,13 @@ int main(int argc, char *argv[])
         auto expr = parser.parse();
         if (expr)
         {
-
+            
+            
             std::cout << "Parsed expression successfully." << std::endl;
             std::shared_ptr<SereParser::ExprVisitor<SereParser::SereObject>> visitor = std::make_shared<SereParser::ExprVisitor<SereParser::SereObject>>();
-            visitor.get()->accept_expression(*expr.get());
-
-            std::cout << "It fucking worked?" << std::endl;
+            SereParser::SereObject result = visitor.get()->accept_expression(*expr.get());
+    
+            std::cout << "Result: " << result.to_string() << std::endl;
         }
         else
         {
