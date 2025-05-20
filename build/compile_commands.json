@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/workspaces/Sere/build",
-  "command": "/usr/bin/g++  -DFMT_SHARED -I/workspaces/Sere/Parser -isystem /opt/conda/include  -g   -o CMakeFiles/Sere.dir/main.cpp.o -c /workspaces/Sere/main.cpp",
-  "file": "/workspaces/Sere/main.cpp"
-}
-]

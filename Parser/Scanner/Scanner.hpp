@@ -3,8 +3,36 @@
 
 #include <vector>
 #include <string>
+#include <map>
+#include <cctype>
+#include <cassert>
+#include <stdexcept>
+#include <limits>
 #include "Token.hpp"
 #include "../errors.hpp"
+
+// Debug macro: Enable debug output if needed
+#ifdef SCANNER_DEBUG
+#include <iostream>
+#define SCANNER_DEBUG_LOG(msg) std::cerr << "[Scanner Debug] " << msg << std::endl
+#else
+#define SCANNER_DEBUG_LOG(msg) ((void)0)
+#endif
+
+// Security: Prevent buffer overflows and integer overflows
+#define SCANNER_SAFE_ADVANCE(ptr, len) \
+    do { \
+        assert((ptr) >= 0 && (ptr) <= (len)); \
+    } while (0)
+
+// Optimization: Likely/unlikely branch prediction hints (GCC/Clang)
+#if defined(__GNUC__) || defined(__clang__)
+#define SCANNER_LIKELY(x)   __builtin_expect(!!(x), 1)
+#define SCANNER_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define SCANNER_LIKELY(x)   (x)
+#define SCANNER_UNLIKELY(x) (x)
+#endif
 
 namespace SereLexer
 {
@@ -15,13 +43,16 @@ namespace SereLexer
         Scanner() = delete; // Disable default constructor to enforce proper initialization
 
         explicit Scanner(const char *input_buffer)
-            : start(0), current(0), line(1), column(1), buffer(input_buffer ? input_buffer : "") {}
+            : start(0), current(0), line(1), column(1), buffer(input_buffer ? input_buffer : "") 
+        {
+            SCANNER_DEBUG_LOG("Scanner initialized");
+        }
 
         TokenList tokenize()
         {
             reset_position();
 
-            while (!is_at_end())
+            while (SCANNER_LIKELY(!is_at_end()))
             {
                 start = current;
                 scan_one();
@@ -91,15 +122,19 @@ namespace SereLexer
             column = 1;
             current = 0;
             start = 0;
+            current_indent = 0;
+            indent_stack.clear();
+            SCANNER_DEBUG_LOG("Position reset");
         }
 
         bool is_at_end() const
         {
-            return current >= buffer.length();
+            return SCANNER_UNLIKELY(current >= static_cast<int>(buffer.length()));
         }
 
         char advance()
         {
+            SCANNER_SAFE_ADVANCE(current, buffer.length());
             if (is_at_end())
             {
                 return '\0'; // Return null character if at end of buffer
@@ -114,6 +149,7 @@ namespace SereLexer
             {
                 column++;
             }
+            SCANNER_DEBUG_LOG("Advanced to char: " << c << " (line " << line << ", col " << column << ")");
             return c;
         }
 
@@ -128,7 +164,7 @@ namespace SereLexer
 
         char peek_next() const
         {
-            if (current + 1 >= buffer.length())
+            if (current + 1 >= static_cast<int>(buffer.length()))
             {
                 return '\0'; // Return null character if at end of buffer
             }
@@ -151,6 +187,7 @@ namespace SereLexer
         {
             std::string text = buffer.substr(start, current - start);
             token_list.add_token<int>(Token<int>(type, text, line, column));
+            SCANNER_DEBUG_LOG("Token added: " << text << " type: " << type);
         }
 
         template <typename T>
@@ -158,6 +195,7 @@ namespace SereLexer
         {
             std::string text = buffer.substr(start, current - start);
             token_list.add_token<T>(Token<T>(type, text, literal, line, column));
+            SCANNER_DEBUG_LOG("Token added: " << text << " type: " << type << " literal: " << literal);
         }
 
         // Scanning methods
@@ -175,7 +213,6 @@ namespace SereLexer
                 // Handle indentation at the start of a line
                 if (column == 1)
                 {
-                    
                     scan_indent();
                 }
                 break;
@@ -246,11 +283,11 @@ namespace SereLexer
                 break;
 
             default:
-                if (isdigit(c))
+                if (std::isdigit(static_cast<unsigned char>(c)))
                 {
                     scan_number();
                 }
-                else if (isalpha(c) || c == '_')
+                else if (std::isalpha(static_cast<unsigned char>(c)) || c == '_')
                 {
                     scan_identifier();
                 }
@@ -296,26 +333,42 @@ namespace SereLexer
             }
 
             current_indent = spaces;
+            SCANNER_DEBUG_LOG("Indentation scanned: " << spaces);
         }
 
         void scan_number()
         {
-            while (isdigit(peek()))
+            int number_start = start;
+            while (std::isdigit(static_cast<unsigned char>(peek())))
                 advance();
-            if (peek() == '.' && isdigit(peek_next()))
+            if (peek() == '.' && std::isdigit(static_cast<unsigned char>(peek_next())))
             {
                 advance(); // '.'
-                while (isdigit(peek()))
+                while (std::isdigit(static_cast<unsigned char>(peek())))
                     advance();
                 goto SCANNED_FLOAT;
             }
 
         SCANNED_INTEGER:
-            add_token<int>(TOKEN_INTEGER, std::stoi(buffer.substr(start, current - start)));
+            try {
+                std::string num_str = buffer.substr(number_start, current - number_start);
+                long long val = std::stoll(num_str);
+                if (val > std::numeric_limits<int>::max() || val < std::numeric_limits<int>::min())
+                    throw std::out_of_range("Integer literal out of range");
+                add_token<int>(TOKEN_INTEGER, static_cast<int>(val));
+            } catch (const std::exception& e) {
+                Error::error(line, "Invalid integer literal.");
+            }
             return;
 
         SCANNED_FLOAT:
-            add_token<float>(TOKEN_FLOAT, std::stof(buffer.substr(start, current - start)));
+            try {
+                std::string num_str = buffer.substr(number_start, current - number_start);
+                float val = std::stof(num_str);
+                add_token<float>(TOKEN_FLOAT, val);
+            } catch (const std::exception& e) {
+                Error::error(line, "Invalid float literal.");
+            }
             return;
         }
 
@@ -336,13 +389,13 @@ namespace SereLexer
                 return;
             }
             advance(); // Consume the closing '"'
-            std::string value = buffer.substr(start + 1, current - start - 1); // Exclude quotes
+            std::string value = buffer.substr(start + 1, current - start - 2); // Exclude quotes
             add_token<std::string>(TOKEN_STRING, value);
         }
 
         void scan_identifier()
         {
-            while (isalnum(peek()))
+            while (std::isalnum(static_cast<unsigned char>(peek())))
                 advance();
             std::string text = buffer.substr(start, current - start);
             auto it = Tok_keywords.find(text);

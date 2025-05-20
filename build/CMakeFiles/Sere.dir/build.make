@@ -60,15 +60,15 @@ include CMakeFiles/Sere.dir/flags.make
 CMakeFiles/Sere.dir/main.cpp.o: CMakeFiles/Sere.dir/flags.make
 CMakeFiles/Sere.dir/main.cpp.o: ../main.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspaces/Sere/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Sere.dir/main.cpp.o"
-	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Sere.dir/main.cpp.o -c /workspaces/Sere/main.cpp
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Sere.dir/main.cpp.o -c /workspaces/Sere/main.cpp
 
 CMakeFiles/Sere.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Sere.dir/main.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspaces/Sere/main.cpp > CMakeFiles/Sere.dir/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspaces/Sere/main.cpp > CMakeFiles/Sere.dir/main.cpp.i
 
 CMakeFiles/Sere.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Sere.dir/main.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/Sere/main.cpp -o CMakeFiles/Sere.dir/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/Sere/main.cpp -o CMakeFiles/Sere.dir/main.cpp.s
 
 # Object files for target Sere
 Sere_OBJECTS = \

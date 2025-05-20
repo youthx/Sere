@@ -1,1 +1,1 @@
-/usr/bin/g++  -g   CMakeFiles/Sere.dir/main.cpp.o  -o Sere  -Wl,-rpath,/opt/conda/lib /opt/conda/lib/libfmt.so.9.1.0 
+/usr/bin/c++     CMakeFiles/Sere.dir/main.cpp.o  -o Sere  -Wl,-rpath,/opt/conda/lib /opt/conda/lib/libfmt.so.9.1.0 

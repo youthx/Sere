@@ -29,6 +29,7 @@ namespace SereParser {
 
         SereObject accept(ExprVisitor<SereObject>& visitor) const override {
             return visitor.visit_binary(*this);
+            
         }
     };
 
@@ -51,9 +52,26 @@ namespace SereParser {
         const std::shared_ptr<ExprAST> right;
 
         LogicalExprAST(const SereLexer::TokenBase& op, std::shared_ptr<ExprAST> left, std::shared_ptr<ExprAST> right)
-            : op(op), left(std::move(left)), right(std::move(right)) {}
+            : op(op), left(std::move(left)), right(std::move(right)) 
+        {
+            if (!this->left || !this->right) {
+                throw std::invalid_argument("LogicalExprAST: left and right expressions must not be null");
+            }
+        }
+
+        LogicalExprAST(const SereLexer::TokenBase* op, std::shared_ptr<ExprAST> left, std::shared_ptr<ExprAST> right)
+            : op(*op), left(std::move(left)), right(std::move(right))
+        {
+            if (!op) {
+                throw std::invalid_argument("LogicalExprAST: op pointer must not be null");
+            }
+            if (!this->left || !this->right) {
+                throw std::invalid_argument("LogicalExprAST: left and right expressions must not be null");
+            }
+        }
 
         SereObject accept(ExprVisitor<SereObject>& visitor) const override {
+            // Defensive: visitor reference should not be null (by contract)
             return visitor.visit_logical(*this);
         }
     };
