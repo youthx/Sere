@@ -2,9 +2,22 @@
 #define TOKEN_TYPE_HPP
 
 #include <map>
+#include <cassert>
+
+// Debug macro: Enable debug prints if SERE_DEBUG is defined
+#ifdef SERE_DEBUG
+    #include <iostream>
+    #define SERE_DEBUG_PRINT(x) std::cerr << "[SERE DEBUG] " << x << std::endl
+#else
+    #define SERE_DEBUG_PRINT(x) do {} while(0)
+#endif
+
+// Static assert for enum size stability
+#define SERE_STATIC_ASSERT_ENUM_SIZE(expected) \
+    static_assert(static_cast<int>(SereLexer::TOKEN_EOF) == (expected), \
+    "TokenType enum size mismatch. Update expected value if you add/remove tokens.")
 
 namespace SereLexer {
-
 
     enum TokenType {
         // Single-character tokens
@@ -27,23 +40,16 @@ namespace SereLexer {
         TOKEN_OR, TOKEN_RETURN,
         TOKEN_SUPER, TOKEN_SELF, TOKEN_TRUE, TOKEN_WHILE,
         TOKEN_NOT, TOKEN_ELIF,
-        // TOKEN_AS, TOKEN_ASSERT, TOKEN_BREAK, TOKEN_CONTINUE,
-        // TOKEN_DEL, TOKEN_EXCEPT, TOKEN_FINALLY,
-        // TOKEN_FROM, TOKEN_GLOBAL, TOKEN_IMPORT, TOKEN_IN,
-        // TOKEN_IS, TOKEN_LAMBDA, TOKEN_NONLOCAL, TOKEN_NOT,
-        // TOKEN_PASS, TOKEN_RAISE, TOKEN_WITH, TOKEN_YIELD,
-        // TOKEN_TRY,
-        // TOKEN_DEL, TOKEN_IN, TOKEN_IS, TOKEN_LAMBDA,
-        // TOKEN_NONLOCAL, TOKEN_PASS, TOKEN_RAISE,
-        // TOKEN_WITH, TOKEN_YIELD,
 
         TOKEN_INDENT, // 39
         TOKEN_DEDENT, // 40
         TOKEN_NEWLINE, // 41
 
         // End of file
-        TOKEN_EOF
-    };           
+        TOKEN_EOF // 42
+    };
+
+    SERE_STATIC_ASSERT_ENUM_SIZE(42);
 
 }
 

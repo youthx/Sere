@@ -117,6 +117,10 @@ any
 /workspaces/Sere/Parser/Scanner/TokenType.hpp
 map
 -
+cassert
+-
+iostream
+-
 
 /workspaces/Sere/errors.hpp
 string
