@@ -9,6 +9,13 @@
 #include <any>
 
 namespace SereLexer {
+    
+    // Enable debug assertions if not in release mode
+    #ifndef NDEBUG
+    #define SERE_ASSERT(expr) assert(expr)
+    #else
+    #define SERE_ASSERT(expr) ((void)0)
+    #endif
 
     class TokenValue {
         public:
