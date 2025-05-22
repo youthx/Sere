@@ -67,16 +67,19 @@ int main(int argc, char *argv[])
         SereLexer::Scanner scanner(reinterpret_cast<const char *>(buffer.data()));
         SereLexer::TokenList tokens = scanner.tokenize();
         SereParser::Parser parser(tokens);
-        auto expr = parser.parse();
-        if (expr)
+        auto stats = parser.parse();
+        if (!stats.empty())
         {
             
             
             std::cout << "Parsed expression successfully." << std::endl;
-            std::shared_ptr<SereParser::ExprVisitor<SereParser::SereObject>> visitor = std::make_shared<SereParser::ExprVisitor<SereParser::SereObject>>();
-            SereParser::SereObject result = visitor.get()->accept_expression(*expr.get());
+            auto expr_visitor = std::make_shared<SereParser::ExprVisitor<SereParser::SereObject>>();
+            auto visitor = std::make_shared<SereParser::StatVisitor<SereParser::SereObject>>(expr_visitor);
+            for (auto stat : stats) {
+                SereParser::SereObject result = stat.get()->accept(*visitor);
     
-            std::cout << "Result: " << result.to_string() << std::endl;
+                std::cout << "Result: " << result.to_string() << std::endl;
+            }
         }
         else
         {

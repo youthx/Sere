@@ -6,14 +6,13 @@
 #include <utility>
 #include "./AST.hpp"
 #include "./Visitor.hpp"
-namespace SereParser {
 
+namespace SereParser {
     class ExprAST {
     public:
         virtual ~ExprAST() = default;
         virtual SereObject accept(ExprVisitor<SereObject>& visitor) const = 0;
     };
-
 
     class BinaryExprAST : public ExprAST {
     public:
@@ -29,7 +28,6 @@ namespace SereParser {
 
         SereObject accept(ExprVisitor<SereObject>& visitor) const override {
             return visitor.visit_binary(*this);
-            
         }
     };
 
@@ -92,18 +90,6 @@ namespace SereParser {
         }
     };
 
-    class AssignExprAST : public ExprAST {
-    public:
-        const SereLexer::TokenBase name;
-        const std::shared_ptr<ExprAST> value;
-
-        AssignExprAST(const SereLexer::TokenBase& name, std::shared_ptr<ExprAST> value)
-            : name(name), value(std::move(value)) {}
-
-        SereObject accept(ExprVisitor<SereObject>& visitor) const override {
-            return visitor.visit_assign(*this);
-        }
-    };
 
     class CallExprAST : public ExprAST {
     public:

@@ -1,5 +1,12 @@
 
-program : expr+
+program : stat* EOF
+        ;
+
+stat    : assign
+        : expr 
+        ;
+
+assign  : IDENT ((":" TYPE) ("=" expr)?) | "=" expr 
         ;
 
 expr    : equality
@@ -19,6 +26,7 @@ unary   : "( "-" | "!" ) unary
         
 primary : NUMBER | STRING | "True" | "False" | "None" 
         | "(" expr ")" 
+        | IDENT
         ;
 
 

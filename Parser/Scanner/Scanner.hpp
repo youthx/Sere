@@ -205,11 +205,11 @@ namespace SereLexer
 
             switch (c)
             {
+            case '\n': add_token(TOKEN_NEWLINE);
             case '\0': break;
             case ' ':
             case '\r':
             case '\t':
-            case '\n':
                 // Handle indentation at the start of a line
                 if (column == 1)
                 {
@@ -250,6 +250,9 @@ namespace SereLexer
                 break;
             case ';':
                 add_token(TOKEN_SEMICOLON);
+                break;
+            case ':':
+                add_token(TOKEN_COLON);
                 break;
             case '*':
                 add_token(TOKEN_STAR);
