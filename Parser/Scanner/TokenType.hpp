@@ -29,6 +29,7 @@ namespace SereLexer {
         TOKEN_BANG, TOKEN_BANG_EQUAL,
         TOKEN_EQUAL, TOKEN_EQUAL_EQUAL,
         TOKEN_GREATER, TOKEN_GREATER_EQUAL,
+        TOKEN_COLON,
         TOKEN_LESS, TOKEN_LESS_EQUAL,
 
         // Literals
@@ -49,7 +50,7 @@ namespace SereLexer {
         TOKEN_EOF // 42
     };
 
-    SERE_STATIC_ASSERT_ENUM_SIZE(42);
+    SERE_STATIC_ASSERT_ENUM_SIZE(43);
 
 }
 

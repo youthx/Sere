@@ -60,6 +60,9 @@ namespace SereParser {
         void perform_multiply(const SereObject& other) {
             if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
                 INTEGER *= other.INTEGER;
+            } else if (TYPE == SereObjectType::STRING && other.TYPE == SereObjectType::INTEGER) {
+                std::string s = STRING;
+                for (int i = 0; i < other.INTEGER - 1; i++) STRING += s;
             } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
                 FLOAT *= other.FLOAT;
             } else {
