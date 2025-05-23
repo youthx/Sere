@@ -3,6 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 project (Sere)
 
 find_package(fmt CONFIG REQUIRED) 
+find_package(LLVM REQUIRED CONFIG)
+
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+include_directories(${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS})
 
 # Collect all .cpp and .h files in the current directory and /Parser
 file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/Parser/*.cpp")
@@ -14,3 +21,4 @@ add_executable(Sere ${SOURCES} ${HEADERS})
 target_include_directories(Sere PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Parser")
 
 target_link_libraries(Sere PRIVATE fmt::fmt)
+target_link_libraries(Sere PRIVATE LLVM)

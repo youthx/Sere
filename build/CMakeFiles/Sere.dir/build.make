@@ -80,6 +80,7 @@ Sere_EXTERNAL_OBJECTS =
 Sere: CMakeFiles/Sere.dir/main.cpp.o
 Sere: CMakeFiles/Sere.dir/build.make
 Sere: /opt/conda/lib/libfmt.so.9.1.0
+Sere: /usr/lib/llvm-10/lib/libLLVM-10.so.1
 Sere: CMakeFiles/Sere.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspaces/Sere/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable Sere"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Sere.dir/link.txt --verbose=$(VERBOSE)
