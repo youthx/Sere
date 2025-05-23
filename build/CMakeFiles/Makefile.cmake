@@ -11,6 +11,11 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/opt/conda/lib/cmake/fmt/fmt-config.cmake"
   "/opt/conda/lib/cmake/fmt/fmt-targets-release.cmake"
   "/opt/conda/lib/cmake/fmt/fmt-targets.cmake"
+  "/usr/lib/llvm-10/cmake/LLVMConfig.cmake"
+  "/usr/lib/llvm-10/cmake/LLVMConfigVersion.cmake"
+  "/usr/lib/llvm-10/lib/cmake/llvm/LLVM-Config.cmake"
+  "/usr/lib/llvm-10/lib/cmake/llvm/LLVMExports-relwithdebinfo.cmake"
+  "/usr/lib/llvm-10/lib/cmake/llvm/LLVMExports.cmake"
   "/usr/share/cmake-3.16/Modules/CMakeCInformation.cmake"
   "/usr/share/cmake-3.16/Modules/CMakeCXXInformation.cmake"
   "/usr/share/cmake-3.16/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake"
@@ -50,4 +55,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/Sere.dir/DependInfo.cmake"
+  "CMakeFiles/intrinsics_gen.dir/DependInfo.cmake"
   )

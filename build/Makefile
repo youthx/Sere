@@ -123,6 +123,19 @@ Sere/fast:
 	$(MAKE) -f CMakeFiles/Sere.dir/build.make CMakeFiles/Sere.dir/build
 .PHONY : Sere/fast
 
+#=============================================================================
+# Target rules for targets named intrinsics_gen
+
+# Build rule for target.
+intrinsics_gen: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 intrinsics_gen
+.PHONY : intrinsics_gen
+
+# fast build rule for target.
+intrinsics_gen/fast:
+	$(MAKE) -f CMakeFiles/intrinsics_gen.dir/build.make CMakeFiles/intrinsics_gen.dir/build
+.PHONY : intrinsics_gen/fast
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -159,6 +172,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Sere"
+	@echo "... intrinsics_gen"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
