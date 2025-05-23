@@ -36,6 +36,20 @@ utility
 ./Visitor.hpp
 /workspaces/Sere/Parser/Parser/AST/Visitor.hpp
 
+/workspaces/Sere/Parser/Parser/AST/Midlevel/SymbolTable.hpp
+unordered_map
+-
+string
+-
+memory
+-
+optional
+-
+stdexcept
+-
+../AST.hpp
+/workspaces/Sere/Parser/Parser/AST/AST.hpp
+
 /workspaces/Sere/Parser/Parser/AST/Stat.hpp
 vector
 -
@@ -53,6 +67,8 @@ typeinfo
 -
 stdexcept
 -
+./Midlevel/SymbolTable.hpp
+/workspaces/Sere/Parser/Parser/AST/Midlevel/SymbolTable.hpp
 
 /workspaces/Sere/Parser/Parser/Parser.hpp
 vector

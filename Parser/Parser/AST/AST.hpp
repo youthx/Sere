@@ -12,7 +12,22 @@ namespace SereParser {
         FLOAT,
         STRING,
         BOOLEAN,
-        NONE
+        SYMBOLIC,
+
+        NONE,
+    };
+
+    enum class SereSymbolType {
+        VARIABLE_REF,
+        FUNCTION_REF,
+        CLASS_REF,
+
+        FUNCTION_CALL,
+        CLASS_CALL,
+
+        VARIABLE_ASSIGN,
+        FUNCTION_ASSIGN,
+        CLASS_ASSIGN,
     };
 
     class SereObject {
@@ -32,8 +47,26 @@ namespace SereParser {
         explicit SereObject(std::string stringValue)
             : INTEGER(0), FLOAT(0.0f), STRING(std::move(stringValue)), BOOLEAN(false), TYPE(SereObjectType::STRING) {}
 
+        explicit SereObject(std::string symbol, SereSymbolType symtype)
+            : INTEGER(0), FLOAT(0.0f), STRING(), BOOLEAN(false), TYPE(SereObjectType::SYMBOLIC), symbol_type(symtype), symbol_name(std::move(symbol)) {}
+
         SereObjectType getType() const noexcept { return TYPE; }
+        const std::string& getSymbolName() const {
+            if (TYPE != SereObjectType::SYMBOLIC)
+                throw std::logic_error("Not a symbolic type.");
+            return symbol_name;
+        }
+        
+        const SereSymbolType getSymbolType() const {
+            if (TYPE != SereObjectType::SYMBOLIC)
+                throw std::logic_error("Not a symbolic type.");
+            return symbol_type;
+        }
+
+        bool isSymbolic() const noexcept { return TYPE == SereObjectType::SYMBOLIC; }
         bool isNone() const noexcept { return TYPE == SereObjectType::NONE; }
+
+
 
         void perform_add(const SereObject& other) {
             if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
@@ -148,6 +181,9 @@ namespace SereParser {
         std::string STRING;
         bool BOOLEAN;
         SereObjectType TYPE;
+
+        std::string symbol_name;
+        SereSymbolType symbol_type;
     };
 
     class ASTNode {

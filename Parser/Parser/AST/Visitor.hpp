@@ -5,7 +5,8 @@
 #include "./Expr.hpp"
 #include <typeinfo>
 #include <stdexcept>
- 
+#include "./Midlevel/SymbolTable.hpp"
+
 // Macro for marking unused variables (for compatibility)
 #if defined(__GNUC__) || defined(__clang__)
     #define SEREPARSER_UNUSED(x) (void)(x)
@@ -176,7 +177,7 @@ namespace SereParser {
     template <typename R>
     R ExprVisitor<R>::visit_variable(const VariableExprAST& expr) SEREPARSER_NOEXCEPT {
         ASSERT_MUST_RETURN_SERE_OBJECT;
-        SEREPARSER_UNUSED(expr);
+        
         throw std::runtime_error("visit_variable not implemented.");
     }
 

@@ -27,31 +27,31 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 18,
+				"line" : 20,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 23,
+				"line" : 26,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 24,
+				"line" : 27,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 11,
+				"line" : 13,
 				"parent" : 0
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 21,
+				"line" : 23,
 				"parent" : 0
 			}
 		]
@@ -105,7 +105,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-Wl,-rpath,/opt/conda/lib:/usr/lib/llvm-10/lib",
+				"fragment" : "-Wl,-rpath,/opt/conda/lib",
 				"role" : "libraries"
 			},
 			{
@@ -115,7 +115,57 @@
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "/usr/lib/llvm-10/lib/libLLVM-10.so.1",
+				"fragment" : "/usr/lib/llvm-10/lib/libLLVMCore.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "/usr/lib/llvm-10/lib/libLLVMSupport.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/llvm-10/lib/libLLVMBinaryFormat.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/llvm-10/lib/libLLVMRemarks.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/llvm-10/lib/libLLVMBitstreamReader.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "/usr/lib/llvm-10/lib/libLLVMSupport.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lz",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lrt",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-ldl",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-ltinfo",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lpthread",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lm",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/llvm-10/lib/libLLVMDemangle.a",
 				"role" : "libraries"
 			}
 		],
