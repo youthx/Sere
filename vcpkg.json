@@ -1,6 +1,5 @@
 {
   "dependencies": [
-    "fmt",
-    "llvm-core"
+    "fmt"
   ]
 }

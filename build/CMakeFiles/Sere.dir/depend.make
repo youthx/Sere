@@ -4,6 +4,7 @@
 CMakeFiles/Sere.dir/main.cpp.o: ../errors.hpp
 CMakeFiles/Sere.dir/main.cpp.o: ../Parser/Parser/AST/AST.hpp
 CMakeFiles/Sere.dir/main.cpp.o: ../Parser/Parser/AST/Expr.hpp
+CMakeFiles/Sere.dir/main.cpp.o: ../Parser/Parser/AST/Midlevel/SymbolTable.hpp
 CMakeFiles/Sere.dir/main.cpp.o: ../Parser/Parser/AST/Stat.hpp
 CMakeFiles/Sere.dir/main.cpp.o: ../Parser/Parser/AST/Visitor.hpp
 CMakeFiles/Sere.dir/main.cpp.o: ../Parser/Parser/Parser.hpp
