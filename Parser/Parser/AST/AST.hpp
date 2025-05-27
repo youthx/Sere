@@ -1,197 +1,238 @@
 #ifndef SEREPARSER_AST_HPP
 #define SEREPARSER_AST_HPP
-#include <memory>
-#include <vector>
+
 #include <string>
 #include <stdexcept>
 #include <utility>
-
+#include <variant>
+#include <optional>
+#include <type_traits>
+#include <sstream>
+#include <memory>
+#include <cmath>
 namespace SereParser {
+
+    // === Type and Symbol Type Definitions ===
+
     enum class SereObjectType {
         INTEGER,
         FLOAT,
         STRING,
         BOOLEAN,
         SYMBOLIC,
-
-        NONE,
+        NONE
     };
 
     enum class SereSymbolType {
         VARIABLE_REF,
         FUNCTION_REF,
         CLASS_REF,
-
         FUNCTION_CALL,
         CLASS_CALL,
-
+        VARIABLE_REASSIGN,
         VARIABLE_ASSIGN,
         FUNCTION_ASSIGN,
         CLASS_ASSIGN,
+        NOT_SYMBOLIC
     };
+
+    // === SereObject: Unified Value and Symbolic Representation ===
 
     class SereObject {
     public:
+        // --- Constructors for core types ---
         SereObject() noexcept
-            : INTEGER(0), FLOAT(0.0f), STRING(), BOOLEAN(false), TYPE(SereObjectType::NONE) {}
+            : value_(std::monostate{}), type_(SereObjectType::NONE),
+              symbol_type_(SereSymbolType::NOT_SYMBOLIC) {}
 
         explicit SereObject(int integerValue) noexcept
-            : INTEGER(integerValue), FLOAT(0.0f), STRING(), BOOLEAN(false), TYPE(SereObjectType::INTEGER) {}
+            : value_(integerValue), type_(SereObjectType::INTEGER),
+              symbol_type_(SereSymbolType::NOT_SYMBOLIC) {}
 
         explicit SereObject(float floatValue) noexcept
-            : INTEGER(0), FLOAT(floatValue), STRING(), BOOLEAN(false), TYPE(SereObjectType::FLOAT) {}
+            : value_(floatValue), type_(SereObjectType::FLOAT),
+              symbol_type_(SereSymbolType::NOT_SYMBOLIC) {}
 
         explicit SereObject(bool boolValue) noexcept
-            : INTEGER(0), FLOAT(0.0f), STRING(), BOOLEAN(boolValue), TYPE(SereObjectType::BOOLEAN) {}
+            : value_(boolValue), type_(SereObjectType::BOOLEAN),
+              symbol_type_(SereSymbolType::NOT_SYMBOLIC) {}
 
-        explicit SereObject(std::string stringValue)
-            : INTEGER(0), FLOAT(0.0f), STRING(std::move(stringValue)), BOOLEAN(false), TYPE(SereObjectType::STRING) {}
+        explicit SereObject(const std::string& stringValue)
+            : value_(stringValue), type_(SereObjectType::STRING),
+              symbol_type_(SereSymbolType::NOT_SYMBOLIC) {}
 
-        explicit SereObject(std::string symbol, SereSymbolType symtype)
-            : INTEGER(0), FLOAT(0.0f), STRING(), BOOLEAN(false), TYPE(SereObjectType::SYMBOLIC), symbol_type(symtype), symbol_name(std::move(symbol)) {}
+        // --- Constructors for symbolic values (e.g. names, unresolved) ---
+        SereObject(std::string symbol, SereSymbolType symtype)
+            : value_(std::monostate{}), type_(SereObjectType::SYMBOLIC),
+              symbol_type_(symtype), symbol_name_(std::move(symbol)) {}
 
-        SereObjectType getType() const noexcept { return TYPE; }
+        // --- Copy/move/default ---
+        SereObject(const SereObject&) = default;
+        SereObject& operator=(const SereObject&) = default;
+        SereObject(SereObject&&) noexcept = default;
+        SereObject& operator=(SereObject&&) noexcept = default;
+        ~SereObject() = default;
+
+        // --- Type and Symbol Info ---
+        SereObjectType getType() const noexcept { return type_; }
+        SereSymbolType getSymbolType() const { return symbol_type_; }
+        void setSymbolType(SereSymbolType ty) { symbol_type_ = ty; }
+        void setType(SereObjectType ty) { type_ = ty; }
+
+        bool compatibleWith(const SereObject& other) const noexcept {
+            return type_ == other.type_;
+        }
+        bool isSymbolic() const noexcept { return symbol_type_ != SereSymbolType::NOT_SYMBOLIC; }
+        bool isNone() const noexcept { return type_ == SereObjectType::NONE; }
         const std::string& getSymbolName() const {
-            if (TYPE != SereObjectType::SYMBOLIC)
+            if (!isSymbolic())
                 throw std::logic_error("Not a symbolic type.");
-            return symbol_name;
-        }
-        
-        const SereSymbolType getSymbolType() const {
-            if (TYPE != SereObjectType::SYMBOLIC)
-                throw std::logic_error("Not a symbolic type.");
-            return symbol_type;
+            return symbol_name_;
         }
 
-        bool isSymbolic() const noexcept { return TYPE == SereObjectType::SYMBOLIC; }
-        bool isNone() const noexcept { return TYPE == SereObjectType::NONE; }
-
-
-
+        // --- Operators for Preprocessing & Compilation ---
         void perform_add(const SereObject& other) {
-            if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
-                INTEGER += other.INTEGER;
-            } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
-                FLOAT += other.FLOAT;
-            } else if (TYPE == SereObjectType::STRING && other.TYPE == SereObjectType::STRING) {
-                STRING += other.STRING;
+            if (type_ == SereObjectType::INTEGER && other.type_ == SereObjectType::INTEGER) {
+                setValue(getInteger() + other.getInteger());
+            } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::FLOAT) {
+                setValue(getFloat() + other.getFloat());
+            } else if (type_ == SereObjectType::STRING && other.type_ == SereObjectType::STRING) {
+                setValue(getString() + other.getString());
             } else {
                 throw std::invalid_argument("Invalid addition operation; Mismatched types.");
             }
         }
 
         void perform_subtract(const SereObject& other) {
-            if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
-                INTEGER -= other.INTEGER;
-            } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
-                FLOAT -= other.FLOAT;
+            if (type_ == SereObjectType::INTEGER && other.type_ == SereObjectType::INTEGER) {
+                setValue(getInteger() - other.getInteger());
+            } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::FLOAT) {
+                setValue(getFloat() - other.getFloat());
             } else {
                 throw std::invalid_argument("Invalid subtraction operation; Mismatched types.");
             }
         }
 
         void perform_multiply(const SereObject& other) {
-            if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
-                INTEGER *= other.INTEGER;
-            } else if (TYPE == SereObjectType::STRING && other.TYPE == SereObjectType::INTEGER) {
-                std::string s = STRING;
-                for (int i = 0; i < other.INTEGER - 1; i++) STRING += s;
-            } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
-                FLOAT *= other.FLOAT;
+            if (type_ == SereObjectType::INTEGER && other.type_ == SereObjectType::INTEGER) {
+                setValue(getInteger() * other.getInteger());
+            } else if (type_ == SereObjectType::STRING && other.type_ == SereObjectType::INTEGER) {
+                if (other.getInteger() < 0)
+                    throw std::invalid_argument("Cannot multiply string by negative integer.");
+                std::string result;
+                for (int i = 0; i < other.getInteger(); ++i) result += getString();
+                setValue(result);
+            } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::FLOAT) {
+                setValue(getFloat() * other.getFloat());
             } else {
                 throw std::invalid_argument("Invalid multiplication operation; Mismatched types.");
             }
         }
 
         void perform_divide(const SereObject& other) {
-            if (TYPE == SereObjectType::INTEGER && other.TYPE == SereObjectType::INTEGER) {
-                if (other.INTEGER == 0) throw std::domain_error("Division by zero.");
-                INTEGER /= other.INTEGER;
-            } else if (TYPE == SereObjectType::FLOAT && other.TYPE == SereObjectType::FLOAT) {
-                if (other.FLOAT == 0.0f) throw std::domain_error("Division by zero.");
-                FLOAT /= other.FLOAT;
+            if (type_ == SereObjectType::INTEGER && other.type_ == SereObjectType::INTEGER) {
+                if (other.getInteger() == 0) throw std::domain_error("Division by zero.");
+                setValue(getInteger() / other.getInteger());
+            } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::FLOAT) {
+                if (std::abs(other.getFloat()) < 1e-7) throw std::domain_error("Division by zero.");
+                setValue(getFloat() / other.getFloat());
             } else {
                 throw std::invalid_argument("Invalid division operation; Mismatched types.");
             }
         }
 
         void perform_negate() {
-            if (TYPE == SereObjectType::INTEGER) {
-                INTEGER = -INTEGER;
-            } else if (TYPE == SereObjectType::FLOAT) {
-                FLOAT = -FLOAT;
-            } else {
-                // throw std::invalid_argument("Invalid negation operation; Type is not numeric.");
-                return; // No-op for non-numeric types
-            }
+            if (type_ == SereObjectType::INTEGER) setValue(-getInteger());
+            else if (type_ == SereObjectType::FLOAT) setValue(-getFloat());
+            // No-op for non-numeric types
         }
 
         void perform_not() {
-            if (TYPE == SereObjectType::BOOLEAN) {
-                BOOLEAN = !BOOLEAN;
-            } else {
-                // throw std::invalid_argument("Invalid NOT operation; Type is not boolean.");
-                return; // No-op for non-boolean types
-            }
+            if (type_ == SereObjectType::BOOLEAN) setValue(!getBoolean());
+            // No-op for non-boolean types
         }
 
-        // Prevent copying/moving if not needed
-        SereObject(const SereObject&) = default;
-        SereObject& operator=(const SereObject&) = default;
-        SereObject(SereObject&&) noexcept = default;
-        SereObject& operator=(SereObject&&) noexcept = default;
+        // --- Preprocessing helpers ---
+        bool isConstant() const noexcept {
+            // Not symbolic, not NONE
+            return !isSymbolic() && type_ != SereObjectType::NONE;
+        }
 
-        ~SereObject() = default;
-
-        // Accessors
+        // --- Value Accessors ---
         int getInteger() const {
-            if (TYPE != SereObjectType::INTEGER) throw std::logic_error("Not an integer type.");
-            return INTEGER;
+            if (type_ != SereObjectType::INTEGER)
+                throw std::logic_error("Not an integer type.");
+            return std::get<int>(value_);
         }
-
         float getFloat() const {
-            if (TYPE != SereObjectType::FLOAT) throw std::logic_error("Not a float type.");
-            return FLOAT;
+            if (type_ != SereObjectType::FLOAT)
+                throw std::logic_error("Not a float type.");
+            return std::get<float>(value_);
         }
-
         const std::string& getString() const {
-            if (TYPE != SereObjectType::STRING) throw std::logic_error("Not a string type.");
-            return STRING;
+            if (type_ != SereObjectType::STRING)
+                throw std::logic_error("Not a string type.");
+            return std::get<std::string>(value_);
         }
-
         bool getBoolean() const {
-            if (TYPE != SereObjectType::BOOLEAN) throw std::logic_error("Not a boolean type.");
-            return BOOLEAN;
+            if (type_ != SereObjectType::BOOLEAN)
+                throw std::logic_error("Not a boolean type.");
+            return std::get<bool>(value_);
         }
 
-        // String representation
+        // --- Value Setters (internal/private use) ---
+        void setValue(int v)    { value_ = v; type_ = SereObjectType::INTEGER; symbol_type_ = SereSymbolType::NOT_SYMBOLIC; }
+        void setValue(float v)  { value_ = v; type_ = SereObjectType::FLOAT; symbol_type_ = SereSymbolType::NOT_SYMBOLIC; }
+        void setValue(bool v)   { value_ = v; type_ = SereObjectType::BOOLEAN; symbol_type_ = SereSymbolType::NOT_SYMBOLIC; }
+        void setValue(const std::string& v) { value_ = v; type_ = SereObjectType::STRING; symbol_type_ = SereSymbolType::NOT_SYMBOLIC; }
+        void setValue(std::string&& v) { value_ = std::move(v); type_ = SereObjectType::STRING; symbol_type_ = SereSymbolType::NOT_SYMBOLIC; }
+
+        // --- String Representation ---
         std::string to_string() const {
-            switch (TYPE) {
-                case SereObjectType::INTEGER: return std::to_string(INTEGER);
-                case SereObjectType::FLOAT: return std::to_string(FLOAT);
-                case SereObjectType::STRING: return STRING;
-                case SereObjectType::BOOLEAN: return BOOLEAN ? "true" : "false";
+            switch (type_) {
+                case SereObjectType::INTEGER: return std::to_string(getInteger());
+                case SereObjectType::FLOAT:   return std::to_string(getFloat());
+                case SereObjectType::STRING:  return getString();
+                case SereObjectType::BOOLEAN: return getBoolean() ? "true" : "false";
+                case SereObjectType::SYMBOLIC: return "<symbol:" + symbol_name_ + ">";
                 default: return "none";
             }
         }
 
-    private:
-        int INTEGER;
-        float FLOAT;
-        std::string STRING;
-        bool BOOLEAN;
-        SereObjectType TYPE;
+        // --- Comparison (for preprocessing, folding, etc) ---
+        bool operator==(const SereObject& other) const {
+            if (type_ != other.type_) return false;
+            switch (type_) {
+                case SereObjectType::INTEGER: return getInteger() == other.getInteger();
+                case SereObjectType::FLOAT:   return std::abs(getFloat() - other.getFloat()) < 1e-7;
+                case SereObjectType::STRING:  return getString() == other.getString();
+                case SereObjectType::BOOLEAN: return getBoolean() == other.getBoolean();
+                case SereObjectType::NONE:    return true;
+                case SereObjectType::SYMBOLIC: return symbol_type_ == other.symbol_type_ && symbol_name_ == other.symbol_name_;
+                default: return false;
+            }
+        }
 
-        std::string symbol_name;
-        SereSymbolType symbol_type;
+        bool operator!=(const SereObject& other) const { return !(*this == other); }
+
+        // --- Additional: Preprocessor/Compiler metadata ---
+        // For future: add source location, AST reference, or IR ref as needed.
+
+    private:
+        // Value is stored as a variant for type safety
+        std::variant<std::monostate, int, float, std::string, bool> value_;
+        SereObjectType type_;
+        SereSymbolType symbol_type_;
+        std::string symbol_name_; // Only set for SYMBOLIC types
     };
 
+    // === AST Node Base ===
     class ASTNode {
     public:
         virtual ~ASTNode() = default;
-        //virtual void accept(class ASTVisitor& visitor) = 0;
+        // Extend with accept(visitor) if needed.
     };
 
-}
+} // namespace SereParser
 
 #endif // SEREPARSER_AST_HPP
