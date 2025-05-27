@@ -98,6 +98,10 @@ namespace SereParser {
                 setValue(getFloat() + other.getFloat());
             } else if (type_ == SereObjectType::STRING && other.type_ == SereObjectType::STRING) {
                 setValue(getString() + other.getString());
+            } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::INTEGER) {
+                setValue(getFloat() + other.getInteger());
+            } else if (type_ == SereObjectType::INTEGER && other.type_ == SereObjectType::FLOAT) {
+                setValue(getInteger() + other.getFloat());
             } else {
                 throw std::invalid_argument("Invalid addition operation; Mismatched types.");
             }
@@ -108,6 +112,10 @@ namespace SereParser {
                 setValue(getInteger() - other.getInteger());
             } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::FLOAT) {
                 setValue(getFloat() - other.getFloat());
+            } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::INTEGER) {
+                setValue(getFloat() - other.getInteger());
+            } else if (type_ == SereObjectType::INTEGER && other.type_ == SereObjectType::FLOAT) {
+                setValue(getInteger() - other.getFloat());
             } else {
                 throw std::invalid_argument("Invalid subtraction operation; Mismatched types.");
             }
@@ -124,6 +132,10 @@ namespace SereParser {
                 setValue(result);
             } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::FLOAT) {
                 setValue(getFloat() * other.getFloat());
+            } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::INTEGER) {
+                setValue(getFloat() * other.getInteger());
+            } else if (type_ == SereObjectType::INTEGER && other.type_ == SereObjectType::FLOAT) {
+                setValue(getInteger() * other.getFloat());
             } else {
                 throw std::invalid_argument("Invalid multiplication operation; Mismatched types.");
             }
@@ -136,6 +148,10 @@ namespace SereParser {
             } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::FLOAT) {
                 if (std::abs(other.getFloat()) < 1e-7) throw std::domain_error("Division by zero.");
                 setValue(getFloat() / other.getFloat());
+            } else if (type_ == SereObjectType::FLOAT && other.type_ == SereObjectType::INTEGER) {
+                setValue(getFloat() / other.getInteger());
+            } else if (type_ == SereObjectType::INTEGER && other.type_ == SereObjectType::FLOAT) {
+                setValue(getInteger() / other.getFloat());
             } else {
                 throw std::invalid_argument("Invalid division operation; Mismatched types.");
             }
