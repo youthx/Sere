@@ -8,9 +8,6 @@
 
 namespace SereParser {
 
-
-
-
     // Base class for all statements
     class StatAST {
     public:

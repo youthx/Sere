@@ -53,7 +53,8 @@ namespace SereLexer {
                 : TokenBase(type, lexeme, TokenValue(literal), line, col) {}
 
             Token(TokenType type, const std::string& lexeme, int line, int col)
-                : TokenBase(type, lexeme, TokenValue(0), line, col) {}            
+                : TokenBase(type, lexeme, TokenValue(0), line, col) {}  
+            
     };
 
     class TokenList {

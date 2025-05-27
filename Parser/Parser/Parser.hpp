@@ -1,325 +1,242 @@
-#pragma once
-#ifndef PARSER_PARSER_HPP
-#define PARSER_PARSER_HPP
+#ifndef PARSER_HPP
+#define PARSER_HPP
 
 #include <vector>
-#include <exception>
-#include <string>
 #include <memory>
 #include <stdexcept>
+#include <string>
+#include <sstream>
 #include <utility>
 #include <type_traits>
-#include <iostream>
-
-// --- Macros for Debugging, Compatibility, and Safety ---
-#if defined(__GNUC__) || defined(__clang__)
-#  define NODISCARD [[nodiscard]]
-#  define NOEXCEPT noexcept
-#  define FALLTHROUGH [[fallthrough]]
-#else
-#  define NODISCARD
-#  define NOEXCEPT
-#  define FALLTHROUGH
-#endif
-
-#ifdef SERE_DEBUG
-#  define DEBUG_LOG(msg) std::cerr << "[DEBUG] " << msg << std::endl
-#else
-#  define DEBUG_LOG(msg) ((void)0)
-#endif
-
-#define DISABLE_COPY(Class)         \
-    Class(const Class&) = delete;   \
-    Class& operator=(const Class&) = delete
-
-// --- Forward Declarations ---
-class ExprAST;
-class StatAST;
-
-
-
 #include "../Scanner/Token.hpp"
-#include "../Scanner/TokenType.hpp"
 #include "../Scanner/Scanner.hpp"
 #include "AST/Expr.hpp"
 #include "AST/Stat.hpp"
 
 namespace SereParser {
 
-    // Exception for parser errors, includes token context
-    class ParserError : public std::runtime_error {
-    public:
-        explicit ParserError(const std::shared_ptr<SereLexer::TokenBase>& token, const std::string& msg)
-            : std::runtime_error(msg), token_(token) {}
+// ========== Exception Class ==========
 
-        explicit ParserError(const std::string& msg)
-            : std::runtime_error(msg), token_(nullptr) {}
+class ParserError : public std::runtime_error {
+public:
+    ParserError(const std::shared_ptr<SereLexer::TokenBase>& token, std::string msg)
+        : std::runtime_error(std::move(msg)), token_(token) {}
+    const char* what() const noexcept override {
+        std::ostringstream oss;
+        oss << "[ParserError] Line " << (token_ ? token_->line : 0) << ": " << std::runtime_error::what();
+        if (token_) oss << " (got '" << token_->lexeme << "')";
+        formatted_ = oss.str();
+        return formatted_.c_str();
+    }
+private:
+    std::shared_ptr<SereLexer::TokenBase> token_;
+    mutable std::string formatted_;
+};
 
-        const char* what() const NOEXCEPT override {
-            try {
-                if (token_) {
-                    formatted_message_ = "[Error] line " + std::to_string(token_->line) + ":\n\t" + std::runtime_error::what();
-                } else {
-                    formatted_message_ = "[Error]\n\t" + std::string(std::runtime_error::what());
-                }
-                return formatted_message_.c_str();
-            } catch (...) {
-                return "ParserError: unknown error formatting message";
-            }
-        }
+// ========== Utility Macros ==========
 
-        NODISCARD std::shared_ptr<SereLexer::TokenBase> token() const NOEXCEPT { return token_; }
+#define SERE_ASSERT(cond, token, msg) \
+    do { if (!(cond)) throw SereParser::ParserError(token, msg); } while(0)
 
-    private:
-        std::shared_ptr<SereLexer::TokenBase> token_;
-        mutable std::string formatted_message_;
-    };
+#define SERE_FATAL(msg) \
+    throw std::logic_error(std::string("[Fatal parser error] ") + msg)
 
-    class Parser {
-    public:
-        explicit Parser(const SereLexer::TokenList& token_list)
-            : tokens_(token_list.getTokens()), token_index_(0) {}
+// ========== Parser Class ==========
 
-        DISABLE_COPY(Parser);
+class Parser {
+public:
+    explicit Parser(const SereLexer::TokenList& tokens)
+        : tokens_(tokens.getTokens()), current_(0)
+    {
+        SERE_ASSERT(!tokens_.empty(), nullptr, "Token stream is empty.");
+        SERE_ASSERT(tokens_.back()->type == SereLexer::TOKEN_EOF, tokens_.back(), "Last token must be EOF.");
+    }
 
-        // Parse entry point
-        NODISCARD std::vector<std::shared_ptr<StatAST>> parse() {
-            std::vector<std::shared_ptr<StatAST>> stats;
-
-            try {
-                DEBUG_LOG("Parsing expression...");
-                while (!is_at_end()) {
-                    if (peek()->type == SereLexer::TOKEN_EOF)
-                        return stats;
-
-                    auto stat = parse_stmt();
-                    if (!token_isa(SereLexer::TOKEN_NEWLINE, SereLexer::TOKEN_EOF, SereLexer::TOKEN_SEMICOLON)) {
-                        
-                        throw error(peek(), "Expected a newline.");
-                    }
-                        
-                    stats.push_back(stat);
-                }
-                return stats;
-            } catch (const ParserError& w) {
-                synchronize();
-                throw w;
-            }
-        }
-
-        // TODO: Add parse_statements(), parse_declarations(), etc.
-
-    private:
-        std::vector<std::shared_ptr<SereLexer::TokenBase>> tokens_;
-        size_t token_index_;
-
-        // --- Token Navigation ---
-
-        NODISCARD bool is_at_end() const NOEXCEPT {
-            return token_index_ >= tokens_.size();
-        }
-
-    
-        NODISCARD std::shared_ptr<SereLexer::TokenBase> peek() const {
-            if (is_at_end()) throw std::out_of_range("Peek past end of tokens.");
-            return tokens_[token_index_];
-        }
-
-        NODISCARD std::shared_ptr<SereLexer::TokenBase> get_previous() const {
-            if (token_index_ == 0) throw std::out_of_range("No previous token.");
-            return tokens_[token_index_ - 1];
-        }
-
-        std::shared_ptr<SereLexer::TokenBase> advance() {
-            if (!is_at_end()) ++token_index_;
-            return get_previous();
-        }
-
-        NODISCARD bool expect(SereLexer::TokenType type) const NOEXCEPT {
-            return !is_at_end() && peek()->type == type;
-        }
-
-        template <typename... TokenTypes>
-        bool token_isa(TokenTypes... types) {
-            static_assert((std::is_same<TokenTypes, SereLexer::TokenType>() && ...), "token_isa only accepts TokenType arguments");
-            for (const auto type : {types...}) {
-                if (expect(type)) {
-                    advance();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        std::shared_ptr<SereLexer::TokenBase> advance_assert(SereLexer::TokenType type, const std::string& message) {
-            if (expect(type)) return advance();
-            throw error(peek(), message);
-        }
-
-        // --- Error Handling ---
-
-        NODISCARD ParserError error(const std::shared_ptr<SereLexer::TokenBase>& token, const std::string& message) const {
-            return ParserError(token, message);
-        }
-
-        void synchronize() NOEXCEPT {
-            try {
-
+    std::vector<std::shared_ptr<StatAST>> parse() {
+        std::vector<std::shared_ptr<StatAST>> statements;
+        skipNewlines();
+        while (!isAtEnd()) {
+            if (check(SereLexer::TOKEN_NEWLINE)) {
                 advance();
-                while (!is_at_end()) {
-                    
-                    switch (peek()->type) {
-                        case SereLexer::TOKEN_CLASS:
-                        case SereLexer::TOKEN_DEF:
-                        case SereLexer::TOKEN_IF:
-                        case SereLexer::TOKEN_ELSE:
-                        case SereLexer::TOKEN_WHILE:
-                        case SereLexer::TOKEN_RETURN:
-                            return;
-                        default:
-                            break;
-                    }
-                    advance();
-                }
-            } catch (...) {
-                // Swallow exceptions during synchronization to avoid cascading errors
+                continue;
+            }
+            // Python allows simple_stmt (expr or assignment) at the top-level
+            statements.push_back(simple_stmt());
+            skipNewlines();
+        }
+        return statements;
+    }
+
+private:
+    const std::vector<std::shared_ptr<SereLexer::TokenBase>>& tokens_;
+    size_t current_;
+
+    // === Token Helpers ===
+
+    const std::shared_ptr<SereLexer::TokenBase>& peek() const { 
+        SERE_ASSERT(current_ < tokens_.size(), nullptr, "Peek out of bounds.");
+        return tokens_[current_]; 
+    }
+    const std::shared_ptr<SereLexer::TokenBase>& previous() const { 
+        SERE_ASSERT(current_ > 0 && current_-1 < tokens_.size(), nullptr, "Previous out of bounds.");
+        return tokens_[current_ - 1]; 
+    }
+    bool isAtEnd() const { 
+        return peek()->type == SereLexer::TOKEN_EOF; 
+    }
+    const std::shared_ptr<SereLexer::TokenBase>& advance() { 
+        if (!isAtEnd()) ++current_; 
+        return previous(); 
+    }
+    bool check(SereLexer::TokenType type) const { 
+        return !isAtEnd() && peek()->type == type; 
+    }
+
+    bool match(std::initializer_list<SereLexer::TokenType> types) {
+        for (auto type : types) {
+            if (check(type)) { advance(); return true; }
+        }
+        return false;
+    }
+    const std::shared_ptr<SereLexer::TokenBase>& consume(SereLexer::TokenType type, const std::string& msg) {
+        if (check(type)) return advance();
+        throw ParserError(peek(), msg);
+    }
+    void skipNewlines() {
+        while (check(SereLexer::TOKEN_NEWLINE)) advance();
+    }
+    bool lookAheadIs(SereLexer::TokenType type) const {
+        return (current_ + 1 < tokens_.size() && tokens_[current_ + 1]->type == type);
+    }
+
+    // Accept EOF as a valid statement terminator (for last line friendliness)
+    void expectStatementEnd() {
+        if (check(SereLexer::TOKEN_NEWLINE)) {
+            advance();
+        } else if (peek()->type != SereLexer::TOKEN_EOF) {
+            throw ParserError(peek(), "Expected newline or EOF after statement.");
+        }
+    }
+
+    // === Python-style Simple Statement (expr_stmt) ===
+
+    std::shared_ptr<StatAST> simple_stmt() {
+        // Assignment or expression statement
+        if (check(SereLexer::TOKEN_IDENTIFIER)) {
+            // Look ahead for assignment
+            if (lookAheadIs(SereLexer::TOKEN_EQUAL) || lookAheadIs(SereLexer::TOKEN_COLON)) {
+                return assignment_stmt();
             }
         }
+        // Otherwise: expression statement
+        auto expr = expression();
+        expectStatementEnd();
+        return std::make_shared<ExprStatAST>(expr);
+    }
 
-        // --- Parsing Methods ---
-
-        NODISCARD std::shared_ptr<StatAST> parse_stmt() {
-            if (expect(SereLexer::TOKEN_IDENTIFIER)) {
-                if (!is_at_end() && (
-                    tokens_.at(token_index_ + 1).get()->type == SereLexer::TOKEN_COLON ||
-                    tokens_.at(token_index_ + 1).get()->type == SereLexer::TOKEN_EQUAL)) {
-                        return assign_stmt();
-                } 
-            } 
-            auto stmt = expr_stmt();
-            
-            return stmt;
+    std::shared_ptr<StatAST> assignment_stmt() {
+        // assignment: NAME (':' TYPE)? '=' expr
+        auto name = consume(SereLexer::TOKEN_IDENTIFIER, "Expected variable name.");
+        std::shared_ptr<SereLexer::TokenBase> type = nullptr;
+        if (match({SereLexer::TOKEN_COLON})) {
+            type = consume(SereLexer::TOKEN_IDENTIFIER, "Expected type name after ':'.");
         }
+        consume(SereLexer::TOKEN_EQUAL, "Expected '=' in assignment.");
+        auto value = expression();
+        expectStatementEnd();
+        return std::make_shared<AssignStatAST>(*name, type ? *type : *name, value);
+    }
 
-        NODISCARD std::shared_ptr<StatAST> assign_stmt() {
-            if (token_isa(SereLexer::TOKEN_IDENTIFIER)) {
-                auto name = get_previous();
+    // === Expression Grammar (matches Python operator precedence) ===
 
-                std::shared_ptr<ExprAST> expr;
-                auto type = name;
-                if (token_isa(SereLexer::TOKEN_COLON)) {
-                    // TODO: Upgrade this soon probably.
-                    type = advance_assert(SereLexer::TOKEN_IDENTIFIER, "Invalid datatype.");
+    std::shared_ptr<ExprAST> expression() { return or_test(); }
 
-                    if (token_isa(SereLexer::TOKEN_EQUAL)) 
-                        expr = parse_expr();
-                } else {
-                    if (token_isa(SereLexer::TOKEN_EQUAL)) 
-                        expr = parse_expr();
-                    else {
-                        return expr_stmt();
-                    }
-                }
-                return std::make_shared<AssignStatAST>(*name, *type, expr);
-            }
-            return expr_stmt();
+    std::shared_ptr<ExprAST> or_test() {
+        auto expr = and_test();
+        while (match({SereLexer::TOKEN_OR})) {
+            auto op = previous();
+            auto right = and_test();
+            expr = std::make_shared<BinaryExprAST>(op.get(), expr, right);
         }
-
-        NODISCARD std::shared_ptr<StatAST> expr_stmt() {
-            auto expr = parse_expr();
-            
-            auto stat = std::make_shared<ExprStatAST>(expr);
-            return stat;
+        return expr;
+    }
+    std::shared_ptr<ExprAST> and_test() {
+        auto expr = not_test();
+        while (match({SereLexer::TOKEN_AND})) {
+            auto op = previous();
+            auto right = not_test();
+            expr = std::make_shared<BinaryExprAST>(op.get(), expr, right);
         }
-
-        NODISCARD std::shared_ptr<ExprAST> parse_expr() {
-            return parse_equality();
+        return expr;
+    }
+    std::shared_ptr<ExprAST> not_test() {
+        if (match({SereLexer::TOKEN_NOT})) {
+            auto op = previous();
+            auto right = not_test();
+            return std::make_shared<UnaryExprAST>(op.get(), right);
         }
-
-        NODISCARD std::shared_ptr<ExprAST> parse_equality() {
-            auto left = parse_comp();
-            while (token_isa(SereLexer::TOKEN_BANG_EQUAL, SereLexer::TOKEN_EQUAL_EQUAL)) {
-                auto op = get_previous();
-                auto right = parse_comp();
-                left = std::make_shared<BinaryExprAST>(op.get(), left, right);
-            }
-            return left;
+        return comparison();
+    }
+    std::shared_ptr<ExprAST> comparison() {
+        auto expr = arith_expr();
+        while (match({SereLexer::TOKEN_LESS, SereLexer::TOKEN_LESS_EQUAL,
+                      SereLexer::TOKEN_GREATER, SereLexer::TOKEN_GREATER_EQUAL,
+                      SereLexer::TOKEN_EQUAL_EQUAL, SereLexer::TOKEN_BANG_EQUAL})) {
+            auto op = previous();
+            auto right = arith_expr();
+            expr = std::make_shared<BinaryExprAST>(op.get(), expr, right);
         }
-
-        NODISCARD std::shared_ptr<ExprAST> parse_comp() {
-            auto expr = parse_term();
-            while (token_isa(SereLexer::TOKEN_LESS, SereLexer::TOKEN_LESS_EQUAL,
-                             SereLexer::TOKEN_GREATER, SereLexer::TOKEN_GREATER_EQUAL)) {
-                auto op = get_previous();
-                auto right = parse_term();
-                expr = std::make_shared<BinaryExprAST>(op.get(), expr, right);
-            }
+        return expr;
+    }
+    std::shared_ptr<ExprAST> arith_expr() {
+        auto expr = term();
+        while (match({SereLexer::TOKEN_PLUS, SereLexer::TOKEN_MINUS})) {
+            auto op = previous();
+            auto right = term();
+            expr = std::make_shared<BinaryExprAST>(op.get(), expr, right);
+        }
+        return expr;
+    }
+    std::shared_ptr<ExprAST> term() {
+        auto expr = factor();
+        while (match({SereLexer::TOKEN_STAR, SereLexer::TOKEN_SLASH})) {
+            auto op = previous();
+            auto right = factor();
+            expr = std::make_shared<BinaryExprAST>(op.get(), expr, right);
+        }
+        return expr;
+    }
+    std::shared_ptr<ExprAST> factor() {
+        if (match({SereLexer::TOKEN_PLUS, SereLexer::TOKEN_MINUS})) {
+            // Python supports unary + and -
+            auto op = previous();
+            auto right = factor();
+            return std::make_shared<UnaryExprAST>(op.get(), right);
+        }
+        return power();
+    }
+    std::shared_ptr<ExprAST> power() {
+        auto expr = atom();
+        // No "**" operator in your grammar yet, but easy to add here
+        return expr;
+    }
+    std::shared_ptr<ExprAST> atom() {
+        if (match({SereLexer::TOKEN_TRUE})) return std::make_shared<LiteralExprAST>(SereObject(true));
+        if (match({SereLexer::TOKEN_FALSE})) return std::make_shared<LiteralExprAST>(SereObject(false));
+        if (match({SereLexer::TOKEN_NONE})) return std::make_shared<LiteralExprAST>(SereObject());
+        if (match({SereLexer::TOKEN_INTEGER})) return std::make_shared<LiteralExprAST>(SereObject(previous()->literal.INTEGER));
+        if (match({SereLexer::TOKEN_FLOAT}))   return std::make_shared<LiteralExprAST>(SereObject(previous()->literal.FLOAT));
+        if (match({SereLexer::TOKEN_STRING}))  return std::make_shared<LiteralExprAST>(SereObject(previous()->literal.STRING));
+        if (match({SereLexer::TOKEN_IDENTIFIER})) return std::make_shared<VariableExprAST>(*previous());
+        if (match({SereLexer::TOKEN_LEFT_PAREN})) {
+            auto expr = expression();
+            consume(SereLexer::TOKEN_RIGHT_PAREN, "Expected ')' after expression.");
             return expr;
         }
-
-        NODISCARD std::shared_ptr<ExprAST> parse_term() {
-            auto expr = parse_factor();
-            while (token_isa(SereLexer::TOKEN_MINUS, SereLexer::TOKEN_PLUS)) {
-                auto op = get_previous();
-                auto right = parse_factor();
-                expr = std::make_shared<BinaryExprAST>(op.get(), expr, right);
-            }
-            return expr;
-        }
-
-        NODISCARD std::shared_ptr<ExprAST> parse_factor() {
-            auto expr = parse_unary();
-            while (token_isa(SereLexer::TOKEN_SLASH, SereLexer::TOKEN_STAR)) {
-                auto op = get_previous();
-                auto right = parse_unary();
-                expr = std::make_shared<BinaryExprAST>(op.get(), expr, right);
-            }
-            return expr;
-        }
-
-        NODISCARD std::shared_ptr<ExprAST> parse_unary() {
-            if (token_isa(SereLexer::TOKEN_MINUS, SereLexer::TOKEN_BANG)) {
-                auto op = get_previous();
-                auto right = parse_unary();
-                return std::make_shared<UnaryExprAST>(op.get(), right);
-            }
-            return parse_primary();
-        }
-
-        NODISCARD std::shared_ptr<ExprAST> parse_primary() {
-            if (token_isa(SereLexer::TOKEN_TRUE))
-                return std::make_shared<LiteralExprAST>(SereObject(true));
-            if (token_isa(SereLexer::TOKEN_FALSE))
-                return std::make_shared<LiteralExprAST>(SereObject(false));
-            if (token_isa(SereLexer::TOKEN_NONE))
-                return std::make_shared<LiteralExprAST>(SereObject());
-
-            if (token_isa(SereLexer::TOKEN_INTEGER)) {
-                auto value = get_previous()->literal.INTEGER;
-                return std::make_shared<LiteralExprAST>(SereObject(value));
-            }
-            if (token_isa(SereLexer::TOKEN_FLOAT)) {
-                auto value = get_previous()->literal.FLOAT;
-                return std::make_shared<LiteralExprAST>(SereObject(value));
-            }
-            if (token_isa(SereLexer::TOKEN_STRING)) {
-                auto value = get_previous()->literal.STRING;
-                return std::make_shared<LiteralExprAST>(SereObject(value));
-            }
-
-            if (token_isa(SereLexer::TOKEN_IDENTIFIER)) {
-                return std::make_shared<VariableExprAST>(*get_previous());
-            }
-            
-            if (token_isa(SereLexer::TOKEN_LEFT_PAREN)) {
-                auto expr = parse_expr();
-                advance_assert(SereLexer::TOKEN_RIGHT_PAREN, "Expected ')' after expression.");
-                return expr;
-            }
-            throw error(peek(), "Expected expression.");
-        }
-    };
+        throw ParserError(peek(), "Expected expression.");
+    }
+};
 
 } // namespace SereParser
 
-#endif // PARSER_PARSER_HPP
+#endif // PARSER_HPP

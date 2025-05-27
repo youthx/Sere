@@ -1,37 +1,36 @@
+program  : stat* EOF ;
 
-program : stat* EOF
-        ;
+stat     : assign
+         | expr
+         ;
 
-stat    : assign
-        : expr 
-        ;
+assign   : IDENT (":" TYPE)? "=" expr
+         ;
 
-assign  : IDENT ((":" TYPE) ("=" expr)?) | "=" expr 
-        ;
+expr     : equality
+         ;
 
-expr    : equality
-        ;
+equality : comp ( ( "!=" | "==" ) comp )* ;
 
-equality: comp ( ( "!=" | "==" ) comp )* ;
+comp     : term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 
-comp    : term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term     : factor ( ( "+" | "-" ) factor )* ;
 
-term    : factor ( ( "- |"+" ) factor )* ;
+factor   : unary ( ( "*" | "/" ) unary )* ;
 
-factor  : unary ( ( "/" | "*" ) unary )* ;
+unary    : ( "-" | "!" ) unary
+         | primary
+         ;
 
-unary   : "( "-" | "!" ) unary 
-        | primary 
-        ;
-        
-primary : NUMBER | STRING | "True" | "False" | "None" 
-        | "(" expr ")" 
-        | IDENT
-        ;
+primary  : NUMBER
+         | STRING
+         | "True"
+         | "False"
+         | "None"
+         | "(" expr ")"
+         | IDENT
+         ;
 
-
-
-
-NUMBER  : INTEGER | FLOAT ;
-INTEGER : [0-9]+ ;
-FLOAT   : [0-9]* ( '.' [0-9]+ ) ;
+NUMBER   : INTEGER | FLOAT ;
+INTEGER  : [0-9]+ ;
+FLOAT    : [0-9]* ( '.' [0-9]+ ) ;
