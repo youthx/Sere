@@ -8,11 +8,12 @@
 #include <assert.h>
 
 #include "errors.hpp"
-#include "./Parser/Scanner/Token.hpp"
-#include "./Parser/Scanner/Scanner.hpp"
-#include "./Parser/Parser/Parser.hpp"
-#include "./Parser/Parser/AST/Visitor.hpp"
-#include "./Parser/Parser/AST/AST.hpp"
+#include "./Sere/Scanner/Token.hpp"
+#include "./Sere/Scanner/Scanner.hpp"
+#include "./Sere/Parser/Parser.hpp"
+#include "./Sere/Parser/AST/Visitor.hpp"
+#include "./Sere/Parser/AST/AST.hpp"
+#include "./Sere/Parser/AST/Midlevel/Environments.hpp"
 
 std::vector<unsigned char> sere_read_file(const char *filepath)
 {
@@ -73,7 +74,8 @@ int main(int argc, char *argv[])
             
             
             std::cout << "Parsed expression successfully." << std::endl;
-            auto expr_visitor = std::make_shared<SereParser::ExprVisitor<SereParser::SereObject>>();
+            auto type_checker = std::make_shared<SereParser::TypeChecker>();
+            auto expr_visitor = std::make_shared<SereParser::ExprVisitor<SereParser::SereObject>>(type_checker);
             auto visitor = std::make_shared<SereParser::StatVisitor<SereParser::SereObject>>(expr_visitor);
             for (auto stat : stats) {
                 SereParser::SereObject result = stat.get()->accept(*visitor);

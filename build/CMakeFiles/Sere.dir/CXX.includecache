@@ -6,13 +6,7 @@
 
 #IncludeRegexTransform: 
 
-../errors.hpp
-string
--
-iostream
--
-
-/workspaces/Sere/Parser/Parser/AST/AST.hpp
+/workspaces/Sere/Sere/Parser/AST/AST.hpp
 string
 -
 stdexcept
@@ -32,7 +26,7 @@ memory
 cmath
 -
 
-/workspaces/Sere/Parser/Parser/AST/Expr.hpp
+/workspaces/Sere/Sere/Parser/AST/Expr.hpp
 vector
 -
 memory
@@ -40,11 +34,23 @@ memory
 utility
 -
 ./AST.hpp
-/workspaces/Sere/Parser/Parser/AST/AST.hpp
+/workspaces/Sere/Sere/Parser/AST/AST.hpp
 ./Visitor.hpp
-/workspaces/Sere/Parser/Parser/AST/Visitor.hpp
+/workspaces/Sere/Sere/Parser/AST/Visitor.hpp
 
-/workspaces/Sere/Parser/Parser/AST/Midlevel/SymbolTable.hpp
+/workspaces/Sere/Sere/Parser/AST/Midlevel/Environments.hpp
+unordered_map
+-
+string
+-
+memory
+-
+stdexcept
+-
+iostream
+-
+
+/workspaces/Sere/Sere/Parser/AST/Midlevel/SymbolTable.hpp
 unordered_map
 -
 string
@@ -56,29 +62,49 @@ stdexcept
 optional
 -
 ../AST.hpp
-/workspaces/Sere/Parser/Parser/AST/AST.hpp
+/workspaces/Sere/Sere/Parser/AST/AST.hpp
 
-/workspaces/Sere/Parser/Parser/AST/Stat.hpp
+/workspaces/Sere/Sere/Parser/AST/Stat.hpp
 vector
 -
 memory
 -
 ./AST.hpp
-/workspaces/Sere/Parser/Parser/AST/AST.hpp
+/workspaces/Sere/Sere/Parser/AST/AST.hpp
 ./Visitor.hpp
-/workspaces/Sere/Parser/Parser/AST/Visitor.hpp
+/workspaces/Sere/Sere/Parser/AST/Visitor.hpp
 
-/workspaces/Sere/Parser/Parser/AST/Visitor.hpp
+/workspaces/Sere/Sere/Parser/AST/Visitor.hpp
 ./Expr.hpp
-/workspaces/Sere/Parser/Parser/AST/Expr.hpp
+/workspaces/Sere/Sere/Parser/AST/Expr.hpp
 typeinfo
 -
 stdexcept
 -
 ./Midlevel/SymbolTable.hpp
-/workspaces/Sere/Parser/Parser/AST/Midlevel/SymbolTable.hpp
+/workspaces/Sere/Sere/Parser/AST/Midlevel/SymbolTable.hpp
+./Midlevel/Environments.hpp
+/workspaces/Sere/Sere/Parser/AST/Midlevel/Environments.hpp
+../Builtins.hpp
+/workspaces/Sere/Sere/Parser/Builtins.hpp
+memory
+-
+iostream
+-
 
-/workspaces/Sere/Parser/Parser/Parser.hpp
+/workspaces/Sere/Sere/Parser/Builtins.hpp
+AST/Midlevel/Environments.hpp
+/workspaces/Sere/Sere/Parser/AST/Midlevel/Environments.hpp
+string
+-
+memory
+-
+unordered_map
+-
+iostream
+-
+
+/workspaces/Sere/Sere/Parser/Parser.hpp
 vector
 -
 memory
@@ -94,15 +120,15 @@ utility
 type_traits
 -
 ../Scanner/Token.hpp
-/workspaces/Sere/Parser/Scanner/Token.hpp
+/workspaces/Sere/Sere/Scanner/Token.hpp
 ../Scanner/Scanner.hpp
-/workspaces/Sere/Parser/Scanner/Scanner.hpp
+/workspaces/Sere/Sere/Scanner/Scanner.hpp
 AST/Expr.hpp
-/workspaces/Sere/Parser/Parser/AST/Expr.hpp
+/workspaces/Sere/Sere/Parser/AST/Expr.hpp
 AST/Stat.hpp
-/workspaces/Sere/Parser/Parser/AST/Stat.hpp
+/workspaces/Sere/Sere/Parser/AST/Stat.hpp
 
-/workspaces/Sere/Parser/Scanner/Scanner.hpp
+/workspaces/Sere/Sere/Scanner/Scanner.hpp
 vector
 -
 string
@@ -118,15 +144,15 @@ stdexcept
 limits
 -
 Token.hpp
-/workspaces/Sere/Parser/Scanner/Token.hpp
-../errors.hpp
-/workspaces/Sere/Parser/errors.hpp
+/workspaces/Sere/Sere/Scanner/Token.hpp
+../../errors.hpp
+/workspaces/Sere/errors.hpp
 iostream
 -
 
-/workspaces/Sere/Parser/Scanner/Token.hpp
+/workspaces/Sere/Sere/Scanner/Token.hpp
 TokenType.hpp
-/workspaces/Sere/Parser/Scanner/TokenType.hpp
+/workspaces/Sere/Sere/Scanner/TokenType.hpp
 vector
 -
 variant
@@ -136,7 +162,7 @@ memory
 any
 -
 
-/workspaces/Sere/Parser/Scanner/TokenType.hpp
+/workspaces/Sere/Sere/Scanner/TokenType.hpp
 map
 -
 cassert
@@ -169,14 +195,16 @@ assert.h
 -
 errors.hpp
 /workspaces/Sere/errors.hpp
-./Parser/Scanner/Token.hpp
-/workspaces/Sere/Parser/Scanner/Token.hpp
-./Parser/Scanner/Scanner.hpp
-/workspaces/Sere/Parser/Scanner/Scanner.hpp
-./Parser/Parser/Parser.hpp
-/workspaces/Sere/Parser/Parser/Parser.hpp
-./Parser/Parser/AST/Visitor.hpp
-/workspaces/Sere/Parser/Parser/AST/Visitor.hpp
-./Parser/Parser/AST/AST.hpp
-/workspaces/Sere/Parser/Parser/AST/AST.hpp
+./Sere/Scanner/Token.hpp
+/workspaces/Sere/Sere/Scanner/Token.hpp
+./Sere/Scanner/Scanner.hpp
+/workspaces/Sere/Sere/Scanner/Scanner.hpp
+./Sere/Parser/Parser.hpp
+/workspaces/Sere/Sere/Parser/Parser.hpp
+./Sere/Parser/AST/Visitor.hpp
+/workspaces/Sere/Sere/Parser/AST/Visitor.hpp
+./Sere/Parser/AST/AST.hpp
+/workspaces/Sere/Sere/Parser/AST/AST.hpp
+./Sere/Parser/AST/Midlevel/Environments.hpp
+/workspaces/Sere/Sere/Parser/AST/Midlevel/Environments.hpp
 

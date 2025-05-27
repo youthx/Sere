@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <limits>
 #include "Token.hpp"
-#include "../errors.hpp"
+#include "../../errors.hpp"
 
 // Debug macro: Enable debug output if needed
 #ifdef SCANNER_DEBUG
