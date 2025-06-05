@@ -1,8 +1,15 @@
 program  : stat* EOF ;
 
-stat     : assign
+stat     : funcdef 
+         | assign
          | expr
          ;
+
+funcdef  : "def" IDENT "(" param_list? ")" ("->" TYPE)? ":" block ;
+
+param_list : IDENT ("," IDENT)* ; 
+
+block : stat+ ;
 
 assign   : IDENT (":" TYPE)? "=" expr
          ;
@@ -29,7 +36,11 @@ primary  : NUMBER
          | "None"
          | "(" expr ")"
          | IDENT
+         | IDENT "(" arg_list? ")"
          ;
+
+arg_list : expr ("," expr)* ;
+
 
 NUMBER   : INTEGER | FLOAT ;
 INTEGER  : [0-9]+ ;

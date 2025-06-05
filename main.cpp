@@ -14,6 +14,64 @@
 #include "./Sere/Parser/AST/Visitor.hpp"
 #include "./Sere/Parser/AST/AST.hpp"
 #include "./Sere/Parser/AST/Midlevel/Environments.hpp"
+#include "./Sere/IR/CodeGenContext.hpp"
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Module.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/IRReader/IRReader.h>
+#include <llvm/Support/SourceMgr.h>
+#include <llvm/Support/raw_ostream.h>
+#include "llvm/Pass.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/IRBuilder.h"
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/Transforms/Scalar.h>
+#include <llvm/Transforms/Scalar/GVN.h>
+#include <llvm/Transforms/Utils.h>
+#include <llvm/Transforms/IPO/PassManagerBuilder.h>
+#include <llvm/Transforms/InstCombine/InstCombine.h>
+
+#include "./Sere/Std/Registry.hpp"
+
+int compile_optimization_passes(llvm::Module *module, llvm::LLVMContext &context)
+{
+    if (module == nullptr) throw std::invalid_argument("Module is null");
+    llvm::SMDiagnostic error;
+
+    // verify the pre-optimized module
+    if (llvm::verifyModule(*module, &llvm::errs())) {
+        llvm::errs() << "Module verification failed before optimization.\n";
+        return -1;
+    }
+    
+
+    llvm::legacy::PassManager passManager;
+
+    /* ========= OPTIMIZATION PIPELINE ========= //
+
+        IN -> mem2reg -> simply -> reassociate -> GVN -> CFGS -> OPTIMIZED OUTPUT
+
+    */ 
+    passManager.add(llvm::createPromoteMemoryToRegisterPass()); // mem2reg
+    passManager.add(llvm::createInstructionCombiningPass()); // combine redundant instructions
+    passManager.add(llvm::createReassociatePass()); // reorder expressions
+    passManager.add(llvm::createGVNPass()); // Eliminate common subexpressions
+    passManager.add(llvm::createCFGSimplificationPass()); // Control flow graph cleanup
+
+    passManager.run(*module);
+    
+    // verify the optimized module
+    if (llvm::verifyModule(*module, &llvm::errs())) {
+        llvm::errs() << "Module verification failed after attempting optimization.\n";
+        return -1;
+    }
+
+    module->print(llvm::outs(), nullptr);
+    return 0;
+}
+
+
 
 std::vector<unsigned char> sere_read_file(const char *filepath)
 {
@@ -47,6 +105,7 @@ std::vector<unsigned char> sere_read_file(const char *filepath)
 int main(int argc, char *argv[])
 {
 
+
     try
     {
         if (argc < 2)
@@ -54,8 +113,6 @@ int main(int argc, char *argv[])
             std::cerr << "Usage: \n\t" << argv[0] << " <input_file>" << std::endl;
             return 64;
         }
-        
-
 
         const char *filepath = argv[1];
         if (filepath == nullptr || filepath[0] == '\0')
@@ -72,16 +129,22 @@ int main(int argc, char *argv[])
         if (!stats.empty())
         {
             
+        
+            SereLib::load_registry();
+            SereLib::include_lib("core");
             
-            std::cout << "Parsed expression successfully." << std::endl;
             auto type_checker = std::make_shared<SereParser::TypeChecker>();
             auto expr_visitor = std::make_shared<SereParser::ExprVisitor<SereParser::SereObject>>(type_checker);
             auto visitor = std::make_shared<SereParser::StatVisitor<SereParser::SereObject>>(expr_visitor);
             for (auto stat : stats) {
                 SereParser::SereObject result = stat.get()->accept(*visitor);
-    
-                std::cout << "Result: " << result.to_string() << std::endl;
             }
+
+            auto module = SereParser::RT::ctx.get_module();
+            llvm::LLVMContext &context = module->getContext();
+            
+
+            compile_optimization_passes(module, context);
         }
         else
         {

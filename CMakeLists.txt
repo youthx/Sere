@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project (Sere)
+project (sere)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,11 +20,12 @@ add_definitions(${LLVM_DEFINITIONS})
 file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/Parser/*.cpp")
 file(GLOB HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/Parser/*.h")
 
-add_executable(Sere ${SOURCES} ${HEADERS})
+
+add_executable(sere ${SOURCES} ${HEADERS})
 
 # Include the /Parser directory for header files
-target_include_directories(Sere PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Parser")
-llvm_map_components_to_libnames(llvm_libs core support) # minimal libs
+target_include_directories(sere PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Parser")
+llvm_map_components_to_libnames(llvm_libs native core support) # minimal libs
 
-target_link_libraries(Sere PRIVATE fmt::fmt)
-target_link_libraries(Sere PRIVATE ${llvm_libs})
+target_link_libraries(sere PRIVATE fmt::fmt)
+target_link_libraries(sere PRIVATE ${llvm_libs})

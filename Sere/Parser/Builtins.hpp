@@ -7,6 +7,8 @@
 #include <memory>
 #include <unordered_map>
 #include <iostream>
+#include <llvm/IR/Type.h>
+
 
 namespace BuiltIn {
 
@@ -86,6 +88,15 @@ namespace BuiltIn {
         auto it = builtins.find(name);
         if (it != builtins.end()) return it->second;
         return nullptr;
+    }
+
+    inline llvm::Type* to_llvm_type(const SereType::Ptr& type, llvm::LLVMContext& context) {
+        if (type == INT) return llvm::Type::getInt32Ty(context);
+        if (type == FLOAT) return llvm::Type::getFloatTy(context);
+        if (type == BOOL) return llvm::Type::getInt1Ty(context);
+        if (type == STR) return llvm::Type::getInt8PtrTy(context);
+        if (type == NONE) return llvm::Type::getVoidTy(context);
+        return nullptr; // Unknown type
     }
     
 }
