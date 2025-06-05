@@ -93,12 +93,11 @@ namespace SereParser {
 
     class CallExprAST : public ExprAST {
     public:
-        const std::shared_ptr<ExprAST> callee;
-        const SereLexer::TokenBase paren;
+        const SereLexer::TokenBase callee;
         const std::vector<std::shared_ptr<ExprAST>> arguments;
 
-        CallExprAST(std::shared_ptr<ExprAST> callee, const SereLexer::TokenBase& paren, std::vector<std::shared_ptr<ExprAST>> arguments)
-            : callee(std::move(callee)), paren(paren), arguments(std::move(arguments)) {}
+        CallExprAST(SereLexer::TokenBase& callee, std::vector<std::shared_ptr<ExprAST>> arguments)
+            : callee(std::move(callee)), arguments(std::move(arguments)) {}
 
         SereObject accept(ExprVisitor<SereObject>& visitor) const override {
             return visitor.visit_call(*this);
@@ -142,17 +141,38 @@ namespace SereParser {
         }
     };
 
-    class VariableExprAST : public ExprAST {
+    class TypeAnnotationExprAST : public ExprAST {
     public:
         const SereLexer::TokenBase name;
+        const std::shared_ptr<ExprAST> subtype;
+
+        explicit TypeAnnotationExprAST(const SereLexer::TokenBase& name)
+            : name(name), subtype(nullptr) {}
+        
+        TypeAnnotationExprAST(const SereLexer::TokenBase& name, std::shared_ptr<ExprAST> subtype)
+            : name(name), subtype(std::move(subtype)) {}
+        
+        SereObject accept(ExprVisitor<SereObject>& visitor) const override {
+            return SereObject();
+        }
+    };
+
+        class VariableExprAST : public ExprAST {
+    public:
+        const SereLexer::TokenBase name;
+        const std::shared_ptr<TypeAnnotationExprAST> type_annotation;
 
         explicit VariableExprAST(const SereLexer::TokenBase& name)
-            : name(name) {}
+            : name(name), type_annotation(nullptr) {}
+
+        VariableExprAST(const SereLexer::TokenBase& name, std::shared_ptr<TypeAnnotationExprAST> type)
+            : name(name), type_annotation(type) {}
 
         SereObject accept(ExprVisitor<SereObject>& visitor) const override {
             return visitor.visit_variable(*this);
         }
     };
+
 
 } // namespace SereParser
 

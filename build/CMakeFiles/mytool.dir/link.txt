@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/mytool.dir/main.cpp.o  -o mytool  -Wl,-rpath,/usr/lib/llvm-10/lib /usr/lib/llvm-10/lib/libLLVM-10.so.1 

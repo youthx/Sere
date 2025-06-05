@@ -20,11 +20,12 @@ namespace SereLexer {
     class TokenValue {
         public:
 
-            TokenValue() = default;
-            TokenValue(int value) : INTEGER(value), FLOAT(0), STRING("") {}
-            TokenValue(float value) : FLOAT(value), INTEGER(0), STRING("") {}
-            TokenValue(const std::string& value) : STRING(value), INTEGER(0), FLOAT(0) {}
-        
+            TokenValue() : INTEGER(0), FLOAT(0.0f), STRING("") {}
+            TokenValue(int value) : INTEGER(value), FLOAT(0.0f), STRING("") {}
+            TokenValue(float value) : INTEGER(0), FLOAT(value), STRING("") {}
+            TokenValue(double value) : INTEGER(0), FLOAT(static_cast<float>(value)), STRING("") {}
+            TokenValue(const std::string& value) : INTEGER(0), FLOAT(0.0f), STRING(value) {}
+
             const int INTEGER;
             const float FLOAT;
             const std::string STRING;

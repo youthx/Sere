@@ -3,6 +3,7 @@
         "*.asm": "nasm",
         "Makefile": "c",
         "*.rs": "rust",
+        "*.hpp": "cpp",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -78,6 +79,27 @@
         "ios": "cpp",
         "locale": "cpp",
         "print": "cpp",
-        "queue": "cpp"
-    }
+        "queue": "cpp",
+        "strstream": "cpp",
+        "charconv": "cpp",
+        "csignal": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "propagate_const": "cpp",
+        "regex": "cpp",
+        "hash_map": "cpp",
+        "future": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "valarray": "cpp",
+        "barrier": "cpp",
+        "execution": "cpp",
+        "numbers": "cpp",
+        "span": "cpp",
+        "stack": "cpp",
+        "syncstream": "cpp",
+        "semaphore": "cpp",
+        "*.inc": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

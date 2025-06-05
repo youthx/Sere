@@ -1,5 +1,5 @@
-#ifndef PARSER_HPP
-#define PARSER_HPP
+#ifndef SERE_PARSER_HPP
+#define SERE_PARSER_HPP
 
 #include <vector>
 #include <memory>
@@ -7,7 +7,6 @@
 #include <string>
 #include <sstream>
 #include <utility>
-#include <type_traits>
 #include "../Scanner/Token.hpp"
 #include "../Scanner/Scanner.hpp"
 #include "AST/Expr.hpp"
@@ -15,34 +14,44 @@
 
 namespace SereParser {
 
-// ========== Exception Class ==========
-
+// ===================== Exception Class =====================
 class ParserError : public std::runtime_error {
 public:
     ParserError(const std::shared_ptr<SereLexer::TokenBase>& token, std::string msg)
         : std::runtime_error(std::move(msg)), token_(token) {}
+
     const char* what() const noexcept override {
-        std::ostringstream oss;
-        oss << "[ParserError] Line " << (token_ ? token_->line : 0) << ": " << std::runtime_error::what();
-        if (token_) oss << " (got '" << token_->lexeme << "')";
-        formatted_ = oss.str();
-        return formatted_.c_str();
+        try {
+            if (!formatted_.empty()) return formatted_.c_str();
+            std::ostringstream oss;
+            oss << "[ParserError] Line " << (token_ ? token_->line : 0) << ": " << std::runtime_error::what();
+            if (token_) oss << " (got '" << token_->lexeme << "')";
+            formatted_ = oss.str();
+            return formatted_.c_str();
+        } catch (...) {
+            return "[ParserError] (error formatting message)";
+        }
     }
+
+    const std::shared_ptr<SereLexer::TokenBase>& token() const noexcept { return token_; }
+
 private:
     std::shared_ptr<SereLexer::TokenBase> token_;
     mutable std::string formatted_;
 };
 
-// ========== Utility Macros ==========
-
+// ===================== Utility Macros =====================
+#ifndef SERE_PARSER_ASSERT_DEFINED
+#define SERE_PARSER_ASSERT_DEFINED
 #define SERE_ASSERT(cond, token, msg) \
     do { if (!(cond)) throw SereParser::ParserError(token, msg); } while(0)
+#endif
 
 #define SERE_FATAL(msg) \
     throw std::logic_error(std::string("[Fatal parser error] ") + msg)
 
-// ========== Parser Class ==========
 
+// ===================== Parser Class =====================
 class Parser {
 public:
     explicit Parser(const SereLexer::TokenList& tokens)
@@ -60,8 +69,8 @@ public:
                 advance();
                 continue;
             }
-            // Python allows simple_stmt (expr or assignment) at the top-level
-            statements.push_back(simple_stmt());
+            if (check(SereLexer::TOKEN_EOF)) break;
+            statements.push_back(statement());
             skipNewlines();
         }
         return statements;
@@ -71,27 +80,28 @@ private:
     const std::vector<std::shared_ptr<SereLexer::TokenBase>>& tokens_;
     size_t current_;
 
-    // === Token Helpers ===
-
-    const std::shared_ptr<SereLexer::TokenBase>& peek() const { 
+    // ===================== Token Helpers =====================
+    const std::shared_ptr<SereLexer::TokenBase>& peek() const {
         SERE_ASSERT(current_ < tokens_.size(), nullptr, "Peek out of bounds.");
-        return tokens_[current_]; 
+        return tokens_[current_];
     }
-    const std::shared_ptr<SereLexer::TokenBase>& previous() const { 
-        SERE_ASSERT(current_ > 0 && current_-1 < tokens_.size(), nullptr, "Previous out of bounds.");
-        return tokens_[current_ - 1]; 
+    const std::shared_ptr<SereLexer::TokenBase>& previous() const {
+        SERE_ASSERT(current_ > 0 && current_ - 1 < tokens_.size(), nullptr, "Previous out of bounds.");
+        return tokens_[current_ - 1];
     }
-    bool isAtEnd() const { 
-        return peek()->type == SereLexer::TOKEN_EOF; 
+    bool isAtEnd() const noexcept {
+        return peek()->type == SereLexer::TOKEN_EOF || current_ >= tokens_.size();
     }
-    const std::shared_ptr<SereLexer::TokenBase>& advance() { 
-        if (!isAtEnd()) ++current_; 
-        return previous(); 
+    const std::shared_ptr<SereLexer::TokenBase>& advance() {
+        if (!isAtEnd()) ++current_;
+        return previous();
     }
-    bool check(SereLexer::TokenType type) const { 
-        return !isAtEnd() && peek()->type == type; 
+    bool check(SereLexer::TokenType type) const noexcept {
+        return !isAtEnd() && peek()->type == type;
     }
-
+    bool lookAheadIs(SereLexer::TokenType type) const noexcept {
+        return (current_ + 1 < tokens_.size() && tokens_[current_ + 1]->type == type);
+    }
     bool match(std::initializer_list<SereLexer::TokenType> types) {
         for (auto type : types) {
             if (check(type)) { advance(); return true; }
@@ -105,52 +115,142 @@ private:
     void skipNewlines() {
         while (check(SereLexer::TOKEN_NEWLINE)) advance();
     }
-    bool lookAheadIs(SereLexer::TokenType type) const {
-        return (current_ + 1 < tokens_.size() && tokens_[current_ + 1]->type == type);
-    }
 
-    // Accept EOF as a valid statement terminator (for last line friendliness)
+    // ===================== Statement End Handling =====================
     void expectStatementEnd() {
-        if (check(SereLexer::TOKEN_NEWLINE)) {
+        const auto& tok = peek();
+        if (tok->type == SereLexer::TOKEN_EOF) return;
+        if (tok->type == SereLexer::TOKEN_NEWLINE) { advance(); return; }
+        if (tok->type == SereLexer::TOKEN_DEDENT) return;
+        if (current_ >= tokens_.size()) return;
+        throw ParserError(tok, "Expected newline, DEDENT, or EOF after statement.");
+    }
+    void expectFreshLine() {
+        const auto& tok = peek();
+        if (tok->type == SereLexer::TOKEN_NEWLINE) {
             advance();
-        } else if (peek()->type != SereLexer::TOKEN_EOF) {
-            throw ParserError(peek(), "Expected newline or EOF after statement.");
+        } else if (tok->type == SereLexer::TOKEN_EOF) {
+            return;
+        } else {
+            throw ParserError(tok, "Expected newline after statement.");
         }
     }
 
-    // === Python-style Simple Statement (expr_stmt) ===
+    // ===================== Type Parsing =====================
+    std::shared_ptr<TypeAnnotationExprAST> parse_type() {
+        // Parse a type name (e.g., int, str, List[T], etc.)
+        auto name_token = consume(SereLexer::TOKEN_IDENTIFIER, "Expected type name.");
+        if (check(SereLexer::TOKEN_LEFT_BRACKET)) {
+            advance(); // consume '['
+            auto subtype = parse_type();
+            consume(SereLexer::TOKEN_RIGHT_BRACKET, "Expected ']' after type parameter.");
+            return std::make_shared<TypeAnnotationExprAST>(*name_token, subtype);
+        }
+        return std::make_shared<TypeAnnotationExprAST>(*name_token);
+    }
 
-    std::shared_ptr<StatAST> simple_stmt() {
-        // Assignment or expression statement
-        if (check(SereLexer::TOKEN_IDENTIFIER)) {
-            // Look ahead for assignment
+    // ===================== Statement Dispatch =====================
+    std::shared_ptr<StatAST> statement() {
+        if (check(SereLexer::TOKEN_DEF)) {
+            return funcdef_stmt();
+        } else if (check(SereLexer::TOKEN_RETURN)) {
+            return return_stmt();
+        } else if (check(SereLexer::TOKEN_IF)) {
+            //return if_stmt();
+        } else if (check(SereLexer::TOKEN_WHILE)) {
+            //return while_stmt();
+        } else if (check(SereLexer::TOKEN_CLASS)) {
+            //return class_stmt();
+        } else if (check(SereLexer::TOKEN_IMPORT) || check(SereLexer::TOKEN_FROM)) {
+            //return import_stmt();
+        } else if (check(SereLexer::TOKEN_IDENTIFIER)) {
             if (lookAheadIs(SereLexer::TOKEN_EQUAL) || lookAheadIs(SereLexer::TOKEN_COLON)) {
                 return assignment_stmt();
             }
         }
-        // Otherwise: expression statement
+        return expr_stmt();
+    }
+
+    // ===================== Function Definition =====================
+    std::shared_ptr<StatAST> funcdef_stmt() {
+        auto def_tok = consume(SereLexer::TOKEN_DEF, "Expected 'def' keyword.");
+        auto name = consume(SereLexer::TOKEN_IDENTIFIER, "Expected function name after 'def'.");
+        consume(SereLexer::TOKEN_LEFT_PAREN, "Expected '(' after function name.");
+        std::vector<std::shared_ptr<VariableExprAST>> params;
+
+        if (!check(SereLexer::TOKEN_RIGHT_PAREN)) {
+            do {
+                auto param_name = consume(SereLexer::TOKEN_IDENTIFIER, "Expected parameter name.");
+                std::shared_ptr<TypeAnnotationExprAST> param_type = nullptr;
+                if (match({SereLexer::TOKEN_COLON})) {
+                    param_type = parse_type();
+                }
+                params.push_back(std::make_shared<VariableExprAST>(*param_name, param_type));
+            } while (match({SereLexer::TOKEN_COMMA}));
+        }
+
+        consume(SereLexer::TOKEN_RIGHT_PAREN, "Expected ')' after parameters.");
+        std::shared_ptr<TypeAnnotationExprAST> return_type = nullptr;
+        if (match({SereLexer::TOKEN_ARROW})) {
+            return_type = parse_type();
+        }
+        consume(SereLexer::TOKEN_COLON, "Expected ':' after function signature.");
+        auto body = block_stmt();
+        return std::make_shared<FunctionStatAST>(*name, params, body, return_type);
+    }
+
+    // ===================== Return Statement =====================
+    std::shared_ptr<StatAST> return_stmt() {
+        consume(SereLexer::TOKEN_RETURN, "Expected 'return' keyword.");
+        std::shared_ptr<ExprAST> value = nullptr;
+        if (!check(SereLexer::TOKEN_NEWLINE) && !check(SereLexer::TOKEN_EOF)) {
+            value = expression();
+        }
+        expectStatementEnd();
+        return std::make_shared<ReturnStatAST>(value);
+    }
+
+    // ===================== Block Parsing =====================
+    std::shared_ptr<StatAST> block_stmt() {
+        expectFreshLine();
+        consume(SereLexer::TOKEN_INDENT, "Expected INDENT to start block.");
+        std::vector<std::shared_ptr<StatAST>> statements;
+        skipNewlines();
+        while (!check(SereLexer::TOKEN_DEDENT) && !isAtEnd()) {
+            if (check(SereLexer::TOKEN_NEWLINE)) {
+                advance();
+                continue;
+            }
+            if (check(SereLexer::TOKEN_EOF)) break;
+            statements.push_back(statement());
+            skipNewlines();
+        }
+        consume(SereLexer::TOKEN_DEDENT, "Expected DEDENT to end block.");
+        return std::make_shared<BlockStatAST>(std::move(statements));
+    }
+
+    // ===================== Assignment =====================
+    std::shared_ptr<StatAST> assignment_stmt() {
+        auto name = consume(SereLexer::TOKEN_IDENTIFIER, "Expected variable name.");
+        std::shared_ptr<TypeAnnotationExprAST> type = nullptr;
+        if (match({SereLexer::TOKEN_COLON})) {
+            type = parse_type();
+        }
+        consume(SereLexer::TOKEN_EQUAL, "Expected '=' in assignment.");
+        auto value = expression();
+        expectStatementEnd();
+        return std::make_shared<AssignStatAST>(*name, value, type);
+    }
+
+    // ===================== Expression Statement =====================
+    std::shared_ptr<StatAST> expr_stmt() {
         auto expr = expression();
         expectStatementEnd();
         return std::make_shared<ExprStatAST>(expr);
     }
 
-    std::shared_ptr<StatAST> assignment_stmt() {
-        // assignment: NAME (':' TYPE)? '=' expr
-        auto name = consume(SereLexer::TOKEN_IDENTIFIER, "Expected variable name.");
-        std::shared_ptr<SereLexer::TokenBase> type = nullptr;
-        if (match({SereLexer::TOKEN_COLON})) {
-            type = consume(SereLexer::TOKEN_IDENTIFIER, "Expected type name after ':'.");
-        }
-        consume(SereLexer::TOKEN_EQUAL, "Expected '=' in assignment.");
-        auto value = expression();
-        expectStatementEnd();
-        return std::make_shared<AssignStatAST>(*name, type ? *type : *name, value);
-    }
-
-    // === Expression Grammar (matches Python operator precedence) ===
-
+    // ===================== Expression Grammar =====================
     std::shared_ptr<ExprAST> expression() { return or_test(); }
-
     std::shared_ptr<ExprAST> or_test() {
         auto expr = and_test();
         while (match({SereLexer::TOKEN_OR})) {
@@ -208,7 +308,6 @@ private:
     }
     std::shared_ptr<ExprAST> factor() {
         if (match({SereLexer::TOKEN_PLUS, SereLexer::TOKEN_MINUS})) {
-            // Python supports unary + and -
             auto op = previous();
             auto right = factor();
             return std::make_shared<UnaryExprAST>(op.get(), right);
@@ -216,9 +315,35 @@ private:
         return power();
     }
     std::shared_ptr<ExprAST> power() {
-        auto expr = atom();
-        // No "**" operator in your grammar yet, but easy to add here
+        auto expr = call();
+        // "**" operator could be added here if needed
         return expr;
+    }
+    std::shared_ptr<ExprAST> call() {
+        
+        if (match({SereLexer::TOKEN_IDENTIFIER})) {
+            auto callee = *previous();
+            while (true) {
+                if (match({SereLexer::TOKEN_LEFT_PAREN})) {
+                    return finish_call(callee);
+                } else {
+                    return std::make_shared<VariableExprAST>(callee);
+                }
+            }
+
+        }
+        return atom();
+    }
+
+    std::shared_ptr<ExprAST> finish_call(SereLexer::TokenBase callee) {
+        std::vector<std::shared_ptr<ExprAST>> arguments;
+        if (!check(SereLexer::TOKEN_RIGHT_PAREN)) {
+            do {
+                arguments.push_back(expression());
+            } while (match({SereLexer::TOKEN_COMMA}));
+        }
+        consume(SereLexer::TOKEN_RIGHT_PAREN, "Expected ')' after arguments.");
+        return std::make_shared<CallExprAST>(callee, std::move(arguments));
     }
     std::shared_ptr<ExprAST> atom() {
         if (match({SereLexer::TOKEN_TRUE})) return std::make_shared<LiteralExprAST>(SereObject(true));
@@ -227,7 +352,7 @@ private:
         if (match({SereLexer::TOKEN_INTEGER})) return std::make_shared<LiteralExprAST>(SereObject(previous()->literal.INTEGER));
         if (match({SereLexer::TOKEN_FLOAT}))   return std::make_shared<LiteralExprAST>(SereObject(previous()->literal.FLOAT));
         if (match({SereLexer::TOKEN_STRING}))  return std::make_shared<LiteralExprAST>(SereObject(previous()->literal.STRING));
-        if (match({SereLexer::TOKEN_IDENTIFIER})) return std::make_shared<VariableExprAST>(*previous());
+        if (match({SereLexer::TOKEN_IDENTIFIER})) {return std::make_shared<VariableExprAST>(*previous());}
         if (match({SereLexer::TOKEN_LEFT_PAREN})) {
             auto expr = expression();
             consume(SereLexer::TOKEN_RIGHT_PAREN, "Expected ')' after expression.");
@@ -239,4 +364,4 @@ private:
 
 } // namespace SereParser
 
-#endif // PARSER_HPP
+#endif // SERE_PARSER_HPP
