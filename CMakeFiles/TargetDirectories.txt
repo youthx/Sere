@@ -1,4 +1,0 @@
-/workspaces/Sere/CMakeFiles/rebuild_cache.dir
-/workspaces/Sere/CMakeFiles/edit_cache.dir
-/workspaces/Sere/CMakeFiles/sere.dir
-/workspaces/Sere/CMakeFiles/intrinsics_gen.dir

@@ -1,9 +1,0 @@
-{
-  "dependencies": [
-    "fmt",
-    {
-      "name": "llvm",
-      "features": [ "mlir" ]
-    }
-  ]
-}
