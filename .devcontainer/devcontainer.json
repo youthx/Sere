@@ -1,0 +1,16 @@
+{
+  "name": "Sere Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/vcpkg:1": {}
+  },
+  "postCreateCommand": "cmake -S . -B build && cmake --build build",
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+  "extensions": [
+    "ms-vscode.cpptools",
+    "ms-vscode.cmake-tools"
+  ],
+  "remoteUser": "vscode"
+}
