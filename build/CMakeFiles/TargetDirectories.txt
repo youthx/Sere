@@ -1,0 +1,7 @@
+/workspaces/Sere/build/CMakeFiles/sere.dir
+/workspaces/Sere/build/CMakeFiles/intrinsics_gen.dir
+/workspaces/Sere/build/CMakeFiles/omp_gen.dir
+/workspaces/Sere/build/CMakeFiles/acc_gen.dir
+/workspaces/Sere/build/CMakeFiles/RISCVTargetParserTableGen.dir
+/workspaces/Sere/build/CMakeFiles/edit_cache.dir
+/workspaces/Sere/build/CMakeFiles/rebuild_cache.dir

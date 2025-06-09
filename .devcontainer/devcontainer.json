@@ -1,9 +1,6 @@
 {
   "name": "Sere Compiler Dev",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
-  },
+  "image": "mcr.microsoft.com/vscode/devcontainers/cpp:ubuntu",
   "settings": {
     "terminal.integrated.defaultProfile.linux": "bash"
   },
@@ -12,13 +9,9 @@
     "llvm-vs-code-extensions.vscode-clangd",
     "ms-vscode.cmake-tools"
   ],
-  "postCreateCommand": "cmake -S . -B build && cmake --build build",
+  "postCreateCommand": "sudo apt update && sudo apt install -y libzstd-dev && cmake -S . -B build && cmake --build build --parallel",
   "remoteUser": "vscode",
-  "forwardPorts": [],
+  "features": {},
   "mounts": [],
-  "features": {
-    "ghcr.io/chaoswars/vscode-features/llvm:1": {
-      "llvm-version": 18
-    }
-  }
+  "forwardPorts": []
 }

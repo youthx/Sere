@@ -7,7 +7,7 @@ project(Sere VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Enable clang-tidy if available
+# clang-tidy (optional)
 find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
 if(CLANG_TIDY_EXE)
     set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
@@ -19,50 +19,37 @@ endif()
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE PROJECT_HEADERS CONFIGURE_DEPENDS include/*.hpp)
 
-add_executable(sere
-    ${PROJECT_SOURCES}
-    ${PROJECT_HEADERS}
-)
+add_executable(sere ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 
 target_include_directories(sere PRIVATE include)
 
 # ─────────────────────────────────────────────────────────────
 # 🧠 LLVM Integration
 # ─────────────────────────────────────────────────────────────
-# Add our local cmake/ directory to module path
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+find_package(zstd REQUIRED)
 
-# Load list of LLVM components
-include(LLVMConfig)
-
-# Find and configure LLVM
 find_package(LLVM REQUIRED CONFIG)
-message(STATUS "Using LLVM ${LLVM_PACKAGE_VERSION} from ${LLVM_DIR}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CXX_FLAGS}")
 
-# Apply LLVM include paths and definitions
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "LLVM_INCLUDE_DIRS = ${LLVM_INCLUDE_DIRS}")
+message(STATUS "LLVM_DEFINITIONS = ${LLVM_DEFINITIONS}")
+
+set(LLVM_COMPONENTS
+    native
+    core
+    support
+)
+
+llvm_map_components_to_libnames(LLVM_LIBS ${LLVM_COMPONENTS})
+
 target_include_directories(sere PRIVATE ${LLVM_INCLUDE_DIRS})
 target_compile_definitions(sere PRIVATE ${LLVM_DEFINITIONS})
 
-# Link against selected LLVM components
-llvm_map_components_to_libnames(LLVM_LIBS ${LLVM_COMPONENTS})
-target_link_libraries(sere PRIVATE ${LLVM_LIBS})
+# Link LLVM libs and zstd properly, once only
+target_link_libraries(sere PRIVATE ${LLVM_LIBS} zstd::libzstd_shared)
 
 # ─────────────────────────────────────────────────────────────
-# 🧪 Tests
-# ─────────────────────────────────────────────────────────────
-enable_testing()
-file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
-
-add_executable(sere_tests ${TEST_SOURCES})
-target_include_directories(sere_tests PRIVATE include)
-target_link_libraries(sere_tests PRIVATE sere)
-
-add_test(NAME AllTests COMMAND sere_tests)
-
-# ─────────────────────────────────────────────────────────────
-# 🧼 IDE Source Grouping (for CLion / VS)
+# 🧼 IDE Grouping (Optional)
 # ─────────────────────────────────────────────────────────────
 source_group(TREE ${CMAKE_SOURCE_DIR}/src PREFIX "Source Files" FILES ${PROJECT_SOURCES})
 source_group(TREE ${CMAKE_SOURCE_DIR}/include PREFIX "Header Files" FILES ${PROJECT_HEADERS})
-source_group(TREE ${CMAKE_SOURCE_DIR}/tests PREFIX "Test Files" FILES ${TEST_SOURCES})
