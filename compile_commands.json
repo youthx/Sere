@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/workspaces/Sere",
+  "command": "/usr/bin/c++ -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/workspaces/Sere/include -I/usr/lib/llvm-18/include -g -std=gnu++20 -o CMakeFiles/sere.dir/src/main.cpp.o -c /workspaces/Sere/src/main.cpp",
+  "file": "/workspaces/Sere/src/main.cpp",
+  "output": "CMakeFiles/sere.dir/src/main.cpp.o"
+}
+]
