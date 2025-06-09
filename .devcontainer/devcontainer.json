@@ -11,7 +11,9 @@
   ],
   "postCreateCommand": "sudo apt update && sudo apt install -y libzstd-dev && cmake -S . -B build && cmake --build build --parallel",
   "remoteUser": "vscode",
-  "features": {},
+  "features": {
+    "ghcr.io/devcontainers/features/sshd:1": {}
+  },
   "mounts": [],
   "forwardPorts": []
 }
