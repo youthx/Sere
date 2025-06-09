@@ -1,0 +1,19 @@
+{
+  "name": "Sere Compiler Dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+  "extensions": [
+    "ms-vscode.cpptools",
+    "llvm-vs-code-extensions.vscode-clangd",
+    "ms-vscode.cmake-tools"
+  ],
+  "postCreateCommand": "cmake -S . -B build && cmake --build build",
+  "remoteUser": "vscode",
+  "forwardPorts": [],
+  "mounts": []
+}
