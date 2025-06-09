@@ -8,6 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/workspaces/Sere/src/lexer/lexer.cpp" "CMakeFiles/sere.dir/src/lexer/lexer.cpp.o" "gcc" "CMakeFiles/sere.dir/src/lexer/lexer.cpp.o.d"
+  "/workspaces/Sere/src/lexer/token.cpp" "CMakeFiles/sere.dir/src/lexer/token.cpp.o" "gcc" "CMakeFiles/sere.dir/src/lexer/token.cpp.o.d"
   "/workspaces/Sere/src/main.cpp" "CMakeFiles/sere.dir/src/main.cpp.o" "gcc" "CMakeFiles/sere.dir/src/main.cpp.o.d"
   )
 

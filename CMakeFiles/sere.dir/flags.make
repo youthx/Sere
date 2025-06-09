@@ -6,5 +6,5 @@ CXX_DEFINES = -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__
 
 CXX_INCLUDES = -I/workspaces/Sere/include -I/usr/lib/llvm-18/include
 
-CXX_FLAGS = -g -std=gnu++20
+CXX_FLAGS = -std=gnu++20
 

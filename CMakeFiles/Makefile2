@@ -85,12 +85,12 @@ clean: CMakeFiles/RISCVTargetParserTableGen.dir/clean
 CMakeFiles/sere.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sere.dir/build.make CMakeFiles/sere.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sere.dir/build.make CMakeFiles/sere.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/Sere/CMakeFiles --progress-num=1,2 "Built target sere"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/Sere/CMakeFiles --progress-num=1,2,3,4 "Built target sere"
 .PHONY : CMakeFiles/sere.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/sere.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/Sere/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/Sere/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/sere.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/Sere/CMakeFiles 0
 .PHONY : CMakeFiles/sere.dir/rule

@@ -182,6 +182,54 @@ RISCVTargetParserTableGen/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISCVTargetParserTableGen.dir/build.make CMakeFiles/RISCVTargetParserTableGen.dir/build
 .PHONY : RISCVTargetParserTableGen/fast
 
+src/lexer/lexer.o: src/lexer/lexer.cpp.o
+.PHONY : src/lexer/lexer.o
+
+# target to build an object file
+src/lexer/lexer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sere.dir/build.make CMakeFiles/sere.dir/src/lexer/lexer.cpp.o
+.PHONY : src/lexer/lexer.cpp.o
+
+src/lexer/lexer.i: src/lexer/lexer.cpp.i
+.PHONY : src/lexer/lexer.i
+
+# target to preprocess a source file
+src/lexer/lexer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sere.dir/build.make CMakeFiles/sere.dir/src/lexer/lexer.cpp.i
+.PHONY : src/lexer/lexer.cpp.i
+
+src/lexer/lexer.s: src/lexer/lexer.cpp.s
+.PHONY : src/lexer/lexer.s
+
+# target to generate assembly for a file
+src/lexer/lexer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sere.dir/build.make CMakeFiles/sere.dir/src/lexer/lexer.cpp.s
+.PHONY : src/lexer/lexer.cpp.s
+
+src/lexer/token.o: src/lexer/token.cpp.o
+.PHONY : src/lexer/token.o
+
+# target to build an object file
+src/lexer/token.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sere.dir/build.make CMakeFiles/sere.dir/src/lexer/token.cpp.o
+.PHONY : src/lexer/token.cpp.o
+
+src/lexer/token.i: src/lexer/token.cpp.i
+.PHONY : src/lexer/token.i
+
+# target to preprocess a source file
+src/lexer/token.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sere.dir/build.make CMakeFiles/sere.dir/src/lexer/token.cpp.i
+.PHONY : src/lexer/token.cpp.i
+
+src/lexer/token.s: src/lexer/token.cpp.s
+.PHONY : src/lexer/token.s
+
+# target to generate assembly for a file
+src/lexer/token.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sere.dir/build.make CMakeFiles/sere.dir/src/lexer/token.cpp.s
+.PHONY : src/lexer/token.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -219,6 +267,12 @@ help:
 	@echo "... intrinsics_gen"
 	@echo "... omp_gen"
 	@echo "... sere"
+	@echo "... src/lexer/lexer.o"
+	@echo "... src/lexer/lexer.i"
+	@echo "... src/lexer/lexer.s"
+	@echo "... src/lexer/token.o"
+	@echo "... src/lexer/token.i"
+	@echo "... src/lexer/token.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

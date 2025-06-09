@@ -1,4 +1,4 @@
 # ninja log v5
-1	16	0	/workspaces/Sere/build/CMakeFiles/cmake.verify_globs	b7ccc639574a9c5d
-16	604	1749449579871950646	CMakeFiles/sere.dir/src/main.cpp.o	b3ae157a8e0fc362
-605	791	1749449580052950650	sere	ca28b3b5fe57e1c
+559	692	1749463758699319438	sere	ca28b3b5fe57e1c
+12	559	1749463758569319435	CMakeFiles/sere.dir/src/main.cpp.o	b3ae157a8e0fc362
+1	10	0	/workspaces/Sere/build/CMakeFiles/cmake.verify_globs	b7ccc639574a9c5d

@@ -7,7 +7,11 @@
   "extensions": [
     "ms-vscode.cpptools",
     "llvm-vs-code-extensions.vscode-clangd",
-    "ms-vscode.cmake-tools"
+    "ms-vscode.cmake-tools",
+    "drcika.apc-extension",
+    "Catppuccin.catppuccin-vsc",
+    "Catppuccin.catppuccin-vsc-icons",
+    "esbenp.prettier-vscode"
   ],
   "postCreateCommand": "sudo apt update && sudo apt install -y libzstd-dev && cmake -S . -B build && cmake --build build --parallel",
   "remoteUser": "vscode",

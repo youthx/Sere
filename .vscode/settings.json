@@ -1,0 +1,135 @@
+{
+  // 🌙 THEME & STYLE
+  "workbench.colorTheme": "New UI Dark", // New UI Dark theme
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.activityBar.location": "bottom",
+  "workbench.sideBar.location": "right",
+  "workbench.editor.showTabs": "multiple",
+  "workbench.editor.tabCloseButton": "off",
+  "window.commandCenter": false,
+  "window.autoDetectColorScheme": false,
+  "window.zoomLevel": 0,
+
+  // 🔳 Transparency & Soft Look
+  "workbench.colorCustomizations": {
+    "editor.background": "#1e1e1ecc",        // editor: dark & semi-transparent
+    "sideBar.background": "#252526cc",       // sidebar: softened
+    "sideBar.border": "#00000000",
+    "panel.background": "#1e1e1ecc",         // terminal/panel background
+    "panel.border": "#00000000",
+    "statusBar.background": "#2c2c2ccc",     // bottom bar
+    "statusBar.noFolderBackground": "#2c2c2ccc",
+    "titleBar.activeBackground": "#1e1e1ecc"
+  },
+
+  // 🖋 FONT & TEXT
+  "editor.fontFamily": "CaskaydiaCove Nerd Font",
+  "editor.fontSize": 15,
+  "editor.fontWeight": "550",
+  "editor.fontLigatures": true,
+  "editor.lineHeight": 22,
+  "editor.letterSpacing": 0.5,
+  "editor.fontAliasing": "antialiased",
+
+  // 💡 EDITOR LOOK & FEEL
+  "editor.smoothScrolling": true,
+  "editor.cursorBlinking": "phase",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "selection",
+  "editor.renderLineHighlight": "line",
+  "editor.guides.bracketPairs": "active",
+  "editor.lineNumbers": "on",
+  "editor.scrollbar.verticalScrollbarSize": 8,
+  "editor.scrollbar.horizontalScrollbarSize": 8,
+  "editor.scrollbar.vertical": "visible",
+  "editor.scrollbar.horizontal": "visible",
+
+  // 🧠 AUTOCOMPLETE & HINTS
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+  "editor.inlayHints.enabled": "on",
+  "editor.inlineSuggest.enabled": true,
+  "editor.inlineSuggest.showToolbar": "always",
+  "editor.suggestSelection": "first",
+  "editor.suggest.snippetsPreventQuickSuggestions": false,
+  "editor.parameterHints.enabled": true,
+  "editor.suggest.showTypeParameters": true,
+  "editor.parameterHints.cycle": true,
+
+
+  // 🧼 CLEAN FORMATTING
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "editor.trimAutoWhitespace": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  // 🧩 C++ SPECIFIC
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.inlayHints.enabled": "on",
+    "editor.formatOnType": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeIncludes": "explicit"
+    }
+  },
+
+  // 🗂️ UI DENSITY
+  "window.density.editorTabHeight": "compact",
+  "explorer.compactFolders": true,
+  "explorer.openEditors.visible": 9,
+
+  "terminal.integrated.fontFamily": "CaskaydiaCove Nerd Font",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.fontWeight": "500",
+  "terminal.integrated.lineHeight": 1.4,
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.cursorStyle": "underline",
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.minimumContrastRatio": 4.5,
+  "terminal.integrated.defaultProfile.windows": "PowerShell", // or "bash" / "zsh" / "fish" / "pwsh" depending on your system
+  "terminal.integrated.tabs.enabled": false,
+  "terminal.integrated.customGlyphs": true,
+  "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTop",
+  "terminal.integrated.enableImages": true,
+  "terminal.integrated.enableMultiLinePasteWarning": "always",
+  "terminal.integrated.enableVisualBell": true,
+  "terminal.integrated.accessibleViewFocusOnCommandExecution": false,
+  "terminal.integrated.allowChords": true,
+  "terminal.integrated.enableFileLinks": "on",
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.drawBoldTextInBrightColors": true,
+  "terminal.integrated.allowedLinkSchemes": [
+    "file",
+    "http",
+    "https",
+    "mailto",
+    "vscode",
+    "vscode-insiders"
+  ],
+  "terminal.integrated.persistentSessionScrollback": true,
+  // 🧼 Live formatting
+  "editor.formatOnType": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true, // optional but useful
+
+  "editor.bracketPairColorization.enabled": false,
+
+
+  // 📦 JSON FORMATTING (optional)
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "C_Cpp.errorSquiggles": "disabled",
+  "workbench.editor.tabActionCloseVisibility": false,
+  "editor.guides.indentation": true,
+  "files.associations": {
+    "string": "cpp",
+    "unordered_map": "cpp",
+    "string_view": "cpp"
+  }
+}

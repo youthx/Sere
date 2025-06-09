@@ -1,4 +1,8 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/sere.dir/src/lexer/lexer.cpp.o"
+  "CMakeFiles/sere.dir/src/lexer/lexer.cpp.o.d"
+  "CMakeFiles/sere.dir/src/lexer/token.cpp.o"
+  "CMakeFiles/sere.dir/src/lexer/token.cpp.o.d"
   "CMakeFiles/sere.dir/src/main.cpp.o"
   "CMakeFiles/sere.dir/src/main.cpp.o.d"
   "sere"
