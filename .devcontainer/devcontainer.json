@@ -15,5 +15,10 @@
   "postCreateCommand": "cmake -S . -B build && cmake --build build",
   "remoteUser": "vscode",
   "forwardPorts": [],
-  "mounts": []
+  "mounts": [],
+  "features": {
+    "ghcr.io/chaoswars/vscode-features/llvm:1": {
+      "llvm-version": 18
+    }
+  }
 }
