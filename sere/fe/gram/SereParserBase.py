@@ -2,7 +2,6 @@ from antlr4 import *  # type: ignore
 
 
 class SereParserBase(Parser):
-
     def CannotBePlusMinus(self) -> bool:
         return True
 

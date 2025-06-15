@@ -8,26 +8,26 @@ from distutils.tests import support
 import pytest
 
 
-@pytest.mark.usefixtures('save_env')
+@pytest.mark.usefixtures("save_env")
 class TestInstallData(
     support.TempdirManager,
 ):
     def test_simple_run(self):
         pkg_dir, dist = self.create_dist()
         cmd = install_data(dist)
-        cmd.install_dir = inst = os.path.join(pkg_dir, 'inst')
+        cmd.install_dir = inst = os.path.join(pkg_dir, "inst")
 
         # data_files can contain
         #  - simple files
         #  - a Path object
         #  - a tuple with a path, and a list of file
-        one = os.path.join(pkg_dir, 'one')
-        self.write_file(one, 'xxx')
-        inst2 = os.path.join(pkg_dir, 'inst2')
-        two = os.path.join(pkg_dir, 'two')
-        self.write_file(two, 'xxx')
-        three = pathlib.Path(pkg_dir) / 'three'
-        self.write_file(three, 'xxx')
+        one = os.path.join(pkg_dir, "one")
+        self.write_file(one, "xxx")
+        inst2 = os.path.join(pkg_dir, "inst2")
+        two = os.path.join(pkg_dir, "two")
+        self.write_file(two, "xxx")
+        three = pathlib.Path(pkg_dir) / "three"
+        self.write_file(three, "xxx")
 
         cmd.data_files = [one, (inst2, [two]), three]
         assert cmd.get_inputs() == [one, (inst2, [two]), three]
@@ -59,11 +59,11 @@ class TestInstallData(
         cmd.outfiles = []
 
         # now using root and empty dir
-        cmd.root = os.path.join(pkg_dir, 'root')
-        inst5 = os.path.join(pkg_dir, 'inst5')
-        four = os.path.join(cmd.install_dir, 'four')
-        self.write_file(four, 'xx')
-        cmd.data_files = [one, (inst2, [two]), three, ('inst5', [four]), (inst5, [])]
+        cmd.root = os.path.join(pkg_dir, "root")
+        inst5 = os.path.join(pkg_dir, "inst5")
+        four = os.path.join(cmd.install_dir, "four")
+        self.write_file(four, "xx")
+        cmd.data_files = [one, (inst2, [two]), three, ("inst5", [four]), (inst5, [])]
         cmd.ensure_finalized()
         cmd.run()
 

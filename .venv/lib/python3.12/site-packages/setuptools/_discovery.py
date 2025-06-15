@@ -13,7 +13,7 @@ def extras_from_dep(dep):
     return set(
         marker[2].value
         for marker in markers
-        if isinstance(marker, tuple) and marker[0].value == 'extra'
+        if isinstance(marker, tuple) and marker[0].value == "extra"
     )
 
 

@@ -5,7 +5,7 @@ def compile():
     configure("sere/fe/gram/SereLexer.g4")
     configure("sere/fe/gram/SereParser.g4")
     os.system("antlr4 -Dlanguage=Python3 -visitor -o . sere/fe/gram/*.g4")
-    
+
 
 def configure(file_path: str):
     if not os.path.exists(file_path):
@@ -23,6 +23,6 @@ def configure(file_path: str):
             x = x.replace("this.", "self.")
         output_file.write(x)
         output_file.flush()
-    #print("Writing ...")
+    # print("Writing ...")
     input_file.close()
     output_file.close()

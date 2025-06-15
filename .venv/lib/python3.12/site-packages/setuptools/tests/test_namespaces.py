@@ -14,37 +14,37 @@ class TestNamespaces:
         should leave the namespace in tact and both packages reachable by
         import.
         """
-        pkg_A = namespaces.build_namespace_package(tmpdir, 'myns.pkgA')
-        pkg_B = namespaces.build_namespace_package(tmpdir, 'myns.pkgB')
-        site_packages = tmpdir / 'site-packages'
-        path_packages = tmpdir / 'path-packages'
+        pkg_A = namespaces.build_namespace_package(tmpdir, "myns.pkgA")
+        pkg_B = namespaces.build_namespace_package(tmpdir, "myns.pkgB")
+        site_packages = tmpdir / "site-packages"
+        path_packages = tmpdir / "path-packages"
         targets = site_packages, path_packages
         # use pip to install to the target directory
         install_cmd = [
             sys.executable,
-            '-m',
-            'pip.__main__',
-            'install',
+            "-m",
+            "pip.__main__",
+            "install",
             str(pkg_A),
-            '-t',
+            "-t",
             str(site_packages),
         ]
         subprocess.check_call(install_cmd)
         namespaces.make_site_dir(site_packages)
         install_cmd = [
             sys.executable,
-            '-m',
-            'pip.__main__',
-            'install',
+            "-m",
+            "pip.__main__",
+            "install",
             str(pkg_B),
-            '-t',
+            "-t",
             str(path_packages),
         ]
         subprocess.check_call(install_cmd)
         try_import = [
             sys.executable,
-            '-c',
-            'import myns.pkgA; import myns.pkgB',
+            "-c",
+            "import myns.pkgA; import myns.pkgB",
         ]
         with paths_on_pythonpath(map(str, targets)):
             subprocess.check_call(try_import)
@@ -54,15 +54,15 @@ class TestNamespaces:
         Ensure that a namespace package doesn't break on import
         of pkg_resources.
         """
-        pkg = namespaces.build_namespace_package(tmpdir, 'myns.pkgA')
-        target = tmpdir / 'packages'
+        pkg = namespaces.build_namespace_package(tmpdir, "myns.pkgA")
+        target = tmpdir / "packages"
         target.mkdir()
         install_cmd = [
             sys.executable,
-            '-m',
-            'pip',
-            'install',
-            '-t',
+            "-m",
+            "pip",
+            "install",
+            "-t",
             str(target),
             str(pkg),
         ]
@@ -71,8 +71,8 @@ class TestNamespaces:
         namespaces.make_site_dir(target)
         try_import = [
             sys.executable,
-            '-c',
-            'import pkg_resources',
+            "-c",
+            "import pkg_resources",
         ]
         with paths_on_pythonpath([str(target)]):
             subprocess.check_call(try_import)
@@ -82,16 +82,16 @@ class TestNamespaces:
         Installing a namespace packages but also having it in the current
         working directory, only one version should take precedence.
         """
-        pkg_A = namespaces.build_namespace_package(tmpdir, 'myns.pkgA')
-        target = tmpdir / 'packages'
+        pkg_A = namespaces.build_namespace_package(tmpdir, "myns.pkgA")
+        target = tmpdir / "packages"
         # use pip to install to the target directory
         install_cmd = [
             sys.executable,
-            '-m',
-            'pip.__main__',
-            'install',
+            "-m",
+            "pip.__main__",
+            "install",
             str(pkg_A),
-            '-t',
+            "-t",
             str(target),
         ]
         subprocess.check_call(install_cmd)
@@ -100,8 +100,8 @@ class TestNamespaces:
         # ensure that package imports and pkg_resources imports
         pkg_resources_imp = [
             sys.executable,
-            '-c',
-            'import pkg_resources; import myns.pkgA',
+            "-c",
+            "import pkg_resources; import myns.pkgA",
         ]
         with paths_on_pythonpath([str(target)]):
             subprocess.check_call(pkg_resources_imp, cwd=str(pkg_A))
@@ -112,17 +112,17 @@ class TestNamespaces:
         namespace in the current working directory, both of them must be
         importable.
         """
-        pkg_A = namespaces.build_namespace_package(tmpdir, 'myns.pkgA')
-        pkg_B = namespaces.build_namespace_package(tmpdir, 'myns.pkgB')
-        target = tmpdir / 'packages'
+        pkg_A = namespaces.build_namespace_package(tmpdir, "myns.pkgA")
+        pkg_B = namespaces.build_namespace_package(tmpdir, "myns.pkgB")
+        target = tmpdir / "packages"
         # use pip to install to the target directory
         install_cmd = [
             sys.executable,
-            '-m',
-            'pip.__main__',
-            'install',
+            "-m",
+            "pip.__main__",
+            "install",
             str(pkg_A),
-            '-t',
+            "-t",
             str(target),
         ]
         subprocess.check_call(install_cmd)
@@ -131,8 +131,8 @@ class TestNamespaces:
         # ensure that all packages import and pkg_resources imports
         pkg_resources_imp = [
             sys.executable,
-            '-c',
-            'import pkg_resources; import myns.pkgA; import myns.pkgB',
+            "-c",
+            "import pkg_resources; import myns.pkgA; import myns.pkgB",
         ]
         with paths_on_pythonpath([str(target)]):
             subprocess.check_call(pkg_resources_imp, cwd=str(pkg_B))

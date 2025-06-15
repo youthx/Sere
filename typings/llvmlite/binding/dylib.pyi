@@ -9,16 +9,15 @@ def address_of_symbol(name):
     """
     ...
 
-def add_symbol(name, address): # -> None:
+def add_symbol(name, address):  # -> None:
     """
     Register the *address* of global symbol *name*.  This will make
     it usable (e.g. callable) from LLVM-compiled functions.
     """
     ...
 
-def load_library_permanently(filename): # -> None:
+def load_library_permanently(filename):  # -> None:
     """
     Load an external library
     """
     ...
-

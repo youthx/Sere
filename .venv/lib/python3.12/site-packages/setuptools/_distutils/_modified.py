@@ -83,9 +83,9 @@ def newer_group(
     """
 
     def missing_as_newer(source):
-        return missing == 'newer' and not os.path.exists(source)
+        return missing == "newer" and not os.path.exists(source)
 
-    ignored = os.path.exists if missing == 'ignore' else None
+    ignored = os.path.exists if missing == "ignore" else None
     return not os.path.exists(target) or any(
         missing_as_newer(source) or _newer(source, target)
         for source in filter(ignored, sources)

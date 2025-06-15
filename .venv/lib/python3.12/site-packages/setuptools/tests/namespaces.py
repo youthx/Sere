@@ -13,8 +13,8 @@ def iter_namespace_pkgs(namespace):
 def build_namespace_package(tmpdir, name, version="1.0", impl="pkg_resources"):
     src_dir = tmpdir / name
     src_dir.mkdir()
-    setup_py = src_dir / 'setup.py'
-    namespace, _, rest = name.rpartition('.')
+    setup_py = src_dir / "setup.py"
+    namespace, _, rest = name.rpartition(".")
     namespaces = list(iter_namespace_pkgs(namespace))
     setup_args = {
         "name": name,
@@ -40,18 +40,18 @@ def build_namespace_package(tmpdir, name, version="1.0", impl="pkg_resources"):
         setuptools.setup(**args)
         """
     ).format(args=args)
-    setup_py.write_text(script, encoding='utf-8')
+    setup_py.write_text(script, encoding="utf-8")
 
     ns_pkg_dir = Path(src_dir, namespace.replace(".", "/"))
     ns_pkg_dir.mkdir(parents=True)
 
     for ns in namespaces:
-        pkg_init = src_dir / ns.replace(".", "/") / '__init__.py'
-        pkg_init.write_text(tmpl, encoding='utf-8')
+        pkg_init = src_dir / ns.replace(".", "/") / "__init__.py"
+        pkg_init.write_text(tmpl, encoding="utf-8")
 
-    pkg_mod = ns_pkg_dir / (rest + '.py')
-    some_functionality = 'name = {rest!r}'.format(**locals())
-    pkg_mod.write_text(some_functionality, encoding='utf-8')
+    pkg_mod = ns_pkg_dir / (rest + ".py")
+    some_functionality = "name = {rest!r}".format(**locals())
+    pkg_mod.write_text(some_functionality, encoding="utf-8")
     return src_dir
 
 
@@ -69,12 +69,12 @@ def build_pep420_namespace_package(tmpdir, name):
         name = "{name}"
         version = "3.14159"
         """
-    pyproject.write_text(textwrap.dedent(script), encoding='utf-8')
+    pyproject.write_text(textwrap.dedent(script), encoding="utf-8")
     ns_pkg_dir = Path(src_dir, namespace.replace(".", "/"))
     ns_pkg_dir.mkdir(parents=True)
     pkg_mod = ns_pkg_dir / (rest + ".py")
     some_functionality = f"name = {rest!r}"
-    pkg_mod.write_text(some_functionality, encoding='utf-8')
+    pkg_mod.write_text(some_functionality, encoding="utf-8")
     return src_dir
 
 
@@ -84,7 +84,7 @@ def make_site_dir(target):
     target to be added to site dirs such that .pth files
     are processed there.
     """
-    sc = target / 'sitecustomize.py'
+    sc = target / "sitecustomize.py"
     target_str = str(target)
     tmpl = '__import__("site").addsitedir({target_str!r})'
-    sc.write_text(tmpl.format(**locals()), encoding='utf-8')
+    sc.write_text(tmpl.format(**locals()), encoding="utf-8")

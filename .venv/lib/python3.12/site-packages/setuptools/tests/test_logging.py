@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-IS_PYPY = '__pypy__' in sys.builtin_module_names
+IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 
 setup_py = """\
@@ -19,7 +19,7 @@ setup(
 
 
 @pytest.mark.parametrize(
-    ('flag', 'expected_level'), [("--dry-run", "INFO"), ("--verbose", "DEBUG")]
+    ("flag", "expected_level"), [("--dry-run", "INFO"), ("--verbose", "DEBUG")]
 )
 def test_verbosity_level(tmp_path, monkeypatch, flag, expected_level):
     """Make sure the correct verbosity level is set (issue #3038)"""

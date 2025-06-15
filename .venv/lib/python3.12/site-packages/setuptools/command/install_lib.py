@@ -41,7 +41,7 @@ class install_lib(orig.install_lib):
         Given a package name and exclusion path within that package,
         compute the full exclusion path.
         """
-        parts = pkg.split('.') + [exclusion_path]
+        parts = pkg.split(".") + [exclusion_path]
         return os.path.join(self.install_dir, *parts)
 
     @staticmethod
@@ -52,7 +52,7 @@ class install_lib(orig.install_lib):
         """
         while pkg_name:
             yield pkg_name
-            pkg_name, _sep, _child = pkg_name.rpartition('.')
+            pkg_name, _sep, _child = pkg_name.rpartition(".")
 
     def _get_SVEM_NSPs(self):
         """
@@ -65,7 +65,7 @@ class install_lib(orig.install_lib):
         if not self.distribution.namespace_packages:
             return []
 
-        install_cmd = self.get_finalized_command('install')
+        install_cmd = self.get_finalized_command("install")
         svem = install_cmd.single_version_externally_managed
 
         return self.distribution.namespace_packages if svem else []
@@ -77,19 +77,19 @@ class install_lib(orig.install_lib):
         cache files).
         """
         # always exclude the package module itself
-        yield '__init__.py'
+        yield "__init__.py"
 
-        yield '__init__.pyc'
-        yield '__init__.pyo'
+        yield "__init__.pyc"
+        yield "__init__.pyo"
 
-        if not hasattr(sys, 'implementation'):
+        if not hasattr(sys, "implementation"):
             return
 
-        base = os.path.join('__pycache__', '__init__.' + sys.implementation.cache_tag)
-        yield base + '.pyc'
-        yield base + '.pyo'
-        yield base + '.opt-1.pyc'
-        yield base + '.opt-2.pyc'
+        base = os.path.join("__pycache__", "__init__." + sys.implementation.cache_tag)
+        yield base + ".pyc"
+        yield base + ".pyo"
+        yield base + ".opt-1.pyc"
+        yield base + ".opt-2.pyc"
 
     def copy_tree(
         self,

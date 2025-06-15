@@ -55,16 +55,16 @@ if TYPE_CHECKING:
     from typing_extensions import TypeAlias
 
 __all__ = [
-    'get_requires_for_build_sdist',
-    'get_requires_for_build_wheel',
-    'prepare_metadata_for_build_wheel',
-    'build_wheel',
-    'build_sdist',
-    'get_requires_for_build_editable',
-    'prepare_metadata_for_build_editable',
-    'build_editable',
-    '__legacy__',
-    'SetupRequirementsError',
+    "get_requires_for_build_sdist",
+    "get_requires_for_build_wheel",
+    "prepare_metadata_for_build_wheel",
+    "build_wheel",
+    "build_sdist",
+    "get_requires_for_build_editable",
+    "prepare_metadata_for_build_editable",
+    "build_editable",
+    "__legacy__",
+    "SetupRequirementsError",
 ]
 
 
@@ -123,8 +123,8 @@ def _file_with_extension(directory: StrPath, extension: str | tuple[str, ...]):
         (file,) = matching
     except ValueError:
         raise ValueError(
-            'No distribution was found. Ensure that `setup.py` '
-            'is not empty and that it calls `setup()`.'
+            "No distribution was found. Ensure that `setup.py` "
+            "is not empty and that it calls `setup()`."
         ) from None
     return file
 
@@ -140,7 +140,7 @@ def _open_setup_script(setup_script):
 @contextlib.contextmanager
 def suppress_known_deprecation():
     with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', 'setup.py install is deprecated')
+        warnings.filterwarnings("ignore", "setup.py install is deprecated")
         yield
 
 
@@ -304,14 +304,14 @@ class _BuildMetaBackend(_ConfigSettingsTranslator):
 
         return requirements
 
-    def run_setup(self, setup_script: str = 'setup.py'):
+    def run_setup(self, setup_script: str = "setup.py"):
         # Note that we can reuse our build directory between calls
         # Correctness comes first, then optimization later
         __file__ = os.path.abspath(setup_script)
-        __name__ = '__main__'
+        __name__ = "__main__"
 
         with _open_setup_script(__file__) as f:
-            code = f.read().replace(r'\r\n', r'\n')
+            code = f.read().replace(r"\r\n", r"\n")
 
         try:
             exec(code, locals())
@@ -422,29 +422,29 @@ class _BuildMetaBackend(_ConfigSettingsTranslator):
             with suppress_known_deprecation():
                 return self._build_with_temp_dir(
                     cmd,
-                    '.whl',
+                    ".whl",
                     wheel_directory,
                     config_settings,
                     self._arbitrary_args(config_settings),
                 )
 
         if metadata_directory is None:
-            return _build(['bdist_wheel'])
+            return _build(["bdist_wheel"])
 
         try:
-            return _build(['bdist_wheel', '--dist-info-dir', str(metadata_directory)])
+            return _build(["bdist_wheel", "--dist-info-dir", str(metadata_directory)])
         except SystemExit as ex:  # pragma: nocover
             # pypa/setuptools#4683
             if "--dist-info-dir not recognized" not in str(ex):
                 raise
             _IncompatibleBdistWheel.emit()
-            return _build(['bdist_wheel'])
+            return _build(["bdist_wheel"])
 
     def build_sdist(
         self, sdist_directory: StrPath, config_settings: _ConfigSettings = None
     ):
         return self._build_with_temp_dir(
-            ['sdist', '--formats', 'gztar'], '.tar.gz', sdist_directory, config_settings
+            ["sdist", "--formats", "gztar"], ".tar.gz", sdist_directory, config_settings
         )
 
     def _get_dist_info_dir(self, metadata_directory: StrPath | None) -> str | None:
@@ -492,7 +492,7 @@ class _BuildMetaLegacyBackend(_BuildMetaBackend):
     and will eventually be removed.
     """
 
-    def run_setup(self, setup_script: str = 'setup.py'):
+    def run_setup(self, setup_script: str = "setup.py"):
         # In order to maintain compatibility with scripts assuming that
         # the setup.py script is in a directory on the PYTHONPATH, inject
         # '' into sys.path. (pypa/setuptools#1642)

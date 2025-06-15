@@ -20,10 +20,10 @@ class alias(option_base):
     command_consumes_arguments = True
 
     user_options = [
-        ('remove', 'r', 'remove (unset) the alias'),
+        ("remove", "r", "remove (unset) the alias"),
     ] + option_base.user_options
 
-    boolean_options = option_base.boolean_options + ['remove']
+    boolean_options = option_base.boolean_options + ["remove"]
 
     def initialize_options(self):
         option_base.initialize_options(self)
@@ -38,7 +38,7 @@ class alias(option_base):
             )
 
     def run(self) -> None:
-        aliases = self.distribution.get_option_dict('aliases')
+        aliases = self.distribution.get_option_dict("aliases")
 
         if not self.args:
             print("Command Aliases")
@@ -59,19 +59,19 @@ class alias(option_base):
                 return
         else:
             alias = self.args[0]
-            command = ' '.join(map(shquote, self.args[1:]))
+            command = " ".join(map(shquote, self.args[1:]))
 
-        edit_config(self.filename, {'aliases': {alias: command}}, self.dry_run)
+        edit_config(self.filename, {"aliases": {alias: command}}, self.dry_run)
 
 
 def format_alias(name, aliases):
     source, command = aliases[name]
-    if source == config_file('global'):
-        source = '--global-config '
-    elif source == config_file('user'):
-        source = '--user-config '
-    elif source == config_file('local'):
-        source = ''
+    if source == config_file("global"):
+        source = "--global-config "
+    elif source == config_file("user"):
+        source = "--user-config "
+    elif source == config_file("local"):
+        source = ""
     else:
-        source = f'--filename={source!r}'
-    return source + name + ' ' + command
+        source = f"--filename={source!r}"
+    return source + name + " " + command

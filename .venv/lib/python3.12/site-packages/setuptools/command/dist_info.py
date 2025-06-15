@@ -27,19 +27,19 @@ class dist_info(Command):
 
     user_options = [
         (
-            'output-dir=',
-            'o',
+            "output-dir=",
+            "o",
             "directory inside of which the .dist-info will be"
             "created [default: top of the source tree]",
         ),
-        ('tag-date', 'd', "Add date stamp (e.g. 20050528) to version number"),
-        ('tag-build=', 'b', "Specify explicit tag to add to version number"),
-        ('no-date', 'D', "Don't include date stamp [default]"),
-        ('keep-egg-info', None, "*TRANSITIONAL* will be removed in the future"),
+        ("tag-date", "d", "Add date stamp (e.g. 20050528) to version number"),
+        ("tag-build=", "b", "Specify explicit tag to add to version number"),
+        ("no-date", "D", "Don't include date stamp [default]"),
+        ("keep-egg-info", None, "*TRANSITIONAL* will be removed in the future"),
     ]
 
-    boolean_options = ['tag-date', 'keep-egg-info']
-    negative_opt = {'no-date': 'tag-date'}
+    boolean_options = ["tag-date", "keep-egg-info"]
+    negative_opt = {"no-date": "tag-date"}
 
     def initialize_options(self):
         self.output_dir = None
@@ -96,7 +96,7 @@ class dist_info(Command):
         assert os.path.isdir(egg_info_dir), ".egg-info dir should have been created"
 
         log.info(f"creating '{os.path.abspath(self.dist_info_dir)}'")
-        bdist_wheel = self.get_finalized_command('bdist_wheel')
+        bdist_wheel = self.get_finalized_command("bdist_wheel")
 
         # TODO: if bdist_wheel if merged into setuptools, just add "keep_egg_info" there
         with self._maybe_bkp_dir(egg_info_dir, self.keep_egg_info):

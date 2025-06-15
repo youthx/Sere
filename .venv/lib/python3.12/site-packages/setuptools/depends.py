@@ -14,7 +14,7 @@ from ._imp import PY_COMPILED, PY_FROZEN, PY_SOURCE, find_module
 
 _T = TypeVar("_T")
 
-__all__ = ['Require', 'find_module']
+__all__ = ["Require", "find_module"]
 
 
 class Require:
@@ -25,7 +25,7 @@ class Require:
         name,
         requested_version,
         module,
-        homepage: str = '',
+        homepage: str = "",
         attribute=None,
         format=None,
     ) -> None:
@@ -35,7 +35,7 @@ class Require:
         if format is not None:
             requested_version = format(requested_version)
             if attribute is None:
-                attribute = '__version__'
+                attribute = "__version__"
 
         self.__dict__.update(locals())
         del self.self
@@ -43,7 +43,7 @@ class Require:
     def full_name(self):
         """Return full package/distribution name, w/version"""
         if self.requested_version is not None:
-            return f'{self.name}-{self.requested_version}'
+            return f"{self.name}-{self.requested_version}"
         return self.name
 
     def version_ok(self, version):
@@ -110,7 +110,7 @@ def maybe_close(f):
 
 # Some objects are not available on some platforms.
 # XXX it'd be better to test assertions about bytecode instead.
-if not sys.platform.startswith('java') and sys.platform != 'cli':
+if not sys.platform.startswith("java") and sys.platform != "cli":
 
     def get_module_constant(
         module, symbol, default: _T | int = -1, paths=None
@@ -134,7 +134,7 @@ if not sys.platform.startswith('java') and sys.platform != 'cli':
             elif kind == PY_FROZEN:
                 code = _imp.get_frozen_object(module, paths)
             elif kind == PY_SOURCE:
-                code = compile(f.read(), path, 'exec')
+                code = compile(f.read(), path, "exec")
             else:
                 # Not something we can parse; we'll have to import it.  :(
                 imported = _imp.get_module(module, paths, info)
@@ -162,9 +162,9 @@ if not sys.platform.startswith('java') and sys.platform != 'cli':
 
         name_idx = list(code.co_names).index(symbol)
 
-        STORE_NAME = dis.opmap['STORE_NAME']
-        STORE_GLOBAL = dis.opmap['STORE_GLOBAL']
-        LOAD_CONST = dis.opmap['LOAD_CONST']
+        STORE_NAME = dis.opmap["STORE_NAME"]
+        STORE_GLOBAL = dis.opmap["STORE_GLOBAL"]
+        LOAD_CONST = dis.opmap["LOAD_CONST"]
 
         const = default
 
@@ -182,4 +182,4 @@ if not sys.platform.startswith('java') and sys.platform != 'cli':
 
         return None
 
-    __all__ += ['get_module_constant', 'extract_constant']
+    __all__ += ["get_module_constant", "extract_constant"]

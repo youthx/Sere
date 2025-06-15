@@ -30,143 +30,145 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def environment(monkeypatch):
-    monkeypatch.setattr(os, 'name', os.name)
-    monkeypatch.setattr(sys, 'platform', sys.platform)
-    monkeypatch.setattr(sys, 'version', sys.version)
-    monkeypatch.setattr(os, 'sep', os.sep)
-    monkeypatch.setattr(os.path, 'join', os.path.join)
-    monkeypatch.setattr(os.path, 'isabs', os.path.isabs)
-    monkeypatch.setattr(os.path, 'splitdrive', os.path.splitdrive)
-    monkeypatch.setattr(sysconfig, '_config_vars', copy(sysconfig._config_vars))
+    monkeypatch.setattr(os, "name", os.name)
+    monkeypatch.setattr(sys, "platform", sys.platform)
+    monkeypatch.setattr(sys, "version", sys.version)
+    monkeypatch.setattr(os, "sep", os.sep)
+    monkeypatch.setattr(os.path, "join", os.path.join)
+    monkeypatch.setattr(os.path, "isabs", os.path.isabs)
+    monkeypatch.setattr(os.path, "splitdrive", os.path.splitdrive)
+    monkeypatch.setattr(sysconfig, "_config_vars", copy(sysconfig._config_vars))
 
 
-@pytest.mark.usefixtures('save_env')
+@pytest.mark.usefixtures("save_env")
 class TestUtil:
     def test_get_host_platform(self):
-        with mock.patch('os.name', 'nt'):
-            with mock.patch('sys.version', '... [... (ARM64)]'):
-                assert get_host_platform() == 'win-arm64'
-            with mock.patch('sys.version', '... [... (ARM)]'):
-                assert get_host_platform() == 'win-arm32'
+        with mock.patch("os.name", "nt"):
+            with mock.patch("sys.version", "... [... (ARM64)]"):
+                assert get_host_platform() == "win-arm64"
+            with mock.patch("sys.version", "... [... (ARM)]"):
+                assert get_host_platform() == "win-arm32"
 
-        with mock.patch('sys.version_info', (3, 9, 0, 'final', 0)):
+        with mock.patch("sys.version_info", (3, 9, 0, "final", 0)):
             assert get_host_platform() == stdlib_sysconfig.get_platform()
 
     def test_get_platform(self):
-        with mock.patch('os.name', 'nt'):
-            with mock.patch.dict('os.environ', {'VSCMD_ARG_TGT_ARCH': 'x86'}):
-                assert get_platform() == 'win32'
-            with mock.patch.dict('os.environ', {'VSCMD_ARG_TGT_ARCH': 'x64'}):
-                assert get_platform() == 'win-amd64'
-            with mock.patch.dict('os.environ', {'VSCMD_ARG_TGT_ARCH': 'arm'}):
-                assert get_platform() == 'win-arm32'
-            with mock.patch.dict('os.environ', {'VSCMD_ARG_TGT_ARCH': 'arm64'}):
-                assert get_platform() == 'win-arm64'
+        with mock.patch("os.name", "nt"):
+            with mock.patch.dict("os.environ", {"VSCMD_ARG_TGT_ARCH": "x86"}):
+                assert get_platform() == "win32"
+            with mock.patch.dict("os.environ", {"VSCMD_ARG_TGT_ARCH": "x64"}):
+                assert get_platform() == "win-amd64"
+            with mock.patch.dict("os.environ", {"VSCMD_ARG_TGT_ARCH": "arm"}):
+                assert get_platform() == "win-arm32"
+            with mock.patch.dict("os.environ", {"VSCMD_ARG_TGT_ARCH": "arm64"}):
+                assert get_platform() == "win-arm64"
 
     def test_convert_path(self):
-        expected = os.sep.join(('', 'home', 'to', 'my', 'stuff'))
-        assert convert_path('/home/to/my/stuff') == expected
-        assert convert_path(pathlib.Path('/home/to/my/stuff')) == expected
-        assert convert_path('.') == os.curdir
+        expected = os.sep.join(("", "home", "to", "my", "stuff"))
+        assert convert_path("/home/to/my/stuff") == expected
+        assert convert_path(pathlib.Path("/home/to/my/stuff")) == expected
+        assert convert_path(".") == os.curdir
 
     def test_change_root(self):
         # linux/mac
-        os.name = 'posix'
+        os.name = "posix"
 
         def _isabs(path):
-            return path[0] == '/'
+            return path[0] == "/"
 
         os.path.isabs = _isabs
 
         def _join(*path):
-            return '/'.join(path)
+            return "/".join(path)
 
         os.path.join = _join
 
-        assert change_root('/root', '/old/its/here') == '/root/old/its/here'
-        assert change_root('/root', 'its/here') == '/root/its/here'
+        assert change_root("/root", "/old/its/here") == "/root/old/its/here"
+        assert change_root("/root", "its/here") == "/root/its/here"
 
         # windows
-        os.name = 'nt'
-        os.sep = '\\'
+        os.name = "nt"
+        os.sep = "\\"
 
         def _isabs(path):
-            return path.startswith('c:\\')
+            return path.startswith("c:\\")
 
         os.path.isabs = _isabs
 
         def _splitdrive(path):
-            if path.startswith('c:'):
-                return ('', path.replace('c:', ''))
-            return ('', path)
+            if path.startswith("c:"):
+                return ("", path.replace("c:", ""))
+            return ("", path)
 
         os.path.splitdrive = _splitdrive
 
         def _join(*path):
-            return '\\'.join(path)
+            return "\\".join(path)
 
         os.path.join = _join
 
         assert (
-            change_root('c:\\root', 'c:\\old\\its\\here') == 'c:\\root\\old\\its\\here'
+            change_root("c:\\root", "c:\\old\\its\\here") == "c:\\root\\old\\its\\here"
         )
-        assert change_root('c:\\root', 'its\\here') == 'c:\\root\\its\\here'
+        assert change_root("c:\\root", "its\\here") == "c:\\root\\its\\here"
 
         # BugsBunny os (it's a great os)
-        os.name = 'BugsBunny'
+        os.name = "BugsBunny"
         with pytest.raises(DistutilsPlatformError):
-            change_root('c:\\root', 'its\\here')
+            change_root("c:\\root", "its\\here")
 
         # XXX platforms to be covered: mac
 
     def test_check_environ(self):
         util.check_environ.cache_clear()
-        os.environ.pop('HOME', None)
+        os.environ.pop("HOME", None)
 
         check_environ()
 
-        assert os.environ['PLAT'] == get_platform()
+        assert os.environ["PLAT"] == get_platform()
 
     @pytest.mark.skipif("os.name != 'posix'")
     def test_check_environ_getpwuid(self):
         util.check_environ.cache_clear()
-        os.environ.pop('HOME', None)
+        os.environ.pop("HOME", None)
 
         import pwd
 
         # only set pw_dir field, other fields are not used
-        result = pwd.struct_passwd((
-            None,
-            None,
-            None,
-            None,
-            None,
-            '/home/distutils',
-            None,
-        ))
-        with mock.patch.object(pwd, 'getpwuid', return_value=result):
+        result = pwd.struct_passwd(
+            (
+                None,
+                None,
+                None,
+                None,
+                None,
+                "/home/distutils",
+                None,
+            )
+        )
+        with mock.patch.object(pwd, "getpwuid", return_value=result):
             check_environ()
-            assert os.environ['HOME'] == '/home/distutils'
+            assert os.environ["HOME"] == "/home/distutils"
 
         util.check_environ.cache_clear()
-        os.environ.pop('HOME', None)
+        os.environ.pop("HOME", None)
 
         # bpo-10496: Catch pwd.getpwuid() error
-        with mock.patch.object(pwd, 'getpwuid', side_effect=KeyError):
+        with mock.patch.object(pwd, "getpwuid", side_effect=KeyError):
             check_environ()
-            assert 'HOME' not in os.environ
+            assert "HOME" not in os.environ
 
     def test_split_quoted(self):
         assert split_quoted('""one"" "two" \'three\' \\four') == [
-            'one',
-            'two',
-            'three',
-            'four',
+            "one",
+            "two",
+            "three",
+            "four",
         ]
 
     def test_strtobool(self):
-        yes = ('y', 'Y', 'yes', 'True', 't', 'true', 'True', 'On', 'on', '1')
-        no = ('n', 'no', 'f', 'false', 'off', '0', 'Off', 'No', 'N')
+        yes = ("y", "Y", "yes", "True", "t", "true", "True", "On", "on", "1")
+        no = ("n", "no", "f", "false", "off", "0", "Off", "No", "N")
 
         for y in yes:
             assert strtobool(y)
@@ -174,7 +176,7 @@ class TestUtil:
         for n in no:
             assert not strtobool(n)
 
-    indent = 8 * ' '
+    indent = 8 * " "
 
     @pytest.mark.parametrize(
         "given,wanted",

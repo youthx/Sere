@@ -12,7 +12,7 @@ import pytest
 class TestDepUtil(support.TempdirManager):
     def test_newer(self):
         tmpdir = self.mkdtemp()
-        new_file = os.path.join(tmpdir, 'new')
+        new_file = os.path.join(tmpdir, "new")
         old_file = os.path.abspath(__file__)
 
         # Raise DistutilsFileError if 'new_file' does not exist.
@@ -22,7 +22,7 @@ class TestDepUtil(support.TempdirManager):
         # Return true if 'new_file' exists and is more recently modified than
         # 'old_file', or if 'new_file' exists and 'old_file' doesn't.
         self.write_file(new_file)
-        assert newer(new_file, 'I_dont_exist')
+        assert newer(new_file, "I_dont_exist")
         assert newer(new_file, old_file)
 
         # Return false if both exist and 'old_file' is the same age or younger
@@ -31,14 +31,14 @@ class TestDepUtil(support.TempdirManager):
 
     def _setup_1234(self):
         tmpdir = self.mkdtemp()
-        sources = os.path.join(tmpdir, 'sources')
-        targets = os.path.join(tmpdir, 'targets')
+        sources = os.path.join(tmpdir, "sources")
+        targets = os.path.join(tmpdir, "targets")
         os.mkdir(sources)
         os.mkdir(targets)
-        one = os.path.join(sources, 'one')
-        two = os.path.join(sources, 'two')
+        one = os.path.join(sources, "one")
+        two = os.path.join(sources, "two")
         three = os.path.abspath(__file__)  # I am the old file
-        four = os.path.join(targets, 'four')
+        four = os.path.join(targets, "four")
         self.write_file(one)
         self.write_file(two)
         self.write_file(four)
@@ -68,11 +68,11 @@ class TestDepUtil(support.TempdirManager):
 
     def test_newer_group(self):
         tmpdir = self.mkdtemp()
-        sources = os.path.join(tmpdir, 'sources')
+        sources = os.path.join(tmpdir, "sources")
         os.mkdir(sources)
-        one = os.path.join(sources, 'one')
-        two = os.path.join(sources, 'two')
-        three = os.path.join(sources, 'three')
+        one = os.path.join(sources, "one")
+        two = os.path.join(sources, "two")
+        three = os.path.join(sources, "three")
         old_file = os.path.abspath(__file__)
 
         # return true if 'old_file' is out-of-date with respect to any file
@@ -88,9 +88,9 @@ class TestDepUtil(support.TempdirManager):
         with pytest.raises(OSError):
             newer_group([one, two, old_file], three)
 
-        assert not newer_group([one, two, old_file], three, missing='ignore')
+        assert not newer_group([one, two, old_file], three, missing="ignore")
 
-        assert newer_group([one, two, old_file], three, missing='newer')
+        assert newer_group([one, two, old_file], three, missing="newer")
 
 
 @pytest.fixture
@@ -100,11 +100,11 @@ def groups_target(tmp_path):
 
     Returns a simple namespace with these values.
     """
-    filenames = ['older.c', 'older.h', 'target.o', 'newer.c', 'newer.h']
+    filenames = ["older.c", "older.h", "target.o", "newer.c", "newer.h"]
     paths = [tmp_path / name for name in filenames]
 
     for mtime, path in enumerate(paths):
-        path.write_text('', encoding='utf-8')
+        path.write_text("", encoding="utf-8")
 
         # make sure modification times are sequential
         os.utime(path, (mtime, mtime))
@@ -123,4 +123,4 @@ def test_newer_group_no_sources_no_target(tmp_path):
     """
     Consider no sources and no target "newer".
     """
-    assert newer_group([], str(tmp_path / 'does-not-exist'))
+    assert newer_group([], str(tmp_path / "does-not-exist"))

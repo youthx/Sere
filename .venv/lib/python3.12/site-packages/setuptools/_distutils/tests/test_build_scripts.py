@@ -49,21 +49,27 @@ class TestBuildScripts(support.TempdirManager):
     @staticmethod
     def write_sample_scripts(dir):
         spec = {
-            'script1.py': textwrap.dedent("""
+            "script1.py": textwrap.dedent(
+                """
                 #! /usr/bin/env python2.3
                 # bogus script w/ Python sh-bang
                 pass
-                """).lstrip(),
-            'script2.py': textwrap.dedent("""
+                """
+            ).lstrip(),
+            "script2.py": textwrap.dedent(
+                """
                 #!/usr/bin/python
                 # bogus script w/ Python sh-bang
                 pass
-                """).lstrip(),
-            'shell.sh': textwrap.dedent("""
+                """
+            ).lstrip(),
+            "shell.sh": textwrap.dedent(
+                """
                 #!/bin/sh
                 # bogus shell script w/ sh-bang
                 exit 0
-                """).lstrip(),
+                """
+            ).lstrip(),
         }
         jaraco.path.build(spec, dir)
         return list(spec)
@@ -83,13 +89,13 @@ class TestBuildScripts(support.TempdirManager):
         # On linux-g++-32 with command line `./configure --enable-ipv6
         # --with-suffix=3`, python is compiled okay but the build scripts
         # failed when writing the name of the executable
-        old = sysconfig.get_config_vars().get('VERSION')
-        sysconfig._config_vars['VERSION'] = 4
+        old = sysconfig.get_config_vars().get("VERSION")
+        sysconfig._config_vars["VERSION"] = 4
         try:
             cmd.run()
         finally:
             if old is not None:
-                sysconfig._config_vars['VERSION'] = old
+                sysconfig._config_vars["VERSION"] = old
 
         built = os.listdir(target)
         for name in expected:

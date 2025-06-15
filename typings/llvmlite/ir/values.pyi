@@ -11,155 +11,139 @@ Instructions are in the instructions module.
 _VALID_CHARS = ...
 _SIMPLE_IDENTIFIER_RE = ...
 _CMP_MAP = ...
+
 class _ConstOpMixin:
     """
     A mixin defining constant operations, for use in constant-like classes.
     """
-    @_binop('shl')
-    def shl(self, other): # -> None:
+
+    @_binop("shl")
+    def shl(self, other):  # -> None:
         """
         Left integer shift:
             lhs << rhs
         """
         ...
-    
-    @_binop('lshr')
-    def lshr(self, other): # -> None:
+    @_binop("lshr")
+    def lshr(self, other):  # -> None:
         """
         Logical (unsigned) right integer shift:
             lhs >> rhs
         """
         ...
-    
-    @_binop('ashr')
-    def ashr(self, other): # -> None:
+    @_binop("ashr")
+    def ashr(self, other):  # -> None:
         """
         Arithmetic (signed) right integer shift:
             lhs >> rhs
         """
         ...
-    
-    @_binop('add')
-    def add(self, other): # -> None:
+    @_binop("add")
+    def add(self, other):  # -> None:
         """
         Integer addition:
             lhs + rhs
         """
         ...
-    
-    @_binop('fadd')
-    def fadd(self, other): # -> None:
+    @_binop("fadd")
+    def fadd(self, other):  # -> None:
         """
         Floating-point addition:
             lhs + rhs
         """
         ...
-    
-    @_binop('sub')
-    def sub(self, other): # -> None:
+    @_binop("sub")
+    def sub(self, other):  # -> None:
         """
         Integer subtraction:
             lhs - rhs
         """
         ...
-    
-    @_binop('fsub')
-    def fsub(self, other): # -> None:
+    @_binop("fsub")
+    def fsub(self, other):  # -> None:
         """
         Floating-point subtraction:
             lhs - rhs
         """
         ...
-    
-    @_binop('mul')
-    def mul(self, other): # -> None:
+    @_binop("mul")
+    def mul(self, other):  # -> None:
         """
         Integer multiplication:
             lhs * rhs
         """
         ...
-    
-    @_binop('fmul')
-    def fmul(self, other): # -> None:
+    @_binop("fmul")
+    def fmul(self, other):  # -> None:
         """
         Floating-point multiplication:
             lhs * rhs
         """
         ...
-    
-    @_binop('udiv')
-    def udiv(self, other): # -> None:
+    @_binop("udiv")
+    def udiv(self, other):  # -> None:
         """
         Unsigned integer division:
             lhs / rhs
         """
         ...
-    
-    @_binop('sdiv')
-    def sdiv(self, other): # -> None:
+    @_binop("sdiv")
+    def sdiv(self, other):  # -> None:
         """
         Signed integer division:
             lhs / rhs
         """
         ...
-    
-    @_binop('fdiv')
-    def fdiv(self, other): # -> None:
+    @_binop("fdiv")
+    def fdiv(self, other):  # -> None:
         """
         Floating-point division:
             lhs / rhs
         """
         ...
-    
-    @_binop('urem')
-    def urem(self, other): # -> None:
+    @_binop("urem")
+    def urem(self, other):  # -> None:
         """
         Unsigned integer remainder:
             lhs % rhs
         """
         ...
-    
-    @_binop('srem')
-    def srem(self, other): # -> None:
+    @_binop("srem")
+    def srem(self, other):  # -> None:
         """
         Signed integer remainder:
             lhs % rhs
         """
         ...
-    
-    @_binop('frem')
-    def frem(self, other): # -> None:
+    @_binop("frem")
+    def frem(self, other):  # -> None:
         """
         Floating-point remainder:
             lhs % rhs
         """
         ...
-    
-    @_binop('or')
-    def or_(self, other): # -> None:
+    @_binop("or")
+    def or_(self, other):  # -> None:
         """
         Bitwise integer OR:
             lhs | rhs
         """
         ...
-    
-    @_binop('and')
-    def and_(self, other): # -> None:
+    @_binop("and")
+    def and_(self, other):  # -> None:
         """
         Bitwise integer AND:
             lhs & rhs
         """
         ...
-    
-    @_binop('xor')
-    def xor(self, other): # -> None:
+    @_binop("xor")
+    def xor(self, other):  # -> None:
         """
         Bitwise integer XOR:
             lhs ^ rhs
         """
         ...
-    
-    def icmp_signed(self, cmpop, other): # -> FormattedConstant:
+    def icmp_signed(self, cmpop, other):  # -> FormattedConstant:
         """
         Signed integer comparison:
             lhs <cmpop> rhs
@@ -167,8 +151,7 @@ class _ConstOpMixin:
         where cmpop can be '==', '!=', '<', '<=', '>', '>='
         """
         ...
-    
-    def icmp_unsigned(self, cmpop, other): # -> FormattedConstant:
+    def icmp_unsigned(self, cmpop, other):  # -> FormattedConstant:
         """
         Unsigned integer (or pointer) comparison:
             lhs <cmpop> rhs
@@ -176,8 +159,7 @@ class _ConstOpMixin:
         where cmpop can be '==', '!=', '<', '<=', '>', '>='
         """
         ...
-    
-    def fcmp_ordered(self, cmpop, other): # -> FormattedConstant:
+    def fcmp_ordered(self, cmpop, other):  # -> FormattedConstant:
         """
         Floating-point ordered comparison:
             lhs <cmpop> rhs
@@ -185,8 +167,7 @@ class _ConstOpMixin:
         where cmpop can be '==', '!=', '<', '<=', '>', '>=', 'ord', 'uno'
         """
         ...
-    
-    def fcmp_unordered(self, cmpop, other): # -> FormattedConstant:
+    def fcmp_unordered(self, cmpop, other):  # -> FormattedConstant:
         """
         Floating-point unordered comparison:
             lhs <cmpop> rhs
@@ -194,231 +175,178 @@ class _ConstOpMixin:
         where cmpop can be '==', '!=', '<', '<=', '>', '>=', 'ord', 'uno'
         """
         ...
-    
-    def not_(self): # -> None:
+    def not_(self):  # -> None:
         """
         Bitwise integer complement:
             ~value
         """
         ...
-    
-    def neg(self): # -> None:
+    def neg(self):  # -> None:
         """
         Integer negative:
             -value
         """
         ...
-    
-    def fneg(self): # -> FormattedConstant:
+    def fneg(self):  # -> FormattedConstant:
         """
         Floating-point negative:
             -value
         """
         ...
-    
-    @_castop('trunc')
-    def trunc(self, typ): # -> None:
+    @_castop("trunc")
+    def trunc(self, typ):  # -> None:
         """
         Truncating integer downcast to a smaller type.
         """
         ...
-    
-    @_castop('zext')
-    def zext(self, typ): # -> None:
+    @_castop("zext")
+    def zext(self, typ):  # -> None:
         """
         Zero-extending integer upcast to a larger type
         """
         ...
-    
-    @_castop('sext')
-    def sext(self, typ): # -> None:
+    @_castop("sext")
+    def sext(self, typ):  # -> None:
         """
         Sign-extending integer upcast to a larger type.
         """
         ...
-    
-    @_castop('fptrunc')
-    def fptrunc(self, typ): # -> None:
+    @_castop("fptrunc")
+    def fptrunc(self, typ):  # -> None:
         """
         Floating-point downcast to a less precise type.
         """
         ...
-    
-    @_castop('fpext')
-    def fpext(self, typ): # -> None:
+    @_castop("fpext")
+    def fpext(self, typ):  # -> None:
         """
         Floating-point upcast to a more precise type.
         """
         ...
-    
-    @_castop('bitcast')
-    def bitcast(self, typ): # -> None:
+    @_castop("bitcast")
+    def bitcast(self, typ):  # -> None:
         """
         Pointer cast to a different pointer type.
         """
         ...
-    
-    @_castop('fptoui')
-    def fptoui(self, typ): # -> None:
+    @_castop("fptoui")
+    def fptoui(self, typ):  # -> None:
         """
         Convert floating-point to unsigned integer.
         """
         ...
-    
-    @_castop('uitofp')
-    def uitofp(self, typ): # -> None:
+    @_castop("uitofp")
+    def uitofp(self, typ):  # -> None:
         """
         Convert unsigned integer to floating-point.
         """
         ...
-    
-    @_castop('fptosi')
-    def fptosi(self, typ): # -> None:
+    @_castop("fptosi")
+    def fptosi(self, typ):  # -> None:
         """
         Convert floating-point to signed integer.
         """
         ...
-    
-    @_castop('sitofp')
-    def sitofp(self, typ): # -> None:
+    @_castop("sitofp")
+    def sitofp(self, typ):  # -> None:
         """
         Convert signed integer to floating-point.
         """
         ...
-    
-    @_castop('ptrtoint')
-    def ptrtoint(self, typ): # -> None:
+    @_castop("ptrtoint")
+    def ptrtoint(self, typ):  # -> None:
         """
         Cast pointer to integer.
         """
         ...
-    
-    @_castop('inttoptr')
-    def inttoptr(self, typ): # -> None:
+    @_castop("inttoptr")
+    def inttoptr(self, typ):  # -> None:
         """
         Cast integer to pointer.
         """
         ...
-    
-    def gep(self, indices): # -> FormattedConstant:
+    def gep(self, indices):  # -> FormattedConstant:
         """
         Call getelementptr on this pointer constant.
         """
         ...
-    
-
 
 class Value:
     """
     The base class for all values.
     """
-    def __repr__(self): # -> str:
-        ...
-    
 
+    def __repr__(self): ...
 
 class _Undefined:
     """
     'undef': a value for undefined values.
     """
-    def __new__(cls): # -> _Undefined:
-        ...
-    
 
+    def __new__(cls): ...
 
 Undefined = ...
+
 class Constant(_StrCaching, _StringReferenceCaching, _ConstOpMixin, Value):
     """
     A constant LLVM value.
     """
-    def __init__(self, typ, constant) -> None:
-        ...
-    
+
+    def __init__(self, typ, constant) -> None: ...
     @classmethod
-    def literal_array(cls, elems): # -> Self:
+    def literal_array(cls, elems):  # -> Self:
         """
         Construct a literal array constant made of the given members.
         """
         ...
-    
     @classmethod
-    def literal_struct(cls, elems, packed=...): # -> Self:
+    def literal_struct(cls, elems, packed=...):  # -> Self:
         """
         Construct a literal structure constant made of the given members.
         """
         ...
-    
     @property
-    def addrspace(self): # -> int:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __ne__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-    def __repr__(self): # -> str:
-        ...
-    
-
+    def addrspace(self): ...
+    def __eq__(self, other) -> bool: ...
+    def __ne__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __repr__(self): ...
 
 class FormattedConstant(Constant):
     """
     A constant with an already formatted IR representation.
     """
-    def __init__(self, typ, constant) -> None:
-        ...
-    
 
+    def __init__(self, typ, constant) -> None: ...
 
 class NamedValue(_StrCaching, _StringReferenceCaching, Value):
     """
     The base class for named values.
     """
+
     name_prefix = ...
     deduplicate_name = ...
-    def __init__(self, parent, type, name) -> None:
-        ...
-    
-    def descr(self, buf):
-        ...
-    
-    name = ...
-    def __repr__(self): # -> str:
-        ...
-    
-    @property
-    def function_type(self): # -> FunctionType:
-        ...
-    
+    def __init__(self, parent, type, name) -> None: ...
+    def descr(self, buf): ...
 
+    name = ...
+    def __repr__(self): ...
+    @property
+    def function_type(self): ...
 
 class MetaDataString(NamedValue):
     """
     A metadata string, i.e. a constant string used as a value in a metadata
     node.
     """
-    def __init__(self, parent, string) -> None:
-        ...
-    
-    def descr(self, buf): # -> None:
-        ...
-    
-    _to_string = ...
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __ne__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
 
+    def __init__(self, parent, string) -> None: ...
+    def descr(self, buf): ...
+
+    _to_string = ...
+    def __eq__(self, other) -> bool: ...
+    def __ne__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
 
 class MetaDataArgument(_StrCaching, _StringReferenceCaching, Value):
     """
@@ -428,11 +356,10 @@ class MetaDataArgument(_StrCaching, _StringReferenceCaching, Value):
     Do not instantiate directly, Builder.call() will create these
     automatically.
     """
-    def __init__(self, value) -> None:
-        ...
-    
-    _to_string = ...
 
+    def __init__(self, value) -> None: ...
+
+    _to_string = ...
 
 class NamedMetaData:
     """
@@ -440,13 +367,9 @@ class NamedMetaData:
 
     Do not instantiate directly, use Module.add_named_metadata() instead.
     """
-    def __init__(self, parent) -> None:
-        ...
-    
-    def add(self, md): # -> None:
-        ...
-    
 
+    def __init__(self, parent) -> None: ...
+    def add(self, md): ...
 
 class MDValue(NamedValue):
     """
@@ -454,23 +377,13 @@ class MDValue(NamedValue):
 
     Do not instantiate directly, use Module.add_metadata() instead.
     """
-    name_prefix = ...
-    def __init__(self, parent, values, name) -> None:
-        ...
-    
-    def descr(self, buf): # -> None:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __ne__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
 
+    name_prefix = ...
+    def __init__(self, parent, values, name) -> None: ...
+    def descr(self, buf): ...
+    def __eq__(self, other) -> bool: ...
+    def __ne__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
 
 class DIToken:
     """
@@ -479,10 +392,8 @@ class DIToken:
 
     Use this to wrap known constants, e.g. the DW_* enumerations.
     """
-    def __init__(self, value) -> None:
-        ...
-    
 
+    def __init__(self, value) -> None: ...
 
 class DIValue(NamedValue):
     """
@@ -490,46 +401,30 @@ class DIValue(NamedValue):
 
     Do not instantiate directly, use Module.add_debug_info() instead.
     """
-    name_prefix = ...
-    def __init__(self, parent, is_distinct, kind, operands, name) -> None:
-        ...
-    
-    def descr(self, buf): # -> None:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __ne__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
 
+    name_prefix = ...
+    def __init__(self, parent, is_distinct, kind, operands, name) -> None: ...
+    def descr(self, buf): ...
+    def __eq__(self, other) -> bool: ...
+    def __ne__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
 
 class GlobalValue(NamedValue, _ConstOpMixin, _HasMetadata):
     """
     A global value.
     """
+
     name_prefix = ...
     deduplicate_name = ...
-    def __init__(self, *args, **kwargs) -> None:
-        ...
-    
-
+    def __init__(self, *args, **kwargs) -> None: ...
 
 class GlobalVariable(GlobalValue):
     """
     A global variable.
     """
-    def __init__(self, module, typ, name, addrspace=...) -> None:
-        ...
-    
-    def descr(self, buf): # -> None:
-        ...
-    
 
+    def __init__(self, module, typ, name, addrspace=...) -> None: ...
+    def descr(self, buf): ...
 
 class AttributeSet(set):
     """A set of string attribute.
@@ -538,152 +433,89 @@ class AttributeSet(set):
     Properties:
     * Iterate in sorted order
     """
-    _known = ...
-    def __init__(self, args=...) -> None:
-        ...
-    
-    def add(self, name): # -> None:
-        ...
-    
 
+    _known = ...
+    def __init__(self, args=...) -> None: ...
+    def add(self, name): ...
 
 class FunctionAttributes(AttributeSet):
     _known = ...
-    def __init__(self, args=...) -> None:
-        ...
-    
-    def add(self, name): # -> None:
-        ...
-    
+    def __init__(self, args=...) -> None: ...
+    def add(self, name): ...
     @property
-    def alignstack(self): # -> int:
-        ...
-    
+    def alignstack(self): ...
     @alignstack.setter
-    def alignstack(self, val): # -> None:
-        ...
-    
+    def alignstack(self, val): ...
     @property
-    def personality(self): # -> GlobalValue | None:
-        ...
-    
+    def personality(self): ...
     @personality.setter
-    def personality(self, val): # -> None:
-        ...
-    
-
+    def personality(self, val): ...
 
 class Function(GlobalValue):
     """Represent a LLVM Function but does uses a Module as parent.
     Global Values are stored as a set of dependencies (attribute `depends`).
     """
-    def __init__(self, module, ftype, name) -> None:
-        ...
-    
+
+    def __init__(self, module, ftype, name) -> None: ...
     @property
-    def module(self):
-        ...
-    
+    def module(self): ...
     @property
-    def entry_basic_block(self):
-        ...
-    
+    def entry_basic_block(self): ...
     @property
-    def basic_blocks(self): # -> list[Any]:
+    def basic_blocks(self): ...
+    def append_basic_block(self, name=...): ...
+    def insert_basic_block(self, before, name=...):  # -> Block:
+        """Insert block before"""
         ...
-    
-    def append_basic_block(self, name=...): # -> Block:
-        ...
-    
-    def insert_basic_block(self, before, name=...): # -> Block:
-        """Insert block before
-        """
-        ...
-    
-    def descr_prototype(self, buf): # -> None:
+    def descr_prototype(self, buf):  # -> None:
         """
         Describe the prototype ("head") of the function.
         """
         ...
-    
-    def descr_body(self, buf): # -> None:
+    def descr_body(self, buf):  # -> None:
         """
         Describe of the body of the function.
         """
         ...
-    
-    def descr(self, buf): # -> None:
-        ...
-    
-    def __str__(self) -> str:
-        ...
-    
+    def descr(self, buf): ...
+    def __str__(self) -> str: ...
     @property
-    def is_declaration(self): # -> bool:
-        ...
-    
-
+    def is_declaration(self): ...
 
 class ArgumentAttributes(AttributeSet):
     _known = ...
-    def __init__(self, args=...) -> None:
-        ...
-    
+    def __init__(self, args=...) -> None: ...
     @property
-    def align(self): # -> int:
-        ...
-    
+    def align(self): ...
     @align.setter
-    def align(self, val): # -> None:
-        ...
-    
+    def align(self, val): ...
     @property
-    def dereferenceable(self): # -> int:
-        ...
-    
+    def dereferenceable(self): ...
     @dereferenceable.setter
-    def dereferenceable(self, val): # -> None:
-        ...
-    
+    def dereferenceable(self, val): ...
     @property
-    def dereferenceable_or_null(self): # -> int:
-        ...
-    
+    def dereferenceable_or_null(self): ...
     @dereferenceable_or_null.setter
-    def dereferenceable_or_null(self, val): # -> None:
-        ...
-    
-
+    def dereferenceable_or_null(self, val): ...
 
 class _BaseArgument(NamedValue):
-    def __init__(self, parent, typ, name=...) -> None:
-        ...
-    
-    def __repr__(self): # -> str:
-        ...
-    
-    def add_attribute(self, attr): # -> None:
-        ...
-    
-
+    def __init__(self, parent, typ, name=...) -> None: ...
+    def __repr__(self): ...
+    def add_attribute(self, attr): ...
 
 class Argument(_BaseArgument):
     """
     The specification of a function argument.
     """
-    def __str__(self) -> str:
-        ...
-    
 
+    def __str__(self) -> str: ...
 
 class ReturnValue(_BaseArgument):
     """
     The specification of a function's return value.
     """
-    def __str__(self) -> str:
-        ...
-    
 
+    def __str__(self) -> str: ...
 
 class Block(NamedValue):
     """
@@ -693,42 +525,24 @@ class Block(NamedValue):
     last instruction, and incoming branches can only jump to the first
     instruction.
     """
-    def __init__(self, parent, name=...) -> None:
-        ...
-    
+
+    def __init__(self, parent, name=...) -> None: ...
     @property
-    def is_terminated(self): # -> bool:
-        ...
-    
+    def is_terminated(self): ...
     @property
-    def function(self):
-        ...
-    
+    def function(self): ...
     @property
-    def module(self):
-        ...
-    
-    def descr(self, buf): # -> None:
-        ...
-    
-    def replace(self, old, new): # -> None:
+    def module(self): ...
+    def descr(self, buf): ...
+    def replace(self, old, new):  # -> None:
         """Replace an instruction"""
         ...
-    
-
 
 class BlockAddress(Value):
     """
     The address of a basic block.
     """
-    def __init__(self, function, basic_block) -> None:
-        ...
-    
-    def __str__(self) -> str:
-        ...
-    
-    def get_reference(self): # -> str:
-        ...
-    
 
-
+    def __init__(self, function, basic_block) -> None: ...
+    def __str__(self) -> str: ...
+    def get_reference(self): ...

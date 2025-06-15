@@ -15,9 +15,9 @@ class rotate(Command):
 
     description = "delete older distributions, keeping N newest files"
     user_options = [
-        ('match=', 'm', "patterns to match (required)"),
-        ('dist-dir=', 'd', "directory where the distributions are"),
-        ('keep=', 'k', "number of matching distributions to keep"),
+        ("match=", "m", "patterns to match (required)"),
+        ("dist-dir=", "d", "directory where the distributions are"),
+        ("keep=", "k", "number of matching distributions to keep"),
     ]
 
     boolean_options: ClassVar[list[str]] = []
@@ -40,15 +40,15 @@ class rotate(Command):
         except ValueError as e:
             raise DistutilsOptionError("--keep must be an integer") from e
         if isinstance(self.match, str):
-            self.match = [convert_path(p.strip()) for p in self.match.split(',')]
-        self.set_undefined_options('bdist', ('dist_dir', 'dist_dir'))
+            self.match = [convert_path(p.strip()) for p in self.match.split(",")]
+        self.set_undefined_options("bdist", ("dist_dir", "dist_dir"))
 
     def run(self) -> None:
         self.run_command("egg_info")
         from glob import glob
 
         for pattern in self.match:
-            pattern = self.distribution.get_name() + '*' + pattern
+            pattern = self.distribution.get_name() + "*" + pattern
             files = glob(os.path.join(self.dist_dir, pattern))
             files = [(os.path.getmtime(f), f) for f in files]
             files.sort()

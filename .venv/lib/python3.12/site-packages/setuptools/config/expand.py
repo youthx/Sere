@@ -87,7 +87,7 @@ def glob_relative(
                          (current directory by default)
     :rtype: list
     """
-    glob_characters = {'*', '?', '[', ']', '{', '}'}
+    glob_characters = {"*", "?", "[", "]", "{", "}"}
     expanded_values = []
     root_dir = root_dir or os.getcwd()
     for value in patterns:
@@ -123,7 +123,7 @@ def read_files(
 
     root_dir = os.path.abspath(root_dir or os.getcwd())
     _filepaths = (os.path.join(root_dir, path) for path in always_iterable(filepaths))
-    return '\n'.join(
+    return "\n".join(
         _read_file(path)
         for path in _filter_existing_files(_filepaths)
         if _assert_local(path, root_dir)
@@ -139,7 +139,7 @@ def _filter_existing_files(filepaths: Iterable[StrPath]) -> Iterator[StrPath]:
 
 
 def _read_file(filepath: bytes | StrPath) -> str:
-    with open(filepath, encoding='utf-8') as f:
+    with open(filepath, encoding="utf-8") as f:
         return f.read()
 
 
@@ -174,10 +174,10 @@ def read_attr(
     :rtype: str
     """
     root_dir = root_dir or os.getcwd()
-    attrs_path = attr_desc.strip().split('.')
+    attrs_path = attr_desc.strip().split(".")
     attr_name = attrs_path.pop()
-    module_name = '.'.join(attrs_path)
-    module_name = module_name or '__init__'
+    module_name = ".".join(attrs_path)
+    module_name = module_name or "__init__"
     path = _find_module(module_name, package_dir, root_dir)
     spec = _find_spec(module_name, path)
 
@@ -242,7 +242,7 @@ def resolve_class(
 ) -> Callable:
     """Given a qualified class name, return the associated class object"""
     root_dir = root_dir or os.getcwd()
-    idx = qualified_class_name.rfind('.')
+    idx = qualified_class_name.rfind(".")
     class_name = qualified_class_name[idx + 1 :]
     pkg_name = qualified_class_name[:idx]
 
@@ -297,7 +297,7 @@ def find_packages(
         from setuptools.discovery import PEP420PackageFinder as PackageFinder
 
     root_dir = root_dir or os.curdir
-    where = kwargs.pop('where', ['.'])
+    where = kwargs.pop("where", ["."])
     packages: list[str] = []
     fill_package_dir = {} if fill_package_dir is None else fill_package_dir
     search = list(unique_everseen(always_iterable(where)))
@@ -330,9 +330,9 @@ def version(value: Callable | Iterable[str | int] | str) -> str:
 
     if isinstance(_value, str):
         return _value
-    if hasattr(_value, '__iter__'):
-        return '.'.join(map(str, _value))
-    return f'{_value}'
+    if hasattr(_value, "__iter__"):
+        return ".".join(map(str, _value))
+    return f"{_value}"
 
 
 def canonic_package_data(package_data: dict) -> dict:

@@ -14,20 +14,20 @@ class TestClean(support.TempdirManager):
         dirs = [
             (d, os.path.join(pkg_dir, d))
             for d in (
-                'build_temp',
-                'build_lib',
-                'bdist_base',
-                'build_scripts',
-                'build_base',
+                "build_temp",
+                "build_lib",
+                "bdist_base",
+                "build_scripts",
+                "build_base",
             )
         ]
 
         for name, path in dirs:
             os.mkdir(path)
             setattr(cmd, name, path)
-            if name == 'build_base':
+            if name == "build_base":
                 continue
-            for f in ('one', 'two', 'three'):
+            for f in ("one", "two", "three"):
                 self.write_file(os.path.join(path, f))
 
         # let's run the command
@@ -37,7 +37,7 @@ class TestClean(support.TempdirManager):
 
         # make sure the files where removed
         for _name, path in dirs:
-            assert not os.path.exists(path), f'{path} was not removed'
+            assert not os.path.exists(path), f"{path} was not removed"
 
         # let's run the command again (should spit warnings but succeed)
         cmd.all = 1

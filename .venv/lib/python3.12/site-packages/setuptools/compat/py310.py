@@ -1,6 +1,6 @@
 import sys
 
-__all__ = ['tomllib']
+__all__ = ["tomllib"]
 
 
 if sys.version_info >= (3, 11):
@@ -17,4 +17,4 @@ if sys.version_info >= (3, 11):
 else:  # pragma: no cover
 
     def add_note(ex, note):
-        vars(ex).setdefault('__notes__', []).append(note)
+        vars(ex).setdefault("__notes__", []).append(note)

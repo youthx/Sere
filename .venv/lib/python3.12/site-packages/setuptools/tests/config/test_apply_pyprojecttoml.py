@@ -253,19 +253,19 @@ def test_no_explicit_content_type_for_missing_extension(tmp_path):
             PEP621_EXAMPLE,
             (
                 'Brett Cannon <brett@python.org>, "John X. Ãørçeč" <john@utf8.org>, '
-                'Γαμα קּ 東 <gama@utf8.org>'
+                "Γαμα קּ 東 <gama@utf8.org>"
             ),
-            id='non-international-emails',
+            id="non-international-emails",
         ),
         pytest.param(
             PEP621_INTERNATIONAL_EMAIL_EXAMPLE,
-            'Степан Бандера <криївка@оун-упа.укр>',
+            "Степан Бандера <криївка@оун-упа.укр>",
             marks=pytest.mark.xfail(
                 reason="CPython's `email.headerregistry.Address` only supports "
-                'RFC 5322, as of Nov 10, 2022 and latest Python 3.11.0',
+                "RFC 5322, as of Nov 10, 2022 and latest Python 3.11.0",
                 strict=True,
             ),
-            id='international-email',
+            id="international-email",
         ),
     ),
 )
@@ -290,20 +290,20 @@ def test_utf8_maintainer_in_metadata(  # issue-3663
 
 @pytest.mark.parametrize(
     (
-        'pyproject_text',
-        'license',
-        'license_expression',
-        'content_str',
-        'not_content_str',
+        "pyproject_text",
+        "license",
+        "license_expression",
+        "content_str",
+        "not_content_str",
     ),
     (
         pytest.param(
             PEP639_LICENSE_TEXT,
-            'MIT',
+            "MIT",
             None,
-            'License: MIT',
-            'License-Expression: ',
-            id='license-text',
+            "License: MIT",
+            "License-Expression: ",
+            id="license-text",
             marks=[
                 pytest.mark.filterwarnings(
                     "ignore:.project.license. as a TOML table is deprecated",
@@ -313,10 +313,10 @@ def test_utf8_maintainer_in_metadata(  # issue-3663
         pytest.param(
             PEP639_LICENSE_EXPRESSION,
             None,
-            'MIT OR Apache-2.0',
-            'License-Expression: MIT OR Apache-2.0',
-            'License: ',
-            id='license-expression',
+            "MIT OR Apache-2.0",
+            "License-Expression: MIT OR Apache-2.0",
+            "License: ",
+            id="license-expression",
         ),
     ),
 )
@@ -350,7 +350,7 @@ def test_license_classifier_with_license_expression(tmp_path):
     pyproject = _pep621_example_project(
         tmp_path,
         "README",
-        f"{text}\n    \"License :: OSI Approved :: MIT License\"\n]",
+        f'{text}\n    "License :: OSI Approved :: MIT License"\n]',
     )
     msg = "License classifiers have been superseded by license expressions"
     with pytest.raises(InvalidConfigError, match=msg) as exc:
@@ -392,7 +392,7 @@ class TestLicenseFiles:
 
         # Sanity-check
         assert 'license = "mit or apache-2.0"' in text
-        assert 'license-files' not in text
+        assert "license-files" not in text
         assert "[tool.setuptools]" not in text
 
         text = re.sub(
@@ -461,7 +461,7 @@ class TestLicenseFiles:
             pyprojecttoml.apply_configuration(makedist(tmp_path), pyproject)
 
     def test_default_patterns(self, tmp_path):
-        setuptools_config = '[tool.setuptools]\nzip-safe = false'
+        setuptools_config = "[tool.setuptools]\nzip-safe = false"
         # ^ used just to trigger section validation
         pyproject = self.base_pyproject(tmp_path, setuptools_config, license_toml="")
 

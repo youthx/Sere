@@ -22,11 +22,11 @@ class Testmsvccompiler(support.TempdirManager):
         def _find_vcvarsall(plat_spec):
             return None, None
 
-        monkeypatch.setattr(msvc, '_find_vcvarsall', _find_vcvarsall)
+        monkeypatch.setattr(msvc, "_find_vcvarsall", _find_vcvarsall)
 
         with pytest.raises(DistutilsPlatformError):
             msvc._get_vc_env(
-                'wont find this version',
+                "wont find this version",
             )
 
     @pytest.mark.skipif(
@@ -50,32 +50,32 @@ class Testmsvccompiler(support.TempdirManager):
         def _get_vcvars_spec(host_platform, platform):
             assert platform == expected
 
-        monkeypatch.setattr(msvc, '_get_vcvars_spec', _get_vcvars_spec)
+        monkeypatch.setattr(msvc, "_get_vcvars_spec", _get_vcvars_spec)
         compiler.initialize(plat_name)
 
     @needs_winreg
     def test_get_vc_env_unicode(self):
-        test_var = 'ṰḖṤṪ┅ṼẨṜ'
-        test_value = '₃⁴₅'
+        test_var = "ṰḖṤṪ┅ṼẨṜ"
+        test_value = "₃⁴₅"
 
         # Ensure we don't early exit from _get_vc_env
-        old_distutils_use_sdk = os.environ.pop('DISTUTILS_USE_SDK', None)
+        old_distutils_use_sdk = os.environ.pop("DISTUTILS_USE_SDK", None)
         os.environ[test_var] = test_value
         try:
-            env = msvc._get_vc_env('x86')
+            env = msvc._get_vc_env("x86")
             assert test_var.lower() in env
             assert test_value == env[test_var.lower()]
         finally:
             os.environ.pop(test_var)
             if old_distutils_use_sdk:
-                os.environ['DISTUTILS_USE_SDK'] = old_distutils_use_sdk
+                os.environ["DISTUTILS_USE_SDK"] = old_distutils_use_sdk
 
     @needs_winreg
-    @pytest.mark.parametrize('ver', (2015, 2017))
+    @pytest.mark.parametrize("ver", (2015, 2017))
     def test_get_vc(self, ver):
         # This function cannot be mocked, so pass if VC is found
         # and skip otherwise.
-        lookup = getattr(msvc, f'_find_vc{ver}')
+        lookup = getattr(msvc, f"_find_vc{ver}")
         expected_version = {2015: 14, 2017: 15}[ver]
         version, path = lookup()
         if not version:
@@ -105,7 +105,7 @@ class TestSpawn:
         compiler = msvc.Compiler()
         compiler._paths = "expected"
         inner_cmd = 'import os; assert os.environ["PATH"] == "expected"'
-        command = [sys.executable, '-c', inner_cmd]
+        command = [sys.executable, "-c", inner_cmd]
 
         threads = [
             CheckThread(target=compiler.spawn, args=[command]) for n in range(100)
@@ -130,7 +130,7 @@ class TestSpawn:
             "A spawn without an env argument."
             assert os.environ["PATH"] == "expected"
 
-        with mock.patch.object(ccompiler.CCompiler, 'spawn', CCompiler_spawn):
+        with mock.patch.object(ccompiler.CCompiler, "spawn", CCompiler_spawn):
             compiler.spawn(["n/a"])
 
         assert os.environ.get("PATH") != "expected"

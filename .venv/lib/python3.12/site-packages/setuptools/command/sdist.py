@@ -16,9 +16,9 @@ from distutils import log
 _default_revctrl = list
 
 
-def walk_revctrl(dirname=''):
+def walk_revctrl(dirname=""):
     """Find all files under revision control"""
-    for ep in metadata.entry_points(group='setuptools.file_finders'):
+    for ep in metadata.entry_points(group="setuptools.file_finders"):
         yield from ep.load()(dirname)
 
 
@@ -26,25 +26,25 @@ class sdist(orig.sdist):
     """Smart sdist that finds anything supported by revision control"""
 
     user_options = [
-        ('formats=', None, "formats for source distribution (comma-separated list)"),
+        ("formats=", None, "formats for source distribution (comma-separated list)"),
         (
-            'keep-temp',
-            'k',
+            "keep-temp",
+            "k",
             "keep the distribution tree around after creating archive file(s)",
         ),
         (
-            'dist-dir=',
-            'd',
+            "dist-dir=",
+            "d",
             "directory to put the source distribution archive(s) in [default: dist]",
         ),
         (
-            'owner=',
-            'u',
+            "owner=",
+            "u",
             "Owner name used when creating a tar file [default: current user]",
         ),
         (
-            'group=',
-            'g',
+            "group=",
+            "g",
             "Group name used when creating a tar file [default: current group]",
         ),
     ]
@@ -52,14 +52,14 @@ class sdist(orig.sdist):
     distribution: Distribution  # override distutils.dist.Distribution with setuptools.dist.Distribution
     negative_opt: ClassVar[dict[str, str]] = {}
 
-    README_EXTENSIONS = ['', '.rst', '.txt', '.md']
-    READMES = tuple(f'README{ext}' for ext in README_EXTENSIONS)
+    README_EXTENSIONS = ["", ".rst", ".txt", ".md"]
+    READMES = tuple(f"README{ext}" for ext in README_EXTENSIONS)
 
     def run(self) -> None:
-        self.run_command('egg_info')
-        ei_cmd = self.get_finalized_command('egg_info')
+        self.run_command("egg_info")
+        ei_cmd = self.get_finalized_command("egg_info")
         self.filelist = ei_cmd.filelist
-        self.filelist.append(os.path.join(ei_cmd.egg_info, 'SOURCES.txt'))
+        self.filelist.append(os.path.join(ei_cmd.egg_info, "SOURCES.txt"))
         self.check_readme()
 
         # Run sub commands
@@ -68,9 +68,9 @@ class sdist(orig.sdist):
 
         self.make_distribution()
 
-        dist_files = getattr(self.distribution, 'dist_files', [])
+        dist_files = getattr(self.distribution, "dist_files", [])
         for file in self.archive_files:
-            data = ('sdist', '', file)
+            data = ("sdist", "", file)
             if data not in dist_files:
                 dist_files.append(data)
 
@@ -94,7 +94,7 @@ class sdist(orig.sdist):
         class NoValue:
             pass
 
-        orig_val = getattr(os, 'link', NoValue)
+        orig_val = getattr(os, "link", NoValue)
         try:
             del os.link
         except Exception:
@@ -111,13 +111,13 @@ class sdist(orig.sdist):
 
     def _add_defaults_optional(self):
         super()._add_defaults_optional()
-        if os.path.isfile('pyproject.toml'):
-            self.filelist.append('pyproject.toml')
+        if os.path.isfile("pyproject.toml"):
+            self.filelist.append("pyproject.toml")
 
     def _add_defaults_python(self):
         """getting python files"""
         if self.distribution.has_pure_modules():
-            build_py = self.get_finalized_command('build_py')
+            build_py = self.get_finalized_command("build_py")
             self.filelist.extend(build_py.get_source_files())
             self._add_data_files(self._safe_data_files(build_py))
 
@@ -170,30 +170,30 @@ class sdist(orig.sdist):
                 return
         else:
             self.warn(
-                "standard file not found: should have one of " + ', '.join(self.READMES)
+                "standard file not found: should have one of " + ", ".join(self.READMES)
             )
 
     def make_release_tree(self, base_dir, files) -> None:
         orig.sdist.make_release_tree(self, base_dir, files)
 
         # Save any egg_info command line options used to create this sdist
-        dest = os.path.join(base_dir, 'setup.cfg')
-        if hasattr(os, 'link') and os.path.exists(dest):
+        dest = os.path.join(base_dir, "setup.cfg")
+        if hasattr(os, "link") and os.path.exists(dest):
             # unlink and re-copy, since it might be hard-linked, and
             # we don't want to change the source version
             os.unlink(dest)
-            self.copy_file('setup.cfg', dest)
+            self.copy_file("setup.cfg", dest)
 
-        self.get_finalized_command('egg_info').save_version_info(dest)
+        self.get_finalized_command("egg_info").save_version_info(dest)
 
     def _manifest_is_not_generated(self):
         # check for special comment used in 2.7.1 and higher
         if not os.path.isfile(self.manifest):
             return False
 
-        with open(self.manifest, 'rb') as fp:
+        with open(self.manifest, "rb") as fp:
             first_line = fp.readline()
-        return first_line != b'# file GENERATED by distutils, do NOT edit\n'
+        return first_line != b"# file GENERATED by distutils, do NOT edit\n"
 
     def read_manifest(self):
         """Read the manifest file (named by 'self.manifest') and use it to
@@ -201,17 +201,17 @@ class sdist(orig.sdist):
         distribution.
         """
         log.info("reading manifest file '%s'", self.manifest)
-        manifest = open(self.manifest, 'rb')
+        manifest = open(self.manifest, "rb")
         for bytes_line in manifest:
             # The manifest must contain UTF-8. See #303.
             try:
-                line = bytes_line.decode('UTF-8')
+                line = bytes_line.decode("UTF-8")
             except UnicodeDecodeError:
                 log.warn(f"{line!r} not UTF-8 decodable -- skipping")
                 continue
             # ignore comments and blank lines
             line = line.strip()
-            if line.startswith('#') or not line:
+            if line.startswith("#") or not line:
                 continue
             self.filelist.append(line)
         manifest.close()

@@ -11,10 +11,10 @@ from .test_resources import Metadata
 
 
 def strip_comments(s):
-    return '\n'.join(
+    return "\n".join(
         line
-        for line in s.split('\n')
-        if line.strip() and not line.strip().startswith('#')
+        for line in s.split("\n")
+        if line.strip() and not line.strip().startswith("#")
     )
 
 
@@ -38,15 +38,15 @@ def parse_distributions(s):
           requires=['foo>=3.0', 'baz; extra=="feature"']
     """
     s = s.strip()
-    for spec in re.split(r'\n(?=[^\s])', s):
+    for spec in re.split(r"\n(?=[^\s])", s):
         if not spec:
             continue
-        fields = spec.split('\n', 1)
+        fields = spec.split("\n", 1)
         assert 1 <= len(fields) <= 2
-        name, version = fields.pop(0).rsplit('-', 1)
+        name, version = fields.pop(0).rsplit("-", 1)
         if fields:
             requires = textwrap.dedent(fields.pop(0))
-            metadata = Metadata(('requires.txt', requires))
+            metadata = Metadata(("requires.txt", requires))
         else:
             metadata = None
         dist = pkg_resources.Distribution(
@@ -78,18 +78,18 @@ def parametrize_test_working_set_resolve(*test_list):
             expected2,
         ) = (
             strip_comments(s.lstrip())
-            for s in textwrap.dedent(test).lstrip().split('\n\n', 5)
+            for s in textwrap.dedent(test).lstrip().split("\n\n", 5)
         )
         installed_dists = list(parse_distributions(installed_dists))
         installable_dists = list(parse_distributions(installable_dists))
         requirements = list(pkg_resources.parse_requirements(requirements))
         for id_, replace_conflicting, expected in (
             (name, False, expected1),
-            (name + '_replace_conflicting', True, expected2),
+            (name + "_replace_conflicting", True, expected2),
         ):
             idlist.append(id_)
             expected = strip_comments(expected.strip())
-            if re.match(r'\w+$', expected):
+            if re.match(r"\w+$", expected):
                 expected = getattr(pkg_resources, expected)
                 assert issubclass(expected, Exception)
             else:

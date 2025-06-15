@@ -23,7 +23,6 @@ def retry(
     """
 
     def wrapper(func: Callable[P, T]) -> Callable[P, T]:
-
         @functools.wraps(func)
         def retry_wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
             # The performance counter is monotonic on all platforms we care

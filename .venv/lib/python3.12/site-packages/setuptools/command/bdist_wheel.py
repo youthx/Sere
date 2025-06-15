@@ -353,9 +353,9 @@ class bdist_wheel(Command):
             supported_tags = [
                 (t.interpreter, t.abi, plat_name) for t in tags.sys_tags()
             ]
-            assert tag in supported_tags, (
-                f"would build wheel with unsupported tag {tag}"
-            )
+            assert (
+                tag in supported_tags
+            ), f"would build wheel with unsupported tag {tag}"
         return tag
 
     def run(self):
@@ -441,11 +441,13 @@ class bdist_wheel(Command):
             wf.write_files(archive_root)
 
         # Add to 'Distribution.dist_files' so that the "upload" command works
-        getattr(self.distribution, "dist_files", []).append((
-            "bdist_wheel",
-            f"{sys.version_info.major}.{sys.version_info.minor}",
-            wheel_path,
-        ))
+        getattr(self.distribution, "dist_files", []).append(
+            (
+                "bdist_wheel",
+                f"{sys.version_info.major}.{sys.version_info.minor}",
+                wheel_path,
+            )
+        )
 
         if not self.keep_temp:
             log.info(f"removing {self.bdist_dir}")

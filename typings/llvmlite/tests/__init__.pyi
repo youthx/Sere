@@ -8,12 +8,11 @@ import faulthandler
 from unittest import TestCase
 from llvmlite.tests import customize
 
-def discover_tests(startdir): # -> TestSuite:
-    """Discover test under a directory
-    """
+def discover_tests(startdir):  # -> TestSuite:
+    """Discover test under a directory"""
     ...
 
-def run_tests(suite=..., xmloutput=..., verbosity=...): # -> TestResult:
+def run_tests(suite=..., xmloutput=..., verbosity=...):  # -> TestResult:
     """
     args
     ----
@@ -28,6 +27,4 @@ def run_tests(suite=..., xmloutput=..., verbosity=...): # -> TestResult:
     """
     ...
 
-def main():
-    ...
-
+def main(): ...

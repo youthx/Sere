@@ -79,7 +79,7 @@ class TestReadAttr:
     )
     def test_read_attr_encoding_cookie(self, example, tmp_path):
         (tmp_path / "mod.py").write_bytes(example)
-        assert expand.read_attr('mod.__version__', root_dir=tmp_path) == 'é'
+        assert expand.read_attr("mod.__version__", root_dir=tmp_path) == "é"
 
     def test_read_attr(self, tmp_path, monkeypatch):
         files = {
@@ -94,20 +94,20 @@ class TestReadAttr:
         with monkeypatch.context() as m:
             m.chdir(tmp_path)
             # Make sure it can read the attr statically without evaluating the module
-            version = expand.read_attr('pkg.sub.VERSION')
-            values = expand.read_attr('lib.mod.VALUES', {'lib': 'pkg/sub'})
+            version = expand.read_attr("pkg.sub.VERSION")
+            values = expand.read_attr("lib.mod.VALUES", {"lib": "pkg/sub"})
 
-        assert version == '0.1.1'
+        assert version == "0.1.1"
         assert is_static(values)
 
-        assert values['a'] == 0
-        assert values['b'] == {42}
+        assert values["a"] == 0
+        assert values["b"] == {42}
         assert is_static(values)
 
         # Make sure the same APIs work outside cwd
-        assert expand.read_attr('pkg.sub.VERSION', root_dir=tmp_path) == '0.1.1'
-        values = expand.read_attr('lib.mod.VALUES', {'lib': 'pkg/sub'}, tmp_path)
-        assert values['c'] == (0, 1, 1)
+        assert expand.read_attr("pkg.sub.VERSION", root_dir=tmp_path) == "0.1.1"
+        values = expand.read_attr("lib.mod.VALUES", {"lib": "pkg/sub"}, tmp_path)
+        assert values["c"] == (0, 1, 1)
 
     @pytest.mark.parametrize(
         "example",
@@ -123,8 +123,8 @@ class TestReadAttr:
         }
         write_files(files, tmp_path)
         # Make sure this attribute can be read statically
-        version = expand.read_attr('pkg.sub.VERSION', root_dir=tmp_path)
-        assert version == '0.1.1'
+        version = expand.read_attr("pkg.sub.VERSION", root_dir=tmp_path)
+        assert version == "0.1.1"
         assert is_static(version)
 
     @pytest.mark.parametrize(
@@ -142,8 +142,8 @@ class TestReadAttr:
         }
         write_files(files, tmp_path)
         monkeypatch.chdir(tmp_path)
-        version = expand.read_attr('pkg.sub.VERSION')
-        assert version == '0.1.1'
+        version = expand.read_attr("pkg.sub.VERSION")
+        assert version == "0.1.1"
         assert not is_static(version)
 
     def test_import_order(self, tmp_path):

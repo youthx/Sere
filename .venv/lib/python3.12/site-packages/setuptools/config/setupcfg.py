@@ -94,7 +94,7 @@ def _apply(
     filepath = os.path.abspath(filepath)
 
     if not os.path.isfile(filepath):
-        raise FileError(f'Configuration file {filepath} does not exist.')
+        raise FileError(f"Configuration file {filepath} does not exist.")
 
     current_directory = os.getcwd()
     os.chdir(os.path.dirname(filepath))
@@ -119,7 +119,7 @@ def _get_option(target_obj: Distribution | DistributionMetadata, key: str):
     the target object, either through a get_{key} method or
     from an attribute directly.
     """
-    getter_name = f'get_{key}'
+    getter_name = f"get_{key}"
     by_attribute = functools.partial(getattr, target_obj, key)
     getter = getattr(target_obj, getter_name, by_attribute)
     return getter()
@@ -266,13 +266,13 @@ class ConfigHandler(Generic[Target]):
             pre, _sep, name = full_name.partition(cls.section_prefix)
             if pre:
                 continue
-            yield name.lstrip('.'), value
+            yield name.lstrip("."), value
 
     @property
     def parsers(self):
         """Metadata item name to parser function mapping."""
         raise NotImplementedError(
-            f'{self.__class__.__name__} must provide .parsers property'
+            f"{self.__class__.__name__} must provide .parsers property"
         )
 
     def __setitem__(self, option_name, value) -> None:
@@ -302,7 +302,7 @@ class ConfigHandler(Generic[Target]):
         self.set_options.append(option_name)
 
     @classmethod
-    def _parse_list(cls, value, separator=','):
+    def _parse_list(cls, value, separator=","):
         """Represents value as a list.
 
         Value is split either by separator (defaults to comma) or by lines.
@@ -314,7 +314,7 @@ class ConfigHandler(Generic[Target]):
         if isinstance(value, list):  # _get_parser_compound case
             return value
 
-        if '\n' in value:
+        if "\n" in value:
             value = value.splitlines()
         else:
             value = value.split(separator)
@@ -328,7 +328,7 @@ class ConfigHandler(Generic[Target]):
         :param value:
         :rtype: dict
         """
-        separator = '='
+        separator = "="
         result = {}
         for line in cls._parse_list(value):
             key, sep, val = line.partition(separator)
@@ -346,7 +346,7 @@ class ConfigHandler(Generic[Target]):
         :rtype: bool
         """
         value = value.lower()
-        return value in ('1', 'true', 'yes')
+        return value in ("1", "true", "yes")
 
     @classmethod
     def _exclude_files_parser(cls, key):
@@ -361,11 +361,11 @@ class ConfigHandler(Generic[Target]):
         """
 
         def parser(value):
-            exclude_directive = 'file:'
+            exclude_directive = "file:"
             if value.startswith(exclude_directive):
                 raise ValueError(
-                    f'Only strings are accepted for the {key} field, '
-                    'files are not accepted'
+                    f"Only strings are accepted for the {key} field, "
+                    "files are not accepted"
                 )
             return _static.Str(value)
 
@@ -384,7 +384,7 @@ class ConfigHandler(Generic[Target]):
         :param str value:
         :rtype: str
         """
-        include_directive = 'file:'
+        include_directive = "file:"
 
         if not isinstance(value, str):
             return value
@@ -393,7 +393,7 @@ class ConfigHandler(Generic[Target]):
             return _static.Str(value)
 
         spec = value[len(include_directive) :]
-        filepaths = [path.strip() for path in spec.split(',')]
+        filepaths = [path.strip() for path in spec.split(",")]
         self._referenced_files.update(filepaths)
         # XXX: Is marking as static contents coming from files too optimistic?
         return _static.Str(expand.read_files(filepaths, root_dir))
@@ -408,11 +408,11 @@ class ConfigHandler(Generic[Target]):
         :param str value:
         :rtype: str
         """
-        attr_directive = 'attr:'
+        attr_directive = "attr:"
         if not value.startswith(attr_directive):
             return _static.Str(value)
 
-        attr_desc = value.replace(attr_directive, '')
+        attr_desc = value.replace(attr_directive, "")
 
         # Make sure package_dir is populated correctly, so `attr:` directives can work
         package_dir.update(self.ensure_discovered.package_dir)
@@ -482,14 +482,14 @@ class ConfigHandler(Generic[Target]):
 
         """
         for section_name, section_options in self.sections.items():
-            method_postfix = ''
+            method_postfix = ""
             if section_name:  # [section.option] variant
                 method_postfix = f"_{section_name}"
 
             section_parser_method: Callable | None = getattr(
                 self,
                 # Dots in section names are translated into dunderscores.
-                f'parse_section{method_postfix}'.replace('.', '__'),
+                f"parse_section{method_postfix}".replace(".", "__"),
                 None,
             )
 
@@ -518,13 +518,13 @@ class ConfigHandler(Generic[Target]):
 
 
 class ConfigMetadataHandler(ConfigHandler["DistributionMetadata"]):
-    section_prefix = 'metadata'
+    section_prefix = "metadata"
 
     aliases = {
-        'home_page': 'url',
-        'summary': 'description',
-        'classifier': 'classifiers',
-        'platform': 'platforms',
+        "home_page": "url",
+        "summary": "description",
+        "classifier": "classifiers",
+        "platform": "platforms",
     }
 
     strict_mode = False
@@ -555,23 +555,23 @@ class ConfigMetadataHandler(ConfigHandler["DistributionMetadata"]):
         exclude_files_parser = self._exclude_files_parser
 
         return {
-            'author': _static.Str,
-            'author_email': _static.Str,
-            'maintainer': _static.Str,
-            'maintainer_email': _static.Str,
-            'platforms': parse_list_static,
-            'keywords': parse_list_static,
-            'provides': parse_list_static,
-            'obsoletes': parse_list_static,
-            'classifiers': self._get_parser_compound(parse_file, parse_list_static),
-            'license': exclude_files_parser('license'),
-            'license_files': parse_list_static,
-            'description': parse_file,
-            'long_description': parse_file,
-            'long_description_content_type': _static.Str,
-            'version': self._parse_version,  # Cannot be marked as dynamic
-            'url': _static.Str,
-            'project_urls': parse_dict_static,
+            "author": _static.Str,
+            "author_email": _static.Str,
+            "maintainer": _static.Str,
+            "maintainer_email": _static.Str,
+            "platforms": parse_list_static,
+            "keywords": parse_list_static,
+            "provides": parse_list_static,
+            "obsoletes": parse_list_static,
+            "classifiers": self._get_parser_compound(parse_file, parse_list_static),
+            "license": exclude_files_parser("license"),
+            "license_files": parse_list_static,
+            "description": parse_file,
+            "long_description": parse_file,
+            "long_description_content_type": _static.Str,
+            "version": self._parse_version,  # Cannot be marked as dynamic
+            "url": _static.Str,
+            "project_urls": parse_dict_static,
         }
 
     def _parse_version(self, value):
@@ -591,8 +591,8 @@ class ConfigMetadataHandler(ConfigHandler["DistributionMetadata"]):
                 Version(version)
             except InvalidVersion as e:
                 raise OptionError(
-                    f'Version loaded from {value} does not '
-                    f'comply with PEP 440: {version}'
+                    f"Version loaded from {value} does not "
+                    f"comply with PEP 440: {version}"
                 ) from e
 
             return version
@@ -601,7 +601,7 @@ class ConfigMetadataHandler(ConfigHandler["DistributionMetadata"]):
 
 
 class ConfigOptionsHandler(ConfigHandler["Distribution"]):
-    section_prefix = 'options'
+    section_prefix = "options"
 
     def __init__(
         self,
@@ -616,7 +616,7 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
 
     @classmethod
     def _parse_list_semicolon(cls, value):
-        return cls._parse_list(value, separator=';')
+        return cls._parse_list(value, separator=";")
 
     def _parse_file_in_root(self, value):
         return self._parse_file(value, root_dir=self.root_dir)
@@ -638,27 +638,27 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
         parse_cmdclass = self._parse_cmdclass
 
         return {
-            'zip_safe': parse_bool,
-            'include_package_data': parse_bool,
-            'package_dir': self._parse_dict,
-            'scripts': parse_list,
-            'eager_resources': parse_list,
-            'dependency_links': parse_list,
-            'namespace_packages': self._deprecated_config_handler(
+            "zip_safe": parse_bool,
+            "include_package_data": parse_bool,
+            "package_dir": self._parse_dict,
+            "scripts": parse_list,
+            "eager_resources": parse_list,
+            "dependency_links": parse_list,
+            "namespace_packages": self._deprecated_config_handler(
                 parse_list,
                 "The namespace_packages parameter is deprecated, "
                 "consider using implicit namespaces instead (PEP 420).",
                 # TODO: define due date, see setuptools.dist:check_nsp.
             ),
-            'install_requires': partial(  # Core Metadata
+            "install_requires": partial(  # Core Metadata
                 self._parse_requirements_list, "install_requires"
             ),
-            'setup_requires': self._parse_list_semicolon,
-            'packages': self._parse_packages,
-            'entry_points': self._parse_file_in_root,
-            'py_modules': parse_list,
-            'python_requires': _static.SpecifierSet,  # Core Metadata
-            'cmdclass': parse_cmdclass,
+            "setup_requires": self._parse_list_semicolon,
+            "packages": self._parse_packages,
+            "entry_points": self._parse_file_in_root,
+            "py_modules": parse_list,
+            "python_requires": _static.SpecifierSet,  # Core Metadata
+            "cmdclass": parse_cmdclass,
         }
 
     def _parse_cmdclass(self, value):
@@ -671,7 +671,7 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
         :param value:
         :rtype: list
         """
-        find_directives = ['find:', 'find_namespace:']
+        find_directives = ["find:", "find_namespace:"]
         trimmed_value = value.strip()
 
         if trimmed_value not in find_directives:
@@ -679,7 +679,7 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
 
         # Read function arguments from a dedicated section.
         find_kwargs = self.parse_section_packages__find(
-            self.sections.get('packages.find', {})
+            self.sections.get("packages.find", {})
         )
 
         find_kwargs.update(
@@ -699,12 +699,12 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
         """
         section_data = self._parse_section_to_dict(section_options, self._parse_list)
 
-        valid_keys = ['where', 'include', 'exclude']
+        valid_keys = ["where", "include", "exclude"]
         find_kwargs = {k: v for k, v in section_data.items() if k in valid_keys and v}
 
-        where = find_kwargs.get('where')
+        where = find_kwargs.get("where")
         if where is not None:
-            find_kwargs['where'] = where[0]  # cast list to single val
+            find_kwargs["where"] = where[0]  # cast list to single val
 
         return find_kwargs
 
@@ -714,7 +714,7 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
         :param dict section_options:
         """
         parsed = self._parse_section_to_dict(section_options, self._parse_list)
-        self['entry_points'] = parsed
+        self["entry_points"] = parsed
 
     def _parse_package_data(self, section_options):
         package_data = self._parse_section_to_dict(section_options, self._parse_list)
@@ -725,14 +725,14 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
 
         :param dict section_options:
         """
-        self['package_data'] = self._parse_package_data(section_options)
+        self["package_data"] = self._parse_package_data(section_options)
 
     def parse_section_exclude_package_data(self, section_options) -> None:
         """Parses `exclude_package_data` configuration file section.
 
         :param dict section_options:
         """
-        self['exclude_package_data'] = self._parse_package_data(section_options)
+        self["exclude_package_data"] = self._parse_package_data(section_options)
 
     def parse_section_extras_require(self, section_options) -> None:  # Core Metadata
         """Parses `extras_require` configuration file section.
@@ -744,7 +744,7 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
             lambda k, v: self._parse_requirements_list(f"extras_require[{k}]", v),
         )
 
-        self['extras_require'] = _static.Dict(parsed)
+        self["extras_require"] = _static.Dict(parsed)
         # ^-- Use `_static.Dict` to mark a non-`Dynamic` Core Metadata
 
     def parse_section_data_files(self, section_options) -> None:
@@ -753,7 +753,7 @@ class ConfigOptionsHandler(ConfigHandler["Distribution"]):
         :param dict section_options:
         """
         parsed = self._parse_section_to_dict(section_options, self._parse_list)
-        self['data_files'] = expand.canonic_data_files(parsed, self.root_dir)
+        self["data_files"] = expand.canonic_data_files(parsed, self.root_dir)
 
 
 class _AmbiguousMarker(SetuptoolsDeprecationWarning):

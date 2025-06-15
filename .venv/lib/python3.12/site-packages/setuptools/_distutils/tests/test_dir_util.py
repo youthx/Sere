@@ -24,9 +24,9 @@ import pytest
 def stuff(request, monkeypatch, distutils_managed_tempdir):
     self = request.instance
     tmp_dir = self.mkdtemp()
-    self.root_target = os.path.join(tmp_dir, 'deep')
-    self.target = os.path.join(self.root_target, 'here')
-    self.target2 = os.path.join(tmp_dir, 'deep2')
+    self.root_target = os.path.join(tmp_dir, "deep")
+    self.target = os.path.join(self.root_target, "here")
+    self.target2 = os.path.join(tmp_dir, "deep2")
 
 
 class TestDirUtil(support.TempdirManager):
@@ -36,7 +36,7 @@ class TestDirUtil(support.TempdirManager):
         remove_tree(self.root_target, verbose=False)
 
         mkpath(self.target, verbose=True)
-        wanted = [f'creating {self.target}']
+        wanted = [f"creating {self.target}"]
         assert caplog.messages == wanted
         caplog.clear()
 
@@ -55,12 +55,12 @@ class TestDirUtil(support.TempdirManager):
         assert stat.S_IMODE(os.stat(self.target2).st_mode) == 0o555 & ~umask
 
     def test_create_tree_verbosity(self, caplog):
-        create_tree(self.root_target, ['one', 'two', 'three'], verbose=False)
+        create_tree(self.root_target, ["one", "two", "three"], verbose=False)
         assert caplog.messages == []
         remove_tree(self.root_target, verbose=False)
 
-        wanted = [f'creating {self.root_target}']
-        create_tree(self.root_target, ['one', 'two', 'three'], verbose=True)
+        wanted = [f"creating {self.root_target}"]
+        create_tree(self.root_target, ["one", "two", "three"], verbose=True)
         assert caplog.messages == wanted
 
         remove_tree(self.root_target, verbose=False)
@@ -74,10 +74,10 @@ class TestDirUtil(support.TempdirManager):
         remove_tree(self.root_target, verbose=False)
 
         mkpath(self.target, verbose=False)
-        a_file = path.Path(self.target) / 'ok.txt'
-        jaraco.path.build({'ok.txt': 'some content'}, self.target)
+        a_file = path.Path(self.target) / "ok.txt"
+        jaraco.path.build({"ok.txt": "some content"}, self.target)
 
-        wanted = [f'copying {a_file} -> {self.target2}']
+        wanted = [f"copying {a_file} -> {self.target2}"]
         copy_tree(self.target, self.target2, verbose=True)
         assert caplog.messages == wanted
 
@@ -87,21 +87,21 @@ class TestDirUtil(support.TempdirManager):
     def test_copy_tree_skips_nfs_temp_files(self):
         mkpath(self.target, verbose=False)
 
-        jaraco.path.build({'ok.txt': 'some content', '.nfs123abc': ''}, self.target)
+        jaraco.path.build({"ok.txt": "some content", ".nfs123abc": ""}, self.target)
 
         copy_tree(self.target, self.target2)
-        assert os.listdir(self.target2) == ['ok.txt']
+        assert os.listdir(self.target2) == ["ok.txt"]
 
         remove_tree(self.root_target, verbose=False)
         remove_tree(self.target2, verbose=False)
 
     def test_ensure_relative(self):
-        if os.sep == '/':
-            assert ensure_relative('/home/foo') == 'home/foo'
-            assert ensure_relative('some/path') == 'some/path'
+        if os.sep == "/":
+            assert ensure_relative("/home/foo") == "home/foo"
+            assert ensure_relative("some/path") == "some/path"
         else:  # \\
-            assert ensure_relative('c:\\home\\foo') == 'c:home\\foo'
-            assert ensure_relative('home\\foo') == 'home\\foo'
+            assert ensure_relative("c:\\home\\foo") == "c:home\\foo"
+            assert ensure_relative("home\\foo") == "home\\foo"
 
     def test_copy_tree_exception_in_listdir(self):
         """
@@ -128,7 +128,7 @@ class TestDirUtil(support.TempdirManager):
             if sys.version_info < (3, 12):
                 _flavour = pathlib.Path()._flavour
 
-        target = tmp_path / 'foodir'
+        target = tmp_path / "foodir"
 
         with pytest.raises(errors.DistutilsFileError):
             mkpath(FailPath(target))

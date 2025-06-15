@@ -12,14 +12,12 @@ from antlr4.tree.Tree import TerminalNode
 
 
 class IRBuilderVisitor(SereParserVisitor):
-
     def __init__(
         self,
         target: Optional[binding.Target] = None,
         target_machine: Optional[binding.TargetMachine] = None,
         scope: Optional[ScopedSymbolTable] = None,
     ):
-
         self.target = target or binding.Target.from_default_triple()
         self.target_machine = target_machine or self.target.create_target_machine()
 
@@ -452,7 +450,6 @@ class IRBuilderVisitor(SereParserVisitor):
             left_val = right_val
 
         if not cmp_vals:
-
             return left_val
 
         if len(cmp_vals) == 1:

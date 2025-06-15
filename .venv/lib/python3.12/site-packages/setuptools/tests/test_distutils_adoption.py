@@ -5,7 +5,7 @@ import textwrap
 
 import pytest
 
-IS_PYPY = '__pypy__' in sys.builtin_module_names
+IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 _TEXT_KWARGS = {"text": True, "encoding": "utf-8"}  # For subprocess.run
 
@@ -17,14 +17,14 @@ def win_sr(env):
     > Fatal Python error: _Py_HashRandomization_Init: failed to
     > get random numbers to initialize Python
     """
-    if env and platform.system() == 'Windows':
-        env['SYSTEMROOT'] = os.environ['SYSTEMROOT']
+    if env and platform.system() == "Windows":
+        env["SYSTEMROOT"] = os.environ["SYSTEMROOT"]
     return env
 
 
-def find_distutils(venv, imports='distutils', env=None, **kwargs):
-    py_cmd = 'import {imports}; print(distutils.__file__)'.format(**locals())
-    cmd = ['python', '-c', py_cmd]
+def find_distutils(venv, imports="distutils", env=None, **kwargs):
+    py_cmd = "import {imports}; print(distutils.__file__)".format(**locals())
+    cmd = ["python", "-c", py_cmd]
     return venv.run(cmd, env=win_sr(env), **_TEXT_KWARGS, **kwargs)
 
 
@@ -36,13 +36,13 @@ def count_meta_path(venv, env=None):
         print(len(list(filter(is_distutils, sys.meta_path))))
         """
     )
-    cmd = ['python', '-c', py_cmd]
+    cmd = ["python", "-c", py_cmd]
     return int(venv.run(cmd, env=win_sr(env), **_TEXT_KWARGS))
 
 
 skip_without_stdlib_distutils = pytest.mark.skipif(
     sys.version_info >= (3, 12),
-    reason='stdlib distutils is removed from Python 3.12+',
+    reason="stdlib distutils is removed from Python 3.12+",
 )
 
 
@@ -51,7 +51,7 @@ def test_distutils_stdlib(venv):
     """
     Ensure stdlib distutils is used when appropriate.
     """
-    env = dict(SETUPTOOLS_USE_DISTUTILS='stdlib')
+    env = dict(SETUPTOOLS_USE_DISTUTILS="stdlib")
     assert venv.name not in find_distutils(venv, env=env).split(os.sep)
     assert count_meta_path(venv, env=env) == 0
 
@@ -60,19 +60,19 @@ def test_distutils_local_with_setuptools(venv):
     """
     Ensure local distutils is used when appropriate.
     """
-    env = dict(SETUPTOOLS_USE_DISTUTILS='local')
-    loc = find_distutils(venv, imports='setuptools, distutils', env=env)
+    env = dict(SETUPTOOLS_USE_DISTUTILS="local")
+    loc = find_distutils(venv, imports="setuptools, distutils", env=env)
     assert venv.name in loc.split(os.sep)
     assert count_meta_path(venv, env=env) <= 1
 
 
-@pytest.mark.xfail('IS_PYPY', reason='pypy imports distutils on startup')
+@pytest.mark.xfail("IS_PYPY", reason="pypy imports distutils on startup")
 def test_distutils_local(venv):
     """
     Even without importing, the setuptools-local copy of distutils is
     preferred.
     """
-    env = dict(SETUPTOOLS_USE_DISTUTILS='local')
+    env = dict(SETUPTOOLS_USE_DISTUTILS="local")
     assert venv.name in find_distutils(venv, env=env).split(os.sep)
     assert count_meta_path(venv, env=env) <= 1
 
@@ -82,7 +82,7 @@ def test_pip_import(venv):
     Ensure pip can be imported.
     Regression test for #3002.
     """
-    cmd = ['python', '-c', 'import pip']
+    cmd = ["python", "-c", "import pip"]
     venv.run(cmd, **_TEXT_KWARGS)
 
 
@@ -90,7 +90,7 @@ def test_distutils_has_origin():
     """
     Distutils module spec should have an origin. #2990.
     """
-    assert __import__('distutils').__spec__.origin
+    assert __import__("distutils").__spec__.origin
 
 
 ENSURE_IMPORTS_ARE_NOT_DUPLICATED = r"""
@@ -116,7 +116,7 @@ print("success")
 
 @pytest.mark.usefixtures("tmpdir_cwd")
 @pytest.mark.parametrize(
-    ('distutils_version', 'imported_module'),
+    ("distutils_version", "imported_module"),
     [
         pytest.param("stdlib", "dir_util", marks=skip_without_stdlib_distutils),
         pytest.param("stdlib", "file_util", marks=skip_without_stdlib_distutils),
@@ -129,7 +129,7 @@ print("success")
 def test_modules_are_not_duplicated_on_import(distutils_version, imported_module, venv):
     env = dict(SETUPTOOLS_USE_DISTUTILS=distutils_version)
     script = ENSURE_IMPORTS_ARE_NOT_DUPLICATED.format(imported_module=imported_module)
-    cmd = ['python', '-c', script]
+    cmd = ["python", "-c", script]
     output = venv.run(cmd, env=win_sr(env), **_TEXT_KWARGS).strip()
     assert output == "success"
 
@@ -154,7 +154,7 @@ print("success")
 )
 def test_log_module_is_not_duplicated_on_import(distutils_version, venv):
     env = dict(SETUPTOOLS_USE_DISTUTILS=distutils_version)
-    cmd = ['python', '-c', ENSURE_LOG_IMPORT_IS_NOT_DUPLICATED]
+    cmd = ["python", "-c", ENSURE_LOG_IMPORT_IS_NOT_DUPLICATED]
     output = venv.run(cmd, env=win_sr(env), **_TEXT_KWARGS).strip()
     assert output == "success"
 
@@ -175,7 +175,7 @@ else:
 
 @pytest.mark.usefixtures("tmpdir_cwd")
 @pytest.mark.parametrize(
-    ('distutils_version', 'imported_module'),
+    ("distutils_version", "imported_module"),
     [
         ("local", "distutils"),
         # Unfortunately we still get ._distutils.errors.DistutilsError with SETUPTOOLS_USE_DISTUTILS=stdlib
@@ -188,8 +188,8 @@ else:
 def test_consistent_error_from_modified_py(distutils_version, imported_module, venv):
     env = dict(SETUPTOOLS_USE_DISTUTILS=distutils_version)
     cmd = [
-        'python',
-        '-c',
+        "python",
+        "-c",
         ENSURE_CONSISTENT_ERROR_FROM_MODIFIED_PY.format(
             imported_module=imported_module
         ),

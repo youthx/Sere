@@ -82,7 +82,7 @@ class Wheel:
     def __init__(self, filename) -> None:
         match = WHEEL_NAME(os.path.basename(filename))
         if match is None:
-            raise ValueError(f'invalid wheel name: {filename!r}')
+            raise ValueError(f"invalid wheel name: {filename!r}")
         self.filename = filename
         for k, v in match.groupdict().items():
             setattr(self, k, v)
@@ -90,9 +90,9 @@ class Wheel:
     def tags(self):
         """List tags (py_version, abi, platform) supported by this wheel."""
         return itertools.product(
-            self.py_version.split('.'),
-            self.abi.split('.'),
-            self.platform.split('.'),
+            self.py_version.split("."),
+            self.abi.split("."),
+            self.platform.split("."),
         )
 
     def is_compatible(self):
@@ -104,7 +104,7 @@ class Wheel:
             _egg_basename(
                 self.project_name,
                 self.version,
-                platform=(None if self.platform == 'any' else get_platform()),
+                platform=(None if self.platform == "any" else get_platform()),
             )
             + ".egg"
         )
@@ -113,7 +113,7 @@ class Wheel:
         # find the correct name of the .dist-info dir in the wheel file
         for member in zf.namelist():
             dirname = posixpath.dirname(member)
-            if dirname.endswith('.dist-info') and canonicalize_name(dirname).startswith(
+            if dirname.endswith(".dist-info") and canonicalize_name(dirname).startswith(
                 canonicalize_name(self.project_name)
             ):
                 return dirname
@@ -125,10 +125,10 @@ class Wheel:
             self._install_as_egg(destination_eggdir, zf)
 
     def _install_as_egg(self, destination_eggdir, zf):
-        dist_basename = f'{self.project_name}-{self.version}'
+        dist_basename = f"{self.project_name}-{self.version}"
         dist_info = self.get_dist_info(zf)
-        dist_data = f'{dist_basename}.data'
-        egg_info = os.path.join(destination_eggdir, 'EGG-INFO')
+        dist_data = f"{dist_basename}.data"
+        egg_info = os.path.join(destination_eggdir, "EGG-INFO")
 
         self._convert_metadata(zf, destination_eggdir, dist_info, egg_info)
         self._move_data_entries(destination_eggdir, dist_data)
@@ -138,15 +138,15 @@ class Wheel:
     def _convert_metadata(zf, destination_eggdir, dist_info, egg_info):
         def get_metadata(name):
             with zf.open(posixpath.join(dist_info, name)) as fp:
-                value = fp.read().decode('utf-8')
+                value = fp.read().decode("utf-8")
                 return email.parser.Parser().parsestr(value)
 
-        wheel_metadata = get_metadata('WHEEL')
+        wheel_metadata = get_metadata("WHEEL")
         # Check wheel format version is supported.
-        wheel_version = parse_version(wheel_metadata.get('Wheel-Version'))
-        wheel_v1 = parse_version('1.0') <= wheel_version < parse_version('2.0dev0')
+        wheel_version = parse_version(wheel_metadata.get("Wheel-Version"))
+        wheel_v1 = parse_version("1.0") <= wheel_version < parse_version("2.0dev0")
         if not wheel_v1:
-            raise ValueError(f'unsupported wheel format version: {wheel_version}')
+            raise ValueError(f"unsupported wheel format version: {wheel_version}")
         # Extract to target directory.
         _unpack_zipfile_obj(zf, destination_eggdir)
         dist_info = os.path.join(destination_eggdir, dist_info)
@@ -155,8 +155,8 @@ class Wheel:
         )
         os.rename(dist_info, egg_info)
         os.rename(
-            os.path.join(egg_info, 'METADATA'),
-            os.path.join(egg_info, 'PKG-INFO'),
+            os.path.join(egg_info, "METADATA"),
+            os.path.join(egg_info, "PKG-INFO"),
         )
         setup_dist = setuptools.Distribution(
             attrs=dict(
@@ -166,15 +166,15 @@ class Wheel:
         )
         with disable_info_traces():
             write_requirements(
-                setup_dist.get_command_obj('egg_info'),
+                setup_dist.get_command_obj("egg_info"),
                 None,
-                os.path.join(egg_info, 'requires.txt'),
+                os.path.join(egg_info, "requires.txt"),
             )
 
     @staticmethod
     def _convert_requires(destination_eggdir, dist_info):
         md = metadata.Distribution.at(dist_info).metadata
-        deps = md.get_all('Requires-Dist') or []
+        deps = md.get_all("Requires-Dist") or []
         reqs = list(map(Requirement, deps))
 
         extras = extras_from_deps(deps)
@@ -198,7 +198,7 @@ class Wheel:
             return set(
                 marker[2].value
                 for marker in markers
-                if isinstance(marker, tuple) and marker[0].value == 'extra'
+                if isinstance(marker, tuple) and marker[0].value == "extra"
             )
 
         install_requires = list(
@@ -219,14 +219,14 @@ class Wheel:
     def _move_data_entries(destination_eggdir, dist_data):
         """Move data entries to their correct location."""
         dist_data = os.path.join(destination_eggdir, dist_data)
-        dist_data_scripts = os.path.join(dist_data, 'scripts')
+        dist_data_scripts = os.path.join(dist_data, "scripts")
         if os.path.exists(dist_data_scripts):
-            egg_info_scripts = os.path.join(destination_eggdir, 'EGG-INFO', 'scripts')
+            egg_info_scripts = os.path.join(destination_eggdir, "EGG-INFO", "scripts")
             os.mkdir(egg_info_scripts)
             for entry in os.listdir(dist_data_scripts):
                 # Remove bytecode, as it's not properly handled
                 # during easy_install scripts install phase.
-                if entry.endswith('.pyc'):
+                if entry.endswith(".pyc"):
                     os.unlink(os.path.join(dist_data_scripts, entry))
                 else:
                     os.rename(
@@ -238,7 +238,7 @@ class Wheel:
             os.path.exists,
             (
                 os.path.join(dist_data, d)
-                for d in ('data', 'headers', 'purelib', 'platlib')
+                for d in ("data", "headers", "purelib", "platlib")
             ),
         ):
             unpack(subdir, destination_eggdir)
@@ -247,15 +247,15 @@ class Wheel:
 
     @staticmethod
     def _fix_namespace_packages(egg_info, destination_eggdir):
-        namespace_packages = os.path.join(egg_info, 'namespace_packages.txt')
+        namespace_packages = os.path.join(egg_info, "namespace_packages.txt")
         if os.path.exists(namespace_packages):
             namespace_packages = _read_utf8_with_fallback(namespace_packages).split()
 
             for mod in namespace_packages:
-                mod_dir = os.path.join(destination_eggdir, *mod.split('.'))
-                mod_init = os.path.join(mod_dir, '__init__.py')
+                mod_dir = os.path.join(destination_eggdir, *mod.split("."))
+                mod_init = os.path.join(mod_dir, "__init__.py")
                 if not os.path.exists(mod_dir):
                     os.mkdir(mod_dir)
                 if not os.path.exists(mod_init):
-                    with open(mod_init, 'w', encoding="utf-8") as fp:
+                    with open(mod_init, "w", encoding="utf-8") as fp:
                         fp.write(NAMESPACE_PACKAGE_INIT)

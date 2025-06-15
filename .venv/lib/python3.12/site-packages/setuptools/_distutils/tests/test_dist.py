@@ -18,7 +18,7 @@ from typing import ClassVar
 import jaraco.path
 import pytest
 
-pydistutils_cfg = '.' * (os.name == 'posix') + 'pydistutils.cfg'
+pydistutils_cfg = "." * (os.name == "posix") + "pydistutils.cfg"
 
 
 class test_dist(Command):
@@ -50,8 +50,8 @@ def clear_argv():
 
 
 @support.combine_markers
-@pytest.mark.usefixtures('save_env')
-@pytest.mark.usefixtures('save_argv')
+@pytest.mark.usefixtures("save_env")
+@pytest.mark.usefixtures("save_argv")
 class TestDistributionBehavior(support.TempdirManager):
     def create_distribution(self, configfiles=()):
         d = TestDistribution()
@@ -68,12 +68,14 @@ class TestDistributionBehavior(support.TempdirManager):
     def test_command_packages_cmdline(self, clear_argv):
         from distutils.tests.test_dist import test_dist
 
-        sys.argv.extend([
-            "--command-packages",
-            "foo.bar,distutils.tests",
-            "test_dist",
-            "-Ssometext",
-        ])
+        sys.argv.extend(
+            [
+                "--command-packages",
+                "foo.bar,distutils.tests",
+                "test_dist",
+                "-Ssometext",
+            ]
+        )
         d = self.create_distribution()
         # let's actually try to load our test command:
         assert d.get_command_packages() == [
@@ -86,17 +88,18 @@ class TestDistributionBehavior(support.TempdirManager):
         assert cmd.sample_option == "sometext"
 
     @pytest.mark.skipif(
-        'distutils' not in Distribution.parse_config_files.__module__,
-        reason='Cannot test when virtualenv has monkey-patched Distribution',
+        "distutils" not in Distribution.parse_config_files.__module__,
+        reason="Cannot test when virtualenv has monkey-patched Distribution",
     )
     def test_venv_install_options(self, tmp_path, clear_argv):
         sys.argv.append("install")
-        file = str(tmp_path / 'file')
+        file = str(tmp_path / "file")
 
-        fakepath = '/somedir'
+        fakepath = "/somedir"
 
-        jaraco.path.build({
-            file: f"""
+        jaraco.path.build(
+            {
+                file: f"""
                     [install]
                     install-base = {fakepath}
                     install-platbase = {fakepath}
@@ -112,53 +115,56 @@ class TestDistributionBehavior(support.TempdirManager):
                     user = {fakepath}
                     root = {fakepath}
                     """,
-        })
+            }
+        )
 
         # Base case: Not in a Virtual Environment
-        with mock.patch.multiple(sys, prefix='/a', base_prefix='/a'):
+        with mock.patch.multiple(sys, prefix="/a", base_prefix="/a"):
             d = self.create_distribution([file])
 
         option_tuple = (file, fakepath)
 
         result_dict = {
-            'install_base': option_tuple,
-            'install_platbase': option_tuple,
-            'install_lib': option_tuple,
-            'install_platlib': option_tuple,
-            'install_purelib': option_tuple,
-            'install_headers': option_tuple,
-            'install_scripts': option_tuple,
-            'install_data': option_tuple,
-            'prefix': option_tuple,
-            'exec_prefix': option_tuple,
-            'home': option_tuple,
-            'user': option_tuple,
-            'root': option_tuple,
+            "install_base": option_tuple,
+            "install_platbase": option_tuple,
+            "install_lib": option_tuple,
+            "install_platlib": option_tuple,
+            "install_purelib": option_tuple,
+            "install_headers": option_tuple,
+            "install_scripts": option_tuple,
+            "install_data": option_tuple,
+            "prefix": option_tuple,
+            "exec_prefix": option_tuple,
+            "home": option_tuple,
+            "user": option_tuple,
+            "root": option_tuple,
         }
 
-        assert sorted(d.command_options.get('install').keys()) == sorted(
+        assert sorted(d.command_options.get("install").keys()) == sorted(
             result_dict.keys()
         )
 
-        for key, value in d.command_options.get('install').items():
+        for key, value in d.command_options.get("install").items():
             assert value == result_dict[key]
 
         # Test case: In a Virtual Environment
-        with mock.patch.multiple(sys, prefix='/a', base_prefix='/b'):
+        with mock.patch.multiple(sys, prefix="/a", base_prefix="/b"):
             d = self.create_distribution([file])
 
         for key in result_dict.keys():
-            assert key not in d.command_options.get('install', {})
+            assert key not in d.command_options.get("install", {})
 
     def test_command_packages_configfile(self, tmp_path, clear_argv):
         sys.argv.append("build")
         file = str(tmp_path / "file")
-        jaraco.path.build({
-            file: """
+        jaraco.path.build(
+            {
+                file: """
                     [global]
                     command_packages = foo.bar, splat
                     """,
-        })
+            }
+        )
 
         d = self.create_distribution([file])
         assert d.get_command_packages() == ["distutils.command", "foo.bar", "splat"]
@@ -185,89 +191,89 @@ class TestDistributionBehavior(support.TempdirManager):
             warns.append(msg)
 
         request.addfinalizer(
-            functools.partial(setattr, warnings, 'warn', warnings.warn)
+            functools.partial(setattr, warnings, "warn", warnings.warn)
         )
         warnings.warn = _warn
         dist = Distribution(
             attrs={
-                'author': 'xxx',
-                'name': 'xxx',
-                'version': 'xxx',
-                'url': 'xxxx',
-                'options': {},
+                "author": "xxx",
+                "name": "xxx",
+                "version": "xxx",
+                "url": "xxxx",
+                "options": {},
             }
         )
 
         assert len(warns) == 0
-        assert 'options' not in dir(dist)
+        assert "options" not in dir(dist)
 
     def test_finalize_options(self):
-        attrs = {'keywords': 'one,two', 'platforms': 'one,two'}
+        attrs = {"keywords": "one,two", "platforms": "one,two"}
 
         dist = Distribution(attrs=attrs)
         dist.finalize_options()
 
         # finalize_option splits platforms and keywords
-        assert dist.metadata.platforms == ['one', 'two']
-        assert dist.metadata.keywords == ['one', 'two']
+        assert dist.metadata.platforms == ["one", "two"]
+        assert dist.metadata.keywords == ["one", "two"]
 
-        attrs = {'keywords': 'foo bar', 'platforms': 'foo bar'}
+        attrs = {"keywords": "foo bar", "platforms": "foo bar"}
         dist = Distribution(attrs=attrs)
         dist.finalize_options()
-        assert dist.metadata.platforms == ['foo bar']
-        assert dist.metadata.keywords == ['foo bar']
+        assert dist.metadata.platforms == ["foo bar"]
+        assert dist.metadata.keywords == ["foo bar"]
 
     def test_get_command_packages(self):
         dist = Distribution()
         assert dist.command_packages is None
         cmds = dist.get_command_packages()
-        assert cmds == ['distutils.command']
-        assert dist.command_packages == ['distutils.command']
+        assert cmds == ["distutils.command"]
+        assert dist.command_packages == ["distutils.command"]
 
-        dist.command_packages = 'one,two'
+        dist.command_packages = "one,two"
         cmds = dist.get_command_packages()
-        assert cmds == ['distutils.command', 'one', 'two']
+        assert cmds == ["distutils.command", "one", "two"]
 
     def test_announce(self):
         # make sure the level is known
         dist = Distribution()
         with pytest.raises(TypeError):
-            dist.announce('ok', level='ok2')
+            dist.announce("ok", level="ok2")
 
     def test_find_config_files_disable(self, temp_home):
         # Ticket #1180: Allow user to disable their home config file.
-        jaraco.path.build({pydistutils_cfg: '[distutils]\n'}, temp_home)
+        jaraco.path.build({pydistutils_cfg: "[distutils]\n"}, temp_home)
 
         d = Distribution()
         all_files = d.find_config_files()
 
-        d = Distribution(attrs={'script_args': ['--no-user-cfg']})
+        d = Distribution(attrs={"script_args": ["--no-user-cfg"]})
         files = d.find_config_files()
 
         # make sure --no-user-cfg disables the user cfg file
         assert len(all_files) - 1 == len(files)
 
     def test_script_args_list_coercion(self):
-        d = Distribution(attrs={'script_args': ('build', '--no-user-cfg')})
+        d = Distribution(attrs={"script_args": ("build", "--no-user-cfg")})
 
         # make sure script_args is a list even if it started as a different iterable
-        assert d.script_args == ['build', '--no-user-cfg']
+        assert d.script_args == ["build", "--no-user-cfg"]
 
     @pytest.mark.skipif(
         'platform.system() == "Windows"',
-        reason='Windows does not honor chmod 000',
+        reason="Windows does not honor chmod 000",
     )
     def test_find_config_files_permission_error(self, fake_home):
         """
         Finding config files should not fail when directory is inaccessible.
         """
-        fake_home.joinpath(pydistutils_cfg).write_text('', encoding='utf-8')
+        fake_home.joinpath(pydistutils_cfg).write_text("", encoding="utf-8")
         fake_home.chmod(0o000)
         Distribution().find_config_files()
 
 
-@pytest.mark.usefixtures('save_env')
-@pytest.mark.usefixtures('save_argv')
+@pytest.mark.usefixtures("save_env")
+@pytest.mark.usefixtures("save_argv")
 class TestMetadata(support.TempdirManager):
     def format_metadata(self, dist):
         sio = io.StringIO()
@@ -359,81 +365,81 @@ class TestMetadata(support.TempdirManager):
 
     def test_classifier(self):
         attrs = {
-            'name': 'Boa',
-            'version': '3.0',
-            'classifiers': ['Programming Language :: Python :: 3'],
+            "name": "Boa",
+            "version": "3.0",
+            "classifiers": ["Programming Language :: Python :: 3"],
         }
         dist = Distribution(attrs)
-        assert dist.get_classifiers() == ['Programming Language :: Python :: 3']
+        assert dist.get_classifiers() == ["Programming Language :: Python :: 3"]
         meta = self.format_metadata(dist)
-        assert 'Metadata-Version: 1.1' in meta
+        assert "Metadata-Version: 1.1" in meta
 
     def test_classifier_invalid_type(self, caplog):
         attrs = {
-            'name': 'Boa',
-            'version': '3.0',
-            'classifiers': ('Programming Language :: Python :: 3',),
+            "name": "Boa",
+            "version": "3.0",
+            "classifiers": ("Programming Language :: Python :: 3",),
         }
         d = Distribution(attrs)
         # should have warning about passing a non-list
-        assert 'should be a list' in caplog.messages[0]
+        assert "should be a list" in caplog.messages[0]
         # should be converted to a list
         assert isinstance(d.metadata.classifiers, list)
-        assert d.metadata.classifiers == list(attrs['classifiers'])
+        assert d.metadata.classifiers == list(attrs["classifiers"])
 
     def test_keywords(self):
         attrs = {
-            'name': 'Monty',
-            'version': '1.0',
-            'keywords': ['spam', 'eggs', 'life of brian'],
+            "name": "Monty",
+            "version": "1.0",
+            "keywords": ["spam", "eggs", "life of brian"],
         }
         dist = Distribution(attrs)
-        assert dist.get_keywords() == ['spam', 'eggs', 'life of brian']
+        assert dist.get_keywords() == ["spam", "eggs", "life of brian"]
 
     def test_keywords_invalid_type(self, caplog):
         attrs = {
-            'name': 'Monty',
-            'version': '1.0',
-            'keywords': ('spam', 'eggs', 'life of brian'),
+            "name": "Monty",
+            "version": "1.0",
+            "keywords": ("spam", "eggs", "life of brian"),
         }
         d = Distribution(attrs)
         # should have warning about passing a non-list
-        assert 'should be a list' in caplog.messages[0]
+        assert "should be a list" in caplog.messages[0]
         # should be converted to a list
         assert isinstance(d.metadata.keywords, list)
-        assert d.metadata.keywords == list(attrs['keywords'])
+        assert d.metadata.keywords == list(attrs["keywords"])
 
     def test_platforms(self):
         attrs = {
-            'name': 'Monty',
-            'version': '1.0',
-            'platforms': ['GNU/Linux', 'Some Evil Platform'],
+            "name": "Monty",
+            "version": "1.0",
+            "platforms": ["GNU/Linux", "Some Evil Platform"],
         }
         dist = Distribution(attrs)
-        assert dist.get_platforms() == ['GNU/Linux', 'Some Evil Platform']
+        assert dist.get_platforms() == ["GNU/Linux", "Some Evil Platform"]
 
     def test_platforms_invalid_types(self, caplog):
         attrs = {
-            'name': 'Monty',
-            'version': '1.0',
-            'platforms': ('GNU/Linux', 'Some Evil Platform'),
+            "name": "Monty",
+            "version": "1.0",
+            "platforms": ("GNU/Linux", "Some Evil Platform"),
         }
         d = Distribution(attrs)
         # should have warning about passing a non-list
-        assert 'should be a list' in caplog.messages[0]
+        assert "should be a list" in caplog.messages[0]
         # should be converted to a list
         assert isinstance(d.metadata.platforms, list)
-        assert d.metadata.platforms == list(attrs['platforms'])
+        assert d.metadata.platforms == list(attrs["platforms"])
 
     def test_download_url(self):
         attrs = {
-            'name': 'Boa',
-            'version': '3.0',
-            'download_url': 'http://example.org/boa',
+            "name": "Boa",
+            "version": "3.0",
+            "download_url": "http://example.org/boa",
         }
         dist = Distribution(attrs)
         meta = self.format_metadata(dist)
-        assert 'Metadata-Version: 1.1' in meta
+        assert "Metadata-Version: 1.1" in meta
 
     def test_long_description(self):
         long_desc = textwrap.dedent(
@@ -447,28 +453,28 @@ class TestMetadata(support.TempdirManager):
 
         dist = Distribution(attrs)
         meta = self.format_metadata(dist)
-        meta = meta.replace('\n' + 8 * ' ', '\n')
+        meta = meta.replace("\n" + 8 * " ", "\n")
         assert long_desc in meta
 
     def test_custom_pydistutils(self, temp_home):
         """
         pydistutils.cfg is found
         """
-        jaraco.path.build({pydistutils_cfg: ''}, temp_home)
+        jaraco.path.build({pydistutils_cfg: ""}, temp_home)
         config_path = temp_home / pydistutils_cfg
 
         assert str(config_path) in Distribution().find_config_files()
 
     def test_extra_pydistutils(self, monkeypatch, tmp_path):
-        jaraco.path.build({'overrides.cfg': ''}, tmp_path)
-        filename = tmp_path / 'overrides.cfg'
-        monkeypatch.setenv('DIST_EXTRA_CONFIG', str(filename))
+        jaraco.path.build({"overrides.cfg": ""}, tmp_path)
+        filename = tmp_path / "overrides.cfg"
+        monkeypatch.setenv("DIST_EXTRA_CONFIG", str(filename))
         assert str(filename) in Distribution().find_config_files()
 
     def test_fix_help_options(self):
-        help_tuples = [('a', 'b', 'c', 'd'), (1, 2, 3, 4)]
+        help_tuples = [("a", "b", "c", "d"), (1, 2, 3, 4)]
         fancy_options = fix_help_options(help_tuples)
-        assert fancy_options[0] == ('a', 'b', 'c')
+        assert fancy_options[0] == ("a", "b", "c")
         assert fancy_options[1] == (1, 2, 3)
 
     def test_show_help(self, request, capsys):
@@ -476,11 +482,11 @@ class TestMetadata(support.TempdirManager):
         dist = Distribution()
         sys.argv = []
         dist.help = True
-        dist.script_name = 'setup.py'
+        dist.script_name = "setup.py"
         dist.parse_command_line()
 
         output = [
-            line for line in capsys.readouterr().out.split('\n') if line.strip() != ''
+            line for line in capsys.readouterr().out.split("\n") if line.strip() != ""
         ]
         assert output
 
@@ -491,8 +497,8 @@ class TestMetadata(support.TempdirManager):
             "long_description": "desc",
             "description": "xxx",
             "download_url": "http://example.com",
-            "keywords": ['one', 'two'],
-            "requires": ['foo'],
+            "keywords": ["one", "two"],
+            "requires": ["foo"],
         }
 
         dist = Distribution(attrs)
@@ -507,11 +513,11 @@ class TestMetadata(support.TempdirManager):
         assert metadata.name == "package"
         assert metadata.version == "1.0"
         assert metadata.description == "xxx"
-        assert metadata.download_url == 'http://example.com'
-        assert metadata.keywords == ['one', 'two']
+        assert metadata.download_url == "http://example.com"
+        assert metadata.keywords == ["one", "two"]
         assert metadata.platforms is None
         assert metadata.obsoletes is None
-        assert metadata.requires == ['foo']
+        assert metadata.requires == ["foo"]
 
     def test_round_trip_through_email_generator(self):
         """

@@ -6,4 +6,4 @@ UnixCCompiler = unix.Compiler
 
 # ensure import of unixccompiler implies ccompiler imported
 # (pypa/setuptools#4871)
-importlib.import_module('distutils.ccompiler')
+importlib.import_module("distutils.ccompiler")

@@ -24,18 +24,15 @@ class Linkage(enum.IntEnum):
     linker_private = ...
     linker_private_weak = ...
 
-
 class Visibility(enum.IntEnum):
     default = ...
     hidden = ...
     protected = ...
 
-
 class StorageClass(enum.IntEnum):
     default = ...
     dllimport = ...
     dllexport = ...
-
 
 class ValueKind(enum.IntEnum):
     argument = ...
@@ -65,109 +62,68 @@ class ValueKind(enum.IntEnum):
     instruction = ...
     poison_value = ...
 
-
 class ValueRef(ffi.ObjectRef):
-    """A weak reference to a LLVM value.
-    """
-    def __init__(self, ptr, kind, parents) -> None:
-        ...
-    
-    def __str__(self) -> str:
-        ...
-    
+    """A weak reference to a LLVM value."""
+
+    def __init__(self, ptr, kind, parents) -> None: ...
+    def __str__(self) -> str: ...
     @property
     def module(self):
         """
         The module this function or global variable value was obtained from.
         """
         ...
-    
     @property
     def function(self):
         """
         The function this argument or basic block value was obtained from.
         """
         ...
-    
     @property
     def block(self):
         """
         The block this instruction value was obtained from.
         """
         ...
-    
     @property
     def instruction(self):
         """
         The instruction this operand value was obtained from.
         """
         ...
-    
     @property
-    def is_global(self):
-        ...
-    
+    def is_global(self): ...
     @property
-    def is_function(self):
-        ...
-    
+    def is_function(self): ...
     @property
-    def is_block(self):
-        ...
-    
+    def is_block(self): ...
     @property
-    def is_argument(self):
-        ...
-    
+    def is_argument(self): ...
     @property
-    def is_instruction(self):
-        ...
-    
+    def is_instruction(self): ...
     @property
-    def is_operand(self):
-        ...
-    
+    def is_operand(self): ...
     @property
-    def is_constant(self): # -> bool:
-        ...
-    
+    def is_constant(self): ...
     @property
-    def value_kind(self): # -> ValueKind:
-        ...
-    
+    def value_kind(self): ...
     @property
-    def name(self):
-        ...
-    
+    def name(self): ...
     @name.setter
-    def name(self, val): # -> None:
-        ...
-    
+    def name(self, val): ...
     @property
-    def linkage(self): # -> Linkage:
-        ...
-    
+    def linkage(self): ...
     @linkage.setter
-    def linkage(self, value): # -> None:
-        ...
-    
+    def linkage(self, value): ...
     @property
-    def visibility(self): # -> Visibility:
-        ...
-    
+    def visibility(self): ...
     @visibility.setter
-    def visibility(self, value): # -> None:
-        ...
-    
+    def visibility(self, value): ...
     @property
-    def storage_class(self): # -> StorageClass:
-        ...
-    
+    def storage_class(self): ...
     @storage_class.setter
-    def storage_class(self, value): # -> None:
-        ...
-    
-    def add_function_attribute(self, attr): # -> None:
+    def storage_class(self, value): ...
+    def add_function_attribute(self, attr):  # -> None:
         """Only works on function value
 
         Parameters
@@ -176,16 +132,14 @@ class ValueRef(ffi.ObjectRef):
             attribute name
         """
         ...
-    
     @property
-    def type(self): # -> TypeRef:
+    def type(self):  # -> TypeRef:
         """
         This value's LLVM type.
         """
         ...
-    
     @property
-    def global_value_type(self): # -> TypeRef:
+    def global_value_type(self):  # -> TypeRef:
         """
         Uses ``LLVMGlobalGetValueType()``.
         Needed for opaque pointers in globals.
@@ -193,7 +147,6 @@ class ValueRef(ffi.ObjectRef):
         See https://llvm.org/docs/OpaquePointers.html#migration-instructions
         """
         ...
-    
     @property
     def is_declaration(self):
         """
@@ -201,60 +154,53 @@ class ValueRef(ffi.ObjectRef):
         module.
         """
         ...
-    
     @property
-    def attributes(self): # -> _AttributeListIterator | Iterator[Never] | _AttributeSetIterator:
+    def attributes(
+        self,
+    ):  # -> _AttributeListIterator | Iterator[Never] | _AttributeSetIterator:
         """
         Return an iterator over this value's attributes.
         The iterator will yield a string for each attribute.
         """
         ...
-    
     @property
-    def blocks(self): # -> _BlocksIterator:
+    def blocks(self):  # -> _BlocksIterator:
         """
         Return an iterator over this function's blocks.
         The iterator will yield a ValueRef for each block.
         """
         ...
-    
     @property
-    def arguments(self): # -> _ArgumentsIterator:
+    def arguments(self):  # -> _ArgumentsIterator:
         """
         Return an iterator over this function's arguments.
         The iterator will yield a ValueRef for each argument.
         """
         ...
-    
     @property
-    def instructions(self): # -> _InstructionsIterator:
+    def instructions(self):  # -> _InstructionsIterator:
         """
         Return an iterator over this block's instructions.
         The iterator will yield a ValueRef for each instruction.
         """
         ...
-    
     @property
-    def operands(self): # -> _OperandsIterator:
+    def operands(self):  # -> _OperandsIterator:
         """
         Return an iterator over this instruction's operands.
         The iterator will yield a ValueRef for each operand.
         """
         ...
-    
     @property
-    def opcode(self): # -> str | None:
-        ...
-    
+    def opcode(self): ...
     @property
-    def incoming_blocks(self): # -> _IncomingBlocksIterator:
+    def incoming_blocks(self):  # -> _IncomingBlocksIterator:
         """
         Return an iterator over this phi instruction's incoming blocks.
         The iterator will yield a ValueRef for each block.
         """
         ...
-    
-    def get_constant_value(self, signed_int=..., round_fp=...): # -> int | str:
+    def get_constant_value(self, signed_int=..., round_fp=...):  # -> int | str:
         """
         Return the constant value, either as a literal (when supported)
         or as a string.
@@ -269,58 +215,35 @@ class ValueRef(ffi.ObjectRef):
             By default, raises an exception on accuracy loss
         """
         ...
-    
-
 
 class _ValueIterator(ffi.ObjectRef):
     kind = ...
-    def __init__(self, ptr, parents) -> None:
-        ...
-    
-    def __next__(self): # -> ValueRef:
-        ...
-    
-    next = ...
-    def __iter__(self): # -> Self:
-        ...
-    
+    def __init__(self, ptr, parents) -> None: ...
+    def __next__(self): ...
 
+    next = ...
+    def __iter__(self): ...
 
 class _AttributeIterator(ffi.ObjectRef):
-    def __next__(self):
-        ...
-    
+    def __next__(self): ...
+
     next = ...
-    def __iter__(self): # -> Self:
-        ...
-    
+    def __iter__(self): ...
 
-
-class _AttributeListIterator(_AttributeIterator):
-    ...
-
-
-class _AttributeSetIterator(_AttributeIterator):
-    ...
-
+class _AttributeListIterator(_AttributeIterator): ...
+class _AttributeSetIterator(_AttributeIterator): ...
 
 class _BlocksIterator(_ValueIterator):
     kind = ...
 
-
 class _ArgumentsIterator(_ValueIterator):
     kind = ...
-
 
 class _InstructionsIterator(_ValueIterator):
     kind = ...
 
-
 class _OperandsIterator(_ValueIterator):
     kind = ...
 
-
 class _IncomingBlocksIterator(_ValueIterator):
     kind = ...
-
-

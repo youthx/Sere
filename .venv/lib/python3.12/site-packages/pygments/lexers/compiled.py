@@ -12,8 +12,7 @@
 from pygments.lexers.jvm import JavaLexer, ScalaLexer
 from pygments.lexers.c_cpp import CLexer, CppLexer
 from pygments.lexers.d import DLexer
-from pygments.lexers.objective import ObjectiveCLexer, \
-    ObjectiveCppLexer, LogosLexer
+from pygments.lexers.objective import ObjectiveCLexer, ObjectiveCppLexer, LogosLexer
 from pygments.lexers.go import GoLexer
 from pygments.lexers.rust import RustLexer
 from pygments.lexers.c_like import ECLexer, ValaLexer, CudaLexer

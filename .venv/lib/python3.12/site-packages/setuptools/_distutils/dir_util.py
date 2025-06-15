@@ -165,7 +165,7 @@ def _copy_one(
     src_name = os.path.join(src, name)
     dst_name = os.path.join(dst, name)
 
-    if name.startswith('.nfs'):
+    if name.startswith(".nfs"):
         # skip NFS rename files
         return
 

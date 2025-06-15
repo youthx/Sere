@@ -15,117 +15,82 @@ class NumbaTestProgram(unittest.main):
 
     Currently the options are only added in 3.4+.
     """
+
     refleak = ...
     profile = ...
     multiprocess = ...
-    def __init__(self, *args, **kwargs) -> None:
-        ...
-    
-    def createTests(self): # -> None:
-        ...
-    
-    def parseArgs(self, argv): # -> None:
-        ...
-    
-    def runTests(self): # -> None:
-        ...
-    
+    def __init__(self, *args, **kwargs) -> None: ...
+    def createTests(self): ...
+    def parseArgs(self, argv): ...
+    def runTests(self): ...
 
-
-class ReferenceLeakError(RuntimeError):
-    ...
-
+class ReferenceLeakError(RuntimeError): ...
 
 class IntPool(collections.defaultdict):
-    def __missing__(self, key):
-        ...
-    
-
+    def __missing__(self, key): ...
 
 class RefleakTestResult(runner.TextTestResult):
     warmup = ...
     repetitions = ...
-    def addSuccess(self, test): # -> None:
-        ...
-    
-
+    def addSuccess(self, test): ...
 
 class RefleakTestRunner(runner.TextTestRunner):
     resultclass = RefleakTestResult
-
 
 class ParallelTestResult(runner.TextTestResult):
     """
     A TestResult able to inject results from other results.
     """
-    def add_results(self, result): # -> None:
+
+    def add_results(self, result):  # -> None:
         """
         Add the results from the other *result* to this result.
         """
         ...
-    
-
 
 class _MinimalResult:
     """
     A minimal, picklable TestResult-alike object.
     """
+
     __slots__ = ...
-    def fixup_case(self, case): # -> None:
+    def fixup_case(self, case):  # -> None:
         """
         Remove any unpicklable attributes from TestCase instance *case*.
         """
         ...
-    
-    def __init__(self, original_result) -> None:
-        ...
-    
-
+    def __init__(self, original_result) -> None: ...
 
 class _FakeStringIO:
     """
     A trivial picklable StringIO-alike for Python 2.
     """
-    def __init__(self, value) -> None:
-        ...
-    
-    def getvalue(self): # -> Any:
-        ...
-    
 
+    def __init__(self, value) -> None: ...
+    def getvalue(self): ...
 
 class _MinimalRunner:
     """
     A minimal picklable object able to instantiate a runner in a
     child process and run a test case with it.
     """
-    def __init__(self, runner_cls, runner_args) -> None:
-        ...
-    
-    def __call__(self, test): # -> _MinimalResult:
-        ...
-    
+
+    def __init__(self, runner_cls, runner_args) -> None: ...
+    def __call__(self, test): ...
     @contextlib.contextmanager
-    def cleanup_object(self, test): # -> Generator[Any, Any, None]:
+    def cleanup_object(self, test):  # -> Generator[Any, Any, None]:
         """
         A context manager which cleans up unwanted attributes on a test case
         (or any other object).
         """
         ...
-    
-
 
 class ParallelTestRunner(runner.TextTestRunner):
     """
     A test runner which delegates the actual running to a pool of child
     processes.
     """
+
     resultclass = ParallelTestResult
-    def __init__(self, runner_cls, **kwargs) -> None:
-        ...
-    
-    def run(self, test): # -> TextTestResult[_WritelnDecorator]:
-        ...
-    
-
-
+    def __init__(self, runner_cls, **kwargs) -> None: ...
+    def run(self, test): ...

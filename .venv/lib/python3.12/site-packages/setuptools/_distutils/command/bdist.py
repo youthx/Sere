@@ -49,55 +49,57 @@ class bdist(Command):
     description = "create a built (binary) distribution"
 
     user_options = [
-        ('bdist-base=', 'b', "temporary directory for creating built distributions"),
+        ("bdist-base=", "b", "temporary directory for creating built distributions"),
         (
-            'plat-name=',
-            'p',
+            "plat-name=",
+            "p",
             "platform name to embed in generated filenames "
             f"[default: {get_platform()}]",
         ),
-        ('formats=', None, "formats for distribution (comma-separated list)"),
+        ("formats=", None, "formats for distribution (comma-separated list)"),
         (
-            'dist-dir=',
-            'd',
+            "dist-dir=",
+            "d",
             "directory to put final built distributions in [default: dist]",
         ),
-        ('skip-build', None, "skip rebuilding everything (for testing/debugging)"),
+        ("skip-build", None, "skip rebuilding everything (for testing/debugging)"),
         (
-            'owner=',
-            'u',
+            "owner=",
+            "u",
             "Owner name used when creating a tar file [default: current user]",
         ),
         (
-            'group=',
-            'g',
+            "group=",
+            "g",
             "Group name used when creating a tar file [default: current group]",
         ),
     ]
 
-    boolean_options: ClassVar[list[str]] = ['skip-build']
+    boolean_options: ClassVar[list[str]] = ["skip-build"]
 
     help_options: ClassVar[list[tuple[str, str | None, str, Callable[[], object]]]] = [
-        ('help-formats', None, "lists available distribution formats", show_formats),
+        ("help-formats", None, "lists available distribution formats", show_formats),
     ]
 
     # The following commands do not take a format option from bdist
-    no_format_option: ClassVar[tuple[str, ...]] = ('bdist_rpm',)
+    no_format_option: ClassVar[tuple[str, ...]] = ("bdist_rpm",)
 
     # This won't do in reality: will need to distinguish RPM-ish Linux,
     # Debian-ish Linux, Solaris, FreeBSD, ..., Windows, Mac OS.
-    default_format: ClassVar[dict[str, str]] = {'posix': 'gztar', 'nt': 'zip'}
+    default_format: ClassVar[dict[str, str]] = {"posix": "gztar", "nt": "zip"}
 
     # Define commands in preferred order for the --help-formats option
-    format_commands = ListCompat({
-        'rpm': ('bdist_rpm', "RPM distribution"),
-        'gztar': ('bdist_dumb', "gzip'ed tar file"),
-        'bztar': ('bdist_dumb', "bzip2'ed tar file"),
-        'xztar': ('bdist_dumb', "xz'ed tar file"),
-        'ztar': ('bdist_dumb', "compressed tar file"),
-        'tar': ('bdist_dumb', "tar file"),
-        'zip': ('bdist_dumb', "ZIP file"),
-    })
+    format_commands = ListCompat(
+        {
+            "rpm": ("bdist_rpm", "RPM distribution"),
+            "gztar": ("bdist_dumb", "gzip'ed tar file"),
+            "bztar": ("bdist_dumb", "bzip2'ed tar file"),
+            "xztar": ("bdist_dumb", "xz'ed tar file"),
+            "ztar": ("bdist_dumb", "compressed tar file"),
+            "tar": ("bdist_dumb", "tar file"),
+            "zip": ("bdist_dumb", "ZIP file"),
+        }
+    )
 
     # for compatibility until consumers only reference format_commands
     format_command = format_commands
@@ -117,16 +119,16 @@ class bdist(Command):
             if self.skip_build:
                 self.plat_name = get_platform()
             else:
-                self.plat_name = self.get_finalized_command('build').plat_name
+                self.plat_name = self.get_finalized_command("build").plat_name
 
         # 'bdist_base' -- parent of per-built-distribution-format
         # temporary directories (eg. we'll probably have
         # "build/bdist.<plat>/dumb", "build/bdist.<plat>/rpm", etc.)
         if self.bdist_base is None:
-            build_base = self.get_finalized_command('build').build_base
-            self.bdist_base = os.path.join(build_base, 'bdist.' + self.plat_name)
+            build_base = self.get_finalized_command("build").build_base
+            self.bdist_base = os.path.join(build_base, "bdist." + self.plat_name)
 
-        self.ensure_string_list('formats')
+        self.ensure_string_list("formats")
         if self.formats is None:
             try:
                 self.formats = [self.default_format[os.name]]
@@ -156,7 +158,7 @@ class bdist(Command):
                 sub_cmd.format = self.formats[i]
 
             # passing the owner and group names for tar archiving
-            if cmd_name == 'bdist_dumb':
+            if cmd_name == "bdist_dumb":
                 sub_cmd.owner = self.owner
                 sub_cmd.group = self.group
 

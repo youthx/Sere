@@ -21,7 +21,7 @@ from inspect import signature
 
 
 async def _run_forever_coro(coro, args, kwargs, loop):
-    '''
+    """
     This helper function launches an async main function that was tagged with
     forever=True. There are two possibilities:
 
@@ -39,7 +39,7 @@ async def _run_forever_coro(coro, args, kwargs, loop):
     the objects created are garbage collected after all is said and done; we
     do this to ensure that any exceptions raised in the tasks are collected
     ASAP.
-    '''
+    """
 
     # Personal note: I consider this an antipattern, as it relies on the use of
     # unowned resources. The setup function dumps some stuff into the event
@@ -52,7 +52,7 @@ async def _run_forever_coro(coro, args, kwargs, loop):
 
 
 def autoasync(coro=None, *, loop=None, forever=False, pass_loop=False):
-    '''
+    """
     Convert an asyncio coroutine into a function which, when called, is
     evaluted in an event loop, and the return value returned. This is intented
     to make it easy to write entry points into asyncio coroutines, which
@@ -94,12 +94,9 @@ def autoasync(coro=None, *, loop=None, forever=False, pass_loop=False):
 
     server('localhost', 8899)
 
-    '''
+    """
     if coro is None:
-        return lambda c: autoasync(
-            c, loop=loop,
-            forever=forever,
-            pass_loop=pass_loop)
+        return lambda c: autoasync(c, loop=loop, forever=forever, pass_loop=pass_loop)
 
     # The old and new signatures are required to correctly bind the loop
     # parameter in 100% of cases, even if it's a positional parameter.
@@ -107,9 +104,11 @@ def autoasync(coro=None, *, loop=None, forever=False, pass_loop=False):
     # a kwonly parameter.
     if pass_loop:
         old_sig = signature(coro)
-        new_sig = old_sig.replace(parameters=(
-            param for name, param in old_sig.parameters.items()
-            if name != "loop"))
+        new_sig = old_sig.replace(
+            parameters=(
+                param for name, param in old_sig.parameters.items() if name != "loop"
+            )
+        )
 
     @wraps(coro)
     def autoasync_wrapper(*args, **kwargs):
@@ -122,14 +121,12 @@ def autoasync(coro=None, *, loop=None, forever=False, pass_loop=False):
         if pass_loop:
             bound_args = old_sig.bind_partial()
             bound_args.arguments.update(
-                loop=local_loop,
-                **new_sig.bind(*args, **kwargs).arguments)
+                loop=local_loop, **new_sig.bind(*args, **kwargs).arguments
+            )
             args, kwargs = bound_args.args, bound_args.kwargs
 
         if forever:
-            local_loop.create_task(_run_forever_coro(
-                coro, args, kwargs, local_loop
-            ))
+            local_loop.create_task(_run_forever_coro(coro, args, kwargs, local_loop))
             local_loop.run_forever()
         else:
             return local_loop.run_until_complete(coro(*args, **kwargs))

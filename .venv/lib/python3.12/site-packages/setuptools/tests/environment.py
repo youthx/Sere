@@ -8,12 +8,12 @@ import jaraco.envs
 
 
 class VirtualEnv(jaraco.envs.VirtualEnv):
-    name = '.env'
+    name = ".env"
     # Some version of PyPy will import distutils on startup, implicitly
     # importing setuptools, and thus leading to BackendInvalid errors
     # when upgrading Setuptools. Bypass this behavior by avoiding the
     # early availability and need to upgrade.
-    create_opts = ['--no-setuptools']
+    create_opts = ["--no-setuptools"]
 
     def run(self, cmd, *args, **kwargs):
         cmd = [self.exe(cmd[0])] + cmd[1:]
@@ -36,7 +36,7 @@ class VirtualEnv(jaraco.envs.VirtualEnv):
 
 def _which_dirs(cmd):
     result = set()
-    for path in os.environ.get('PATH', '').split(os.pathsep):
+    for path in os.environ.get("PATH", "").split(os.pathsep):
         filename = os.path.join(path, cmd)
         if os.access(filename, os.X_OK):
             result.add(path)
@@ -67,7 +67,7 @@ def run_setup_py(cmd, pypath=None, path=None, data_stream=0, env=None):
     cmd = [sys.executable, "setup.py"] + list(cmd)
 
     # https://bugs.python.org/issue8557
-    shell = sys.platform == 'win32'
+    shell = sys.platform == "win32"
 
     try:
         proc = _Popen(
@@ -83,13 +83,13 @@ def run_setup_py(cmd, pypath=None, path=None, data_stream=0, env=None):
             data_stream = slice(*data_stream)
         data = proc.communicate()[data_stream]
     except OSError:
-        return 1, ''
+        return 1, ""
 
     # decode the console string if needed
     if hasattr(data, "decode"):
         # use the default encoding
         data = data.decode()
-        data = unicodedata.normalize('NFC', data)
+        data = unicodedata.normalize("NFC", data)
 
     # communicate calls wait()
     return proc.returncode, data

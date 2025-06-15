@@ -75,7 +75,7 @@ def _move_install_requirements_markers(
     simple_install_requires = list(map(str, simple_reqs))
 
     for r in complex_reqs:
-        extras_require[':' + str(r.marker)].setdefault(r)
+        extras_require[":" + str(r.marker)].setdefault(r)
 
     expanded_extras = dict(
         # list(dict.fromkeys(...))  ensures a list of unique strings
@@ -88,7 +88,7 @@ def _move_install_requirements_markers(
 
 def _suffix_for(req):
     """Return the 'extras_require' suffix for a given requirement."""
-    return ':' + str(req.marker) if req.marker else ''
+    return ":" + str(req.marker) if req.marker else ""
 
 
 def _clean_req(req):
@@ -106,7 +106,7 @@ def _write_requirements(stream, reqs):
     lines = yield_lines(reqs or ())
 
     def append_cr(line):
-        return line + '\n'
+        return line + "\n"
 
     lines = map(append_cr, lines)
     stream.writelines(lines)
@@ -120,7 +120,7 @@ def write_requirements(cmd, basename, filename):
     )
     _write_requirements(data, install_requires)
     for extra in sorted(extras_require):
-        data.write('\n[{extra}]\n'.format(**vars()))
+        data.write("\n[{extra}]\n".format(**vars()))
         _write_requirements(data, extras_require[extra])
     cmd.write_or_delete_file("requirements", filename, data.getvalue())
 

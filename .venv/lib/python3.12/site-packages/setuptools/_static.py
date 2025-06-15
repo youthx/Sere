@@ -91,16 +91,16 @@ class List(list, Static):
 # Make `List` immutable-ish
 # (certain places of setuptools/distutils issue a warn if we use tuple instead of list)
 for _method in (
-    '__delitem__',
-    '__iadd__',
-    '__setitem__',
-    'append',
-    'clear',
-    'extend',
-    'insert',
-    'remove',
-    'reverse',
-    'pop',
+    "__delitem__",
+    "__iadd__",
+    "__setitem__",
+    "append",
+    "clear",
+    "extend",
+    "insert",
+    "remove",
+    "reverse",
+    "pop",
 ):
     _prevent_modification(List, _method, "`list(value)`")
 
@@ -130,14 +130,14 @@ class Dict(dict, Static):
 
 # Make `Dict` immutable-ish (we cannot inherit from types.MappingProxyType):
 for _method in (
-    '__delitem__',
-    '__ior__',
-    '__setitem__',
-    'clear',
-    'pop',
-    'popitem',
-    'setdefault',
-    'update',
+    "__delitem__",
+    "__ior__",
+    "__setitem__",
+    "clear",
+    "pop",
+    "popitem",
+    "setdefault",
+    "update",
 ):
     _prevent_modification(Dict, _method, "`dict(value)`")
 

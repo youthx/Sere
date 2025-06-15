@@ -7,413 +7,277 @@ from llvmlite.ir._utils import _StrCaching
 """
 Classes that are LLVM types
 """
+
 class Type(_StrCaching):
     """
     The base class for all LLVM types.
     """
+
     is_pointer = ...
     null = ...
-    def __repr__(self): # -> str:
-        ...
-    
-    def as_pointer(self, addrspace=...): # -> PointerType:
-        ...
-    
-    def __ne__(self, other) -> bool:
-        ...
-    
+    def __repr__(self): ...
+    def as_pointer(self, addrspace=...): ...
+    def __ne__(self, other) -> bool: ...
     def get_abi_size(self, target_data, context=...):
         """
         Get the ABI size of this type according to data layout *target_data*.
         """
         ...
-    
-    def get_element_offset(self, target_data, ndx, context=...):
-        ...
-    
+    def get_element_offset(self, target_data, ndx, context=...): ...
     def get_abi_alignment(self, target_data, context=...):
         """
         Get the minimum ABI alignment of this type according to data layout
         *target_data*.
         """
         ...
-    
-    def format_constant(self, value): # -> str:
+    def format_constant(self, value):  # -> str:
         """
         Format constant *value* of this type.  This method may be overriden
         by subclasses.
         """
         ...
-    
     def wrap_constant_value(self, value):
         """
         Wrap constant *value* if necessary.  This method may be overriden
         by subclasses (especially aggregate types).
         """
         ...
-    
-    def __call__(self, value): # -> Constant:
+    def __call__(self, value):  # -> Constant:
         """
         Create a LLVM constant of this type with the given Python value.
         """
         ...
-    
-
 
 class MetaDataType(Type):
-    def as_pointer(self):
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-
+    def as_pointer(self): ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
 
 class LabelType(Type):
     """
     The label type is the type of e.g. basic blocks.
     """
-    ...
 
+    ...
 
 class PointerType(Type):
     """
     The type of all pointer values.
     By default (without specialisation) represents an opaque pointer.
     """
+
     is_opaque = ...
     is_pointer = ...
     null = ...
-    def __new__(cls, pointee=..., addrspace=...): # -> Self | PointerType:
-        ...
-    
-    def __init__(self, addrspace=...) -> None:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
+    def __new__(cls, pointee=..., addrspace=...): ...
+    def __init__(self, addrspace=...) -> None: ...
+    def __hash__(self) -> int: ...
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> _TypedPointerType | Self:
+    def from_llvm(cls, typeref, ir_ctx):  # -> _TypedPointerType | Self:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class _TypedPointerType(PointerType):
     """
     The type of typed pointer values. To be removed eventually.
     """
-    def __init__(self, pointee, addrspace=...) -> None:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
+
+    def __init__(self, pointee, addrspace=...) -> None: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
     def gep(self, i):
         """
         Resolve the type of the i-th element (for getelementptr lookups).
         """
         ...
-    
     @property
-    def intrinsic_name(self): # -> str:
-        ...
-    
+    def intrinsic_name(self): ...
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> Self:
+    def from_llvm(cls, typeref, ir_ctx):  # -> Self:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class VoidType(Type):
     """
     The type for empty values (e.g. a function returning no value).
     """
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
+
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> Self:
+    def from_llvm(cls, typeref, ir_ctx):  # -> Self:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class FunctionType(Type):
     """
     The type for functions.
     """
-    def __init__(self, return_type, args, var_arg=...) -> None:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
+
+    def __init__(self, return_type, args, var_arg=...) -> None: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> Self:
+    def from_llvm(cls, typeref, ir_ctx):  # -> Self:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class IntType(Type):
     """
     The type for integers.
     """
+
     null = ...
     _instance_cache = ...
     width: int
-    def __new__(cls, bits): # -> Self:
-        ...
-    
-    def __getnewargs__(self): # -> tuple[int]:
-        ...
-    
-    def __copy__(self): # -> Self:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-    def format_constant(self, val): # -> str:
-        ...
-    
-    def wrap_constant_value(self, val): # -> Literal[0]:
-        ...
-    
+    def __new__(cls, bits): ...
+    def __getnewargs__(self): ...
+    def __copy__(self): ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def format_constant(self, val): ...
+    def wrap_constant_value(self, val): ...
     @property
-    def intrinsic_name(self): # -> str:
-        ...
-    
+    def intrinsic_name(self): ...
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> IntType:
+    def from_llvm(cls, typeref, ir_ctx):  # -> IntType:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class _BaseFloatType(Type):
-    def __new__(cls): # -> Self:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
+    def __new__(cls): ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> Self:
+    def from_llvm(cls, typeref, ir_ctx):  # -> Self:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class HalfType(_BaseFloatType):
     """
     The type for single-precision floats.
     """
+
     null = ...
     intrinsic_name = ...
-    def __str__(self) -> str:
-        ...
-    
-    def format_constant(self, value): # -> str:
-        ...
-    
-
+    def __str__(self) -> str: ...
+    def format_constant(self, value): ...
 
 class FloatType(_BaseFloatType):
     """
     The type for single-precision floats.
     """
+
     null = ...
     intrinsic_name = ...
-    def __str__(self) -> str:
-        ...
-    
-    def format_constant(self, value): # -> str:
-        ...
-    
-
+    def __str__(self) -> str: ...
+    def format_constant(self, value): ...
 
 class DoubleType(_BaseFloatType):
     """
     The type for double-precision floats.
     """
+
     null = ...
     intrinsic_name = ...
-    def __str__(self) -> str:
-        ...
-    
-    def format_constant(self, value): # -> str:
-        ...
-    
-
+    def __str__(self) -> str: ...
+    def format_constant(self, value): ...
 
 class _Repeat:
-    def __init__(self, value, size) -> None:
-        ...
-    
-    def __len__(self): # -> Any:
-        ...
-    
-    def __getitem__(self, item): # -> Any:
-        ...
-    
-
+    def __init__(self, value, size) -> None: ...
+    def __len__(self): ...
+    def __getitem__(self, item): ...
 
 class VectorType(Type):
     """
     The type for vectors of primitive data items (e.g. "<f32 x 4>").
     """
-    def __init__(self, element, count) -> None:
-        ...
-    
+
+    def __init__(self, element, count) -> None: ...
     @property
-    def elements(self): # -> _Repeat:
-        ...
-    
-    def __len__(self): # -> Any:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-    def __copy__(self): # -> Self:
-        ...
-    
-    def format_constant(self, value): # -> str:
-        ...
-    
-    def wrap_constant_value(self, values): # -> tuple[Constant, ...] | list[Constant | Value]:
-        ...
-    
+    def elements(self): ...
+    def __len__(self): ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __copy__(self): ...
+    def format_constant(self, value): ...
+    def wrap_constant_value(self, values): ...
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> Self:
+    def from_llvm(cls, typeref, ir_ctx):  # -> Self:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class Aggregate(Type):
     """
     Base class for aggregate types.
     See http://llvm.org/docs/LangRef.html#t-aggregate
     """
-    def wrap_constant_value(self, values): # -> list[Constant | Value]:
-        ...
-    
 
+    def wrap_constant_value(self, values): ...
 
 class ArrayType(Aggregate):
     """
     The type for fixed-size homogenous arrays (e.g. "[f32 x 3]").
     """
-    def __init__(self, element, count) -> None:
-        ...
-    
+
+    def __init__(self, element, count) -> None: ...
     @property
-    def elements(self): # -> _Repeat:
-        ...
-    
-    def __len__(self): # -> Any:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-    def gep(self, i): # -> Any:
+    def elements(self): ...
+    def __len__(self): ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def gep(self, i):  # -> Any:
         """
         Resolve the type of the i-th element (for getelementptr lookups).
         """
         ...
-    
-    def format_constant(self, value): # -> str:
-        ...
-    
+    def format_constant(self, value): ...
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> Self:
+    def from_llvm(cls, typeref, ir_ctx):  # -> Self:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class BaseStructType(Aggregate):
     """
     The base type for heterogenous struct types.
     """
+
     _packed = ...
     @property
-    def packed(self): # -> bool:
+    def packed(self):  # -> bool:
         """
         A boolean attribute that indicates whether the structure uses
         packed layout.
         """
         ...
-    
     @packed.setter
-    def packed(self, val): # -> None:
-        ...
-    
-    def __len__(self): # -> int:
-        ...
-    
-    def __iter__(self):
-        ...
-    
+    def packed(self, val): ...
+    def __len__(self): ...
+    def __iter__(self): ...
     @property
-    def is_opaque(self): # -> bool:
-        ...
-    
-    def structure_repr(self): # -> str:
+    def is_opaque(self): ...
+    def structure_repr(self):  # -> str:
         """
         Return the LLVM IR for the structure representation
         """
         ...
-    
-    def format_constant(self, value): # -> str:
-        ...
-    
+    def format_constant(self, value): ...
     def gep(self, i):
         """
         Resolve the type of the i-th element (for getelementptr lookups).
@@ -422,21 +286,19 @@ class BaseStructType(Aggregate):
         at compile-time.
         """
         ...
-    
     @classmethod
-    def from_llvm(cls, typeref, ir_ctx): # -> Self:
+    def from_llvm(cls, typeref, ir_ctx):  # -> Self:
         """
         Create from a llvmlite.binding.TypeRef
         """
         ...
-    
-
 
 class LiteralStructType(BaseStructType):
     """
     The type of "literal" structs, i.e. structs with a literally-defined
     type (by contrast with IdentifiedStructType).
     """
+
     null = ...
     def __init__(self, elems, packed=...) -> None:
         """
@@ -444,14 +306,8 @@ class LiteralStructType(BaseStructType):
         *packed* controls the use of packed layout.
         """
         ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
 
 class IdentifiedStructType(BaseStructType):
     """
@@ -461,6 +317,7 @@ class IdentifiedStructType(BaseStructType):
 
     Do not use this directly.
     """
+
     null = ...
     def __init__(self, context, name, packed=...) -> None:
         """
@@ -469,21 +326,11 @@ class IdentifiedStructType(BaseStructType):
         *packed* controls the use of packed layout.
         """
         ...
-    
-    def get_declaration(self): # -> str:
+    def get_declaration(self):  # -> str:
         """
         Returns the string for the declaration of the type
         """
         ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-    def set_body(self, *elems): # -> None:
-        ...
-    
-
-
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def set_body(self, *elems): ...

@@ -8,7 +8,7 @@ MSVCCompiler = msvc.Compiler
 
 
 def __getattr__(name):
-    if name == '_get_vc_env':
+    if name == "_get_vc_env":
         warnings.warn(
             "_get_vc_env is private; find an alternative (pypa/distutils#340)"
         )

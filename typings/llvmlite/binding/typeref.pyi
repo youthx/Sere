@@ -28,53 +28,47 @@ class TypeKind(enum.IntEnum):
     bfloat = ...
     x86_amx = ...
 
-
 _TypeKindToIRType = ...
+
 class TypeRef(ffi.ObjectRef):
-    """A weak reference to a LLVM type
-    """
+    """A weak reference to a LLVM type"""
+
     @property
-    def name(self): # -> str | None:
+    def name(self):  # -> str | None:
         """
         Get type name
         """
         ...
-    
     @property
     def is_struct(self):
         """
         Returns true if the type is a struct type.
         """
         ...
-    
     @property
     def is_pointer(self):
         """
         Returns true if the type is a pointer type.
         """
         ...
-    
     @property
     def is_array(self):
         """
         Returns true if the type is an array type.
         """
         ...
-    
     @property
     def is_vector(self):
         """
         Returns true if the type is a vector type.
         """
         ...
-    
     @property
     def is_function(self):
         """
         Returns true if the type is a function type.
         """
         ...
-    
     @property
     def is_function_vararg(self):
         """
@@ -82,22 +76,19 @@ class TypeRef(ffi.ObjectRef):
         When the type is not a function, raises exception.
         """
         ...
-    
     @property
-    def elements(self): # -> _TypeListIterator:
+    def elements(self):  # -> _TypeListIterator:
         """
         Returns iterator over enclosing types
         """
         ...
-    
     @property
-    def element_type(self): # -> TypeRef:
+    def element_type(self):  # -> TypeRef:
         """
         Returns the pointed-to type. When the type is not a pointer,
         raises exception.
         """
         ...
-    
     @property
     def element_count(self):
         """
@@ -106,7 +97,6 @@ class TypeRef(ffi.ObjectRef):
         an array nor a vector, raises exception.
         """
         ...
-    
     @property
     def type_width(self):
         """
@@ -123,53 +113,29 @@ class TypeRef(ffi.ObjectRef):
         instance of the type is stored to memory.
         """
         ...
-    
     @property
-    def type_kind(self): # -> TypeKind:
+    def type_kind(self):  # -> TypeKind:
         """
         Returns the LLVMTypeKind enumeration of this type.
         """
         ...
-    
     @property
-    def is_packed_struct(self):
-        ...
-    
+    def is_packed_struct(self): ...
     @property
-    def is_literal_struct(self):
-        ...
-    
+    def is_literal_struct(self): ...
     @property
-    def is_opaque_struct(self):
-        ...
-    
-    def get_function_parameters(self) -> tuple[TypeRef]:
-        ...
-    
-    def get_function_return(self) -> TypeRef:
-        ...
-    
+    def is_opaque_struct(self): ...
+    def get_function_parameters(self) -> tuple[TypeRef]: ...
+    def get_function_return(self) -> TypeRef: ...
     def as_ir(self, ir_ctx: ir.Context) -> ir.Type:
-        """Convert into a ``llvmlite.ir.Type``.
-        """
+        """Convert into a ``llvmlite.ir.Type``."""
         ...
-    
-    def __str__(self) -> str:
-        ...
-    
-
+    def __str__(self) -> str: ...
 
 class _TypeIterator(ffi.ObjectRef):
-    def __next__(self): # -> TypeRef:
-        ...
-    
+    def __next__(self): ...
+
     next = ...
-    def __iter__(self): # -> Self:
-        ...
-    
+    def __iter__(self): ...
 
-
-class _TypeListIterator(_TypeIterator):
-    ...
-
-
+class _TypeListIterator(_TypeIterator): ...

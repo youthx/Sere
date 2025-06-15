@@ -23,8 +23,8 @@ with contextlib.suppress(ImportError):
             halt_level,
             stream=None,
             debug=False,
-            encoding='ascii',
-            error_handler='replace',
+            encoding="ascii",
+            error_handler="replace",
         ):
             self.messages = []
             super().__init__(
@@ -43,16 +43,16 @@ class check(Command):
 
     description = "perform some checks on the package"
     user_options: ClassVar[list[tuple[str, str, str]]] = [
-        ('metadata', 'm', 'Verify meta-data'),
+        ("metadata", "m", "Verify meta-data"),
         (
-            'restructuredtext',
-            'r',
-            'Checks if long string meta-data syntax are reStructuredText-compliant',
+            "restructuredtext",
+            "r",
+            "Checks if long string meta-data syntax are reStructuredText-compliant",
         ),
-        ('strict', 's', 'Will exit with an error if a check fails'),
+        ("strict", "s", "Will exit with an error if a check fails"),
     ]
 
-    boolean_options: ClassVar[list[str]] = ['metadata', 'restructuredtext', 'strict']
+    boolean_options: ClassVar[list[str]] = ["metadata", "restructuredtext", "strict"]
 
     def initialize_options(self):
         """Sets default values for options."""
@@ -75,18 +75,18 @@ class check(Command):
         if self.metadata:
             self.check_metadata()
         if self.restructuredtext:
-            if 'docutils' in globals():
+            if "docutils" in globals():
                 try:
                     self.check_restructuredtext()
                 except TypeError as exc:
                     raise DistutilsSetupError(str(exc))
             elif self.strict:
-                raise DistutilsSetupError('The docutils package is needed.')
+                raise DistutilsSetupError("The docutils package is needed.")
 
         # let's raise an error in strict mode, if we have at least
         # one warning
         if self.strict and self._warnings > 0:
-            raise DistutilsSetupError('Please correct your package.')
+            raise DistutilsSetupError("Please correct your package.")
 
     def check_metadata(self):
         """Ensures that all required elements of meta-data are supplied.
@@ -99,27 +99,27 @@ class check(Command):
         metadata = self.distribution.metadata
 
         missing = [
-            attr for attr in ('name', 'version') if not getattr(metadata, attr, None)
+            attr for attr in ("name", "version") if not getattr(metadata, attr, None)
         ]
 
         if missing:
-            self.warn("missing required meta-data: {}".format(', '.join(missing)))
+            self.warn("missing required meta-data: {}".format(", ".join(missing)))
 
     def check_restructuredtext(self):
         """Checks if the long string fields are reST-compliant."""
         data = self.distribution.get_long_description()
         for warning in self._check_rst_data(data):
-            line = warning[-1].get('line')
+            line = warning[-1].get("line")
             if line is None:
                 warning = warning[1]
             else:
-                warning = f'{warning[1]} (line {line})'
+                warning = f"{warning[1]} (line {line})"
             self.warn(warning)
 
     def _check_rst_data(self, data):
         """Returns warnings when the provided data doesn't compile."""
         # the include and csv_table directives need this to be a path
-        source_path = self.distribution.script_name or 'setup.py'
+        source_path = self.distribution.script_name or "setup.py"
         parser = docutils.parsers.rst.Parser()
         settings = docutils.frontend.OptionParser(
             components=(docutils.parsers.rst.Parser,)
@@ -142,11 +142,13 @@ class check(Command):
         try:
             parser.parse(data, document)
         except (AttributeError, TypeError) as e:
-            reporter.messages.append((
-                -1,
-                f'Could not finish the parsing: {e}.',
-                '',
-                {},
-            ))
+            reporter.messages.append(
+                (
+                    -1,
+                    f"Could not finish the parsing: {e}.",
+                    "",
+                    {},
+                )
+            )
 
         return reporter.messages

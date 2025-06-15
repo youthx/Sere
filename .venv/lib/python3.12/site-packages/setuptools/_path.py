@@ -47,7 +47,7 @@ def _cygwin_patch(filename: StrPath):  # pragma: nocover
     would probably better, in Cygwin even more so, except
     that this seems to be by design...
     """
-    return os.path.abspath(filename) if sys.platform == 'cygwin' else filename
+    return os.path.abspath(filename) if sys.platform == "cygwin" else filename
 
 
 def normpath(filename: StrPath) -> str:
@@ -77,17 +77,17 @@ def paths_on_pythonpath(paths):
     >>> os.environ.get('PYTHONPATH')
     """
     nothing = object()
-    orig_pythonpath = os.environ.get('PYTHONPATH', nothing)
-    current_pythonpath = os.environ.get('PYTHONPATH', '')
+    orig_pythonpath = os.environ.get("PYTHONPATH", nothing)
+    current_pythonpath = os.environ.get("PYTHONPATH", "")
     try:
         prefix = os.pathsep.join(unique_everseen(paths))
         to_join = filter(None, [prefix, current_pythonpath])
         new_path = os.pathsep.join(to_join)
         if new_path:
-            os.environ['PYTHONPATH'] = new_path
+            os.environ["PYTHONPATH"] = new_path
         yield
     finally:
         if orig_pythonpath is nothing:
-            os.environ.pop('PYTHONPATH', None)
+            os.environ.pop("PYTHONPATH", None)
         else:
-            os.environ['PYTHONPATH'] = orig_pythonpath
+            os.environ["PYTHONPATH"] = orig_pythonpath

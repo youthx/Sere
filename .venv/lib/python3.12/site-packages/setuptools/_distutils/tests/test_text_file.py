@@ -21,11 +21,11 @@ class TestTextFile(support.TempdirManager):
 
         # result 1: no fancy options
         result1 = [
-            '# test file\n',
-            '\n',
-            'line 3 \\\n',
-            '# intervening comment\n',
-            '  continues on next line\n',
+            "# test file\n",
+            "\n",
+            "line 3 \\\n",
+            "# intervening comment\n",
+            "  continues on next line\n",
         ]
 
         # result 2: just strip comments
@@ -56,7 +56,7 @@ class TestTextFile(support.TempdirManager):
             assert result == expected_result
 
         tmp_path = path.Path(self.mkdtemp())
-        filename = tmp_path / 'test.txt'
+        filename = tmp_path / "test.txt"
         jaraco.path.build({filename.name: TEST_DATA}, tmp_path)
 
         in_file = TextFile(

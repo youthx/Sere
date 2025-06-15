@@ -38,29 +38,29 @@ class TestZipProvider:
     @classmethod
     def setup_class(cls):
         "create a zip egg and add it to sys.path"
-        egg = tempfile.NamedTemporaryFile(suffix='.egg', delete=False)
-        zip_egg = zipfile.ZipFile(egg, 'w')
+        egg = tempfile.NamedTemporaryFile(suffix=".egg", delete=False)
+        zip_egg = zipfile.ZipFile(egg, "w")
         zip_info = zipfile.ZipInfo()
-        zip_info.filename = 'mod.py'
+        zip_info.filename = "mod.py"
         zip_info.date_time = cls.ref_time.timetuple()
-        zip_egg.writestr(zip_info, 'x = 3\n')
+        zip_egg.writestr(zip_info, "x = 3\n")
         zip_info = zipfile.ZipInfo()
-        zip_info.filename = 'data.dat'
+        zip_info.filename = "data.dat"
         zip_info.date_time = cls.ref_time.timetuple()
-        zip_egg.writestr(zip_info, 'hello, world!')
+        zip_egg.writestr(zip_info, "hello, world!")
         zip_info = zipfile.ZipInfo()
-        zip_info.filename = 'subdir/mod2.py'
+        zip_info.filename = "subdir/mod2.py"
         zip_info.date_time = cls.ref_time.timetuple()
-        zip_egg.writestr(zip_info, 'x = 6\n')
+        zip_egg.writestr(zip_info, "x = 6\n")
         zip_info = zipfile.ZipInfo()
-        zip_info.filename = 'subdir/data2.dat'
+        zip_info.filename = "subdir/data2.dat"
         zip_info.date_time = cls.ref_time.timetuple()
-        zip_egg.writestr(zip_info, 'goodbye, world!')
+        zip_egg.writestr(zip_info, "goodbye, world!")
         zip_egg.close()
         egg.close()
 
         sys.path.append(egg.name)
-        subdir = os.path.join(egg.name, 'subdir')
+        subdir = os.path.join(egg.name, "subdir")
         sys.path.append(subdir)
         cls.finalizers.append(EggRemover(subdir))
         cls.finalizers.append(EggRemover(egg.name))
@@ -75,24 +75,24 @@ class TestZipProvider:
 
         zp = pkg_resources.ZipProvider(mod)
 
-        expected_root = ['data.dat', 'mod.py', 'subdir']
-        assert sorted(zp.resource_listdir('')) == expected_root
+        expected_root = ["data.dat", "mod.py", "subdir"]
+        assert sorted(zp.resource_listdir("")) == expected_root
 
-        expected_subdir = ['data2.dat', 'mod2.py']
-        assert sorted(zp.resource_listdir('subdir')) == expected_subdir
-        assert sorted(zp.resource_listdir('subdir/')) == expected_subdir
+        expected_subdir = ["data2.dat", "mod2.py"]
+        assert sorted(zp.resource_listdir("subdir")) == expected_subdir
+        assert sorted(zp.resource_listdir("subdir/")) == expected_subdir
 
-        assert zp.resource_listdir('nonexistent') == []
-        assert zp.resource_listdir('nonexistent/') == []
+        assert zp.resource_listdir("nonexistent") == []
+        assert zp.resource_listdir("nonexistent/") == []
 
         import mod2  # pyright: ignore[reportMissingImports] # Temporary package for test
 
         zp2 = pkg_resources.ZipProvider(mod2)
 
-        assert sorted(zp2.resource_listdir('')) == expected_subdir
+        assert sorted(zp2.resource_listdir("")) == expected_subdir
 
-        assert zp2.resource_listdir('subdir') == []
-        assert zp2.resource_listdir('subdir/') == []
+        assert zp2.resource_listdir("subdir") == []
+        assert zp2.resource_listdir("subdir/") == []
 
     def test_resource_filename_rewrites_on_change(self):
         """
@@ -105,24 +105,24 @@ class TestZipProvider:
 
         manager = pkg_resources.ResourceManager()
         zp = pkg_resources.ZipProvider(mod)
-        filename = zp.get_resource_filename(manager, 'data.dat')
+        filename = zp.get_resource_filename(manager, "data.dat")
         actual = datetime.datetime.fromtimestamp(os.stat(filename).st_mtime)
         assert actual == self.ref_time
-        f = open(filename, 'w', encoding="utf-8")
-        f.write('hello, world?')
+        f = open(filename, "w", encoding="utf-8")
+        f.write("hello, world?")
         f.close()
         ts = self.ref_time.timestamp()
         os.utime(filename, (ts, ts))
-        filename = zp.get_resource_filename(manager, 'data.dat')
+        filename = zp.get_resource_filename(manager, "data.dat")
         with open(filename, encoding="utf-8") as f:
-            assert f.read() == 'hello, world!'
+            assert f.read() == "hello, world!"
         manager.cleanup_resources()
 
 
 class TestResourceManager:
     def test_get_cache_path(self):
         mgr = pkg_resources.ResourceManager()
-        path = mgr.get_cache_path('foo')
+        path = mgr.get_cache_path("foo")
         type_ = str(type(path))
         message = "Unexpected type from get_cache_path: " + type_
         assert isinstance(path, str), message
@@ -143,8 +143,8 @@ class TestResourceManager:
         mgr = pkg_resources.ResourceManager()
         mgr.set_extraction_path(str(tmpdir))
 
-        archive_name = os.sep.join(('foo', 'bar', 'baz'))
-        with mock.patch.object(pkg_resources, 'isdir', new=patched_isdir):
+        archive_name = os.sep.join(("foo", "bar", "baz"))
+        with mock.patch.object(pkg_resources, "isdir", new=patched_isdir):
             mgr.get_cache_path(archive_name)
 
         # Because this test relies on the implementation details of this
@@ -152,8 +152,8 @@ class TestResourceManager:
         # test suite will not fail silently if the implementation changes.
         called_dirnames = patched_isdir.dirnames
         assert len(called_dirnames) == 2
-        assert called_dirnames[0].split(os.sep)[-2:] == ['foo', 'bar']
-        assert called_dirnames[1].split(os.sep)[-1:] == ['foo']
+        assert called_dirnames[0].split(os.sep)[-2:] == ["foo", "bar"]
+        assert called_dirnames[1].split(os.sep)[-1:] == ["foo"]
 
     """
     Tests to ensure that pkg_resources runs independently from setuptools.
@@ -165,11 +165,11 @@ class TestResourceManager:
         that action doesn't cause setuptools to be imported.
         """
         lines = (
-            'import pkg_resources',
-            'import sys',
+            "import pkg_resources",
+            "import sys",
             ('assert "setuptools" not in sys.modules, "setuptools was imported"'),
         )
-        cmd = [sys.executable, '-c', '; '.join(lines)]
+        cmd = [sys.executable, "-c", "; ".join(lines)]
         subprocess.check_call(cmd)
 
 
@@ -185,7 +185,7 @@ def make_test_distribution(metadata_path, metadata):
     """
     dist_dir = os.path.dirname(metadata_path)
     os.mkdir(dist_dir)
-    with open(metadata_path, 'wb') as f:
+    with open(metadata_path, "wb") as f:
         f.write(metadata)
     dists = list(pkg_resources.distributions_from_metadata(dist_dir))
     (dist,) = dists
@@ -197,11 +197,11 @@ def test_get_metadata__bad_utf8(tmpdir):
     """
     Test a metadata file with bytes that can't be decoded as utf-8.
     """
-    filename = 'METADATA'
+    filename = "METADATA"
     # Convert the tmpdir LocalPath object to a string before joining.
-    metadata_path = os.path.join(str(tmpdir), 'foo.dist-info', filename)
+    metadata_path = os.path.join(str(tmpdir), "foo.dist-info", filename)
     # Encode a non-ascii string with the wrong encoding (not utf-8).
-    metadata = 'née'.encode('iso-8859-1')
+    metadata = "née".encode("iso-8859-1")
     dist = make_test_distribution(metadata_path, metadata=metadata)
 
     with pytest.raises(UnicodeDecodeError) as excinfo:
@@ -213,10 +213,10 @@ def test_get_metadata__bad_utf8(tmpdir):
         # The error message starts with "'utf-8' codec ..." However, the
         # spelling of "utf-8" can vary (e.g. "utf8") so we don't include it
         "codec can't decode byte 0xe9 in position 1: "
-        'invalid continuation byte in METADATA file at path: '
+        "invalid continuation byte in METADATA file at path: "
     )
-    assert expected in actual, f'actual: {actual}'
-    assert actual.endswith(metadata_path), f'actual: {actual}'
+    assert expected in actual, f"actual: {actual}"
+    assert actual.endswith(metadata_path), f"actual: {actual}"
 
 
 def make_distribution_no_version(tmpdir, basename):
@@ -227,7 +227,7 @@ def make_distribution_no_version(tmpdir, basename):
     dist_dir.ensure_dir()
     # Make the directory non-empty so distributions_from_metadata()
     # will detect it and yield it.
-    dist_dir.join('temp.txt').ensure()
+    dist_dir.join("temp.txt").ensure()
 
     dists = list(pkg_resources.distributions_from_metadata(dist_dir))
     assert len(dists) == 1
@@ -239,12 +239,12 @@ def make_distribution_no_version(tmpdir, basename):
 @pytest.mark.parametrize(
     ("suffix", "expected_filename", "expected_dist_type"),
     [
-        ('egg-info', 'PKG-INFO', EggInfoDistribution),
-        ('dist-info', 'METADATA', DistInfoDistribution),
+        ("egg-info", "PKG-INFO", EggInfoDistribution),
+        ("dist-info", "METADATA", DistInfoDistribution),
     ],
 )
 @pytest.mark.xfail(
-    sys.version_info[:2] == (3, 12) and sys.version_info.releaselevel != 'final',
+    sys.version_info[:2] == (3, 12) and sys.version_info.releaselevel != "final",
     reason="https://github.com/python/cpython/issues/103632",
 )
 def test_distribution_version_missing(
@@ -253,7 +253,7 @@ def test_distribution_version_missing(
     """
     Test Distribution.version when the "Version" header is missing.
     """
-    basename = f'foo.{suffix}'
+    basename = f"foo.{suffix}"
     dist, dist_dir = make_distribution_no_version(tmpdir, basename)
 
     expected_text = (
@@ -279,7 +279,7 @@ def test_distribution_version_missing(
 
 
 @pytest.mark.xfail(
-    sys.version_info[:2] == (3, 12) and sys.version_info.releaselevel != 'final',
+    sys.version_info[:2] == (3, 12) and sys.version_info.releaselevel != "final",
     reason="https://github.com/python/cpython/issues/103632",
 )
 def test_distribution_version_missing_undetected_path():
@@ -289,7 +289,7 @@ def test_distribution_version_missing_undetected_path():
     """
     # Create a Distribution object with no metadata argument, which results
     # in an empty metadata provider.
-    dist = Distribution('/foo')
+    dist = Distribution("/foo")
     with pytest.raises(ValueError) as excinfo:
         dist.version
 
@@ -300,10 +300,10 @@ def test_distribution_version_missing_undetected_path():
     assert msg == expected
 
 
-@pytest.mark.parametrize('only', [False, True])
+@pytest.mark.parametrize("only", [False, True])
 def test_dist_info_is_not_dir(tmp_path, only):
     """Test path containing a file with dist-info extension."""
-    dist_info = tmp_path / 'foobar.dist-info'
+    dist_info = tmp_path / "foobar.dist-info"
     dist_info.touch()
     assert not pkg_resources.dist_factory(str(tmp_path), str(dist_info), only)
 
@@ -313,20 +313,20 @@ def test_macos_vers_fallback(monkeypatch, tmp_path):
     orig_open = builtins.open
 
     # Pretend we need to use the plist file
-    monkeypatch.setattr('platform.mac_ver', mock.Mock(return_value=('', (), '')))
+    monkeypatch.setattr("platform.mac_ver", mock.Mock(return_value=("", (), "")))
 
     # Create fake content for the fake plist file
-    with open(tmp_path / 'fake.plist', 'wb') as fake_file:
+    with open(tmp_path / "fake.plist", "wb") as fake_file:
         plistlib.dump({"ProductVersion": "11.4"}, fake_file)
 
     # Pretend the fake file exists
-    monkeypatch.setattr('os.path.exists', mock.Mock(return_value=True))
+    monkeypatch.setattr("os.path.exists", mock.Mock(return_value=True))
 
     def fake_open(file, *args, **kwargs):
-        return orig_open(tmp_path / 'fake.plist', *args, **kwargs)
+        return orig_open(tmp_path / "fake.plist", *args, **kwargs)
 
     # Ensure that the _macos_vers works correctly
-    with mock.patch('builtins.open', mock.Mock(side_effect=fake_open)) as m:
+    with mock.patch("builtins.open", mock.Mock(side_effect=fake_open)) as m:
         pkg_resources._macos_vers.cache_clear()
         assert pkg_resources._macos_vers() == ["11", "4"]
         pkg_resources._macos_vers.cache_clear()
@@ -347,7 +347,7 @@ class TestDeepVersionLookupDistutils:
 
         env = Environment(tmpdir)
         tmpdir.chmod(stat.S_IRWXU)
-        subs = 'home', 'lib', 'scripts', 'data', 'egg-base'
+        subs = "home", "lib", "scripts", "data", "egg-base"
         env.paths = dict((dirname, str(tmpdir / dirname)) for dirname in subs)
         list(map(os.mkdir, env.paths.values()))
         return env
@@ -358,31 +358,31 @@ class TestDeepVersionLookupDistutils:
         as version.
         """
         ld = "This package has unicode metadata! ❄"
-        attrs = dict(name='foo', version=version, long_description=ld)
+        attrs = dict(name="foo", version=version, long_description=ld)
         dist = distutils.dist.Distribution(attrs)
         iei_cmd = distutils.command.install_egg_info.install_egg_info(dist)
         iei_cmd.initialize_options()
-        iei_cmd.install_dir = env.paths['lib']
+        iei_cmd.install_dir = env.paths["lib"]
         iei_cmd.finalize_options()
         iei_cmd.run()
 
     def test_version_resolved_from_egg_info(self, env):
-        version = '1.11.0.dev0+2329eae'
+        version = "1.11.0.dev0+2329eae"
         self.create_foo_pkg(env, version)
 
         # this requirement parsing will raise a VersionConflict unless the
         # .egg-info file is parsed (see #419 on BitBucket)
-        req = pkg_resources.Requirement.parse('foo>=1.9')
-        dist = pkg_resources.WorkingSet([env.paths['lib']]).find(req)
+        req = pkg_resources.Requirement.parse("foo>=1.9")
+        dist = pkg_resources.WorkingSet([env.paths["lib"]]).find(req)
         assert dist.version == version
 
     @pytest.mark.parametrize(
         ("unnormalized", "normalized"),
         [
-            ('foo', 'foo'),
-            ('foo/', 'foo'),
-            ('foo/bar', 'foo/bar'),
-            ('foo/bar/', 'foo/bar'),
+            ("foo", "foo"),
+            ("foo/", "foo"),
+            ("foo/bar", "foo/bar"),
+            ("foo/bar/", "foo/bar"),
         ],
     )
     def test_normalize_path_trailing_sep(self, unnormalized, normalized):
@@ -395,13 +395,13 @@ class TestDeepVersionLookupDistutils:
         assert result_from_unnormalized == result_from_normalized
 
     @pytest.mark.skipif(
-        os.path.normcase('A') != os.path.normcase('a'),
-        reason='Testing case-insensitive filesystems.',
+        os.path.normcase("A") != os.path.normcase("a"),
+        reason="Testing case-insensitive filesystems.",
     )
     @pytest.mark.parametrize(
         ("unnormalized", "normalized"),
         [
-            ('MiXeD/CasE', 'mixed/case'),
+            ("MiXeD/CasE", "mixed/case"),
         ],
     )
     def test_normalize_path_normcase(self, unnormalized, normalized):
@@ -411,15 +411,15 @@ class TestDeepVersionLookupDistutils:
         assert result_from_unnormalized == result_from_normalized
 
     @pytest.mark.skipif(
-        os.path.sep != '\\',
-        reason='Testing systems using backslashes as path separators.',
+        os.path.sep != "\\",
+        reason="Testing systems using backslashes as path separators.",
     )
     @pytest.mark.parametrize(
         ("unnormalized", "expected"),
         [
-            ('forward/slash', 'forward\\slash'),
-            ('forward/slash/', 'forward\\slash'),
-            ('backward\\slash\\', 'backward\\slash'),
+            ("forward/slash", "forward\\slash"),
+            ("forward/slash/", "forward\\slash"),
+            ("backward\\slash\\", "backward\\slash"),
         ],
     )
     def test_normalize_path_backslash_sep(self, unnormalized, expected):

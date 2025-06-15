@@ -19,83 +19,83 @@ from . import unix
 from .errors import CompileError
 
 _cc_args = {
-    'ibm-openxl': [
-        '-m64',
-        '-fvisibility=default',
-        '-fzos-le-char-mode=ascii',
-        '-fno-short-enums',
+    "ibm-openxl": [
+        "-m64",
+        "-fvisibility=default",
+        "-fzos-le-char-mode=ascii",
+        "-fno-short-enums",
     ],
-    'ibm-xlclang': [
-        '-q64',
-        '-qexportall',
-        '-qascii',
-        '-qstrict',
-        '-qnocsect',
-        '-Wa,asa,goff',
-        '-Wa,xplink',
-        '-qgonumber',
-        '-qenum=int',
-        '-Wc,DLL',
+    "ibm-xlclang": [
+        "-q64",
+        "-qexportall",
+        "-qascii",
+        "-qstrict",
+        "-qnocsect",
+        "-Wa,asa,goff",
+        "-Wa,xplink",
+        "-qgonumber",
+        "-qenum=int",
+        "-Wc,DLL",
     ],
-    'ibm-xlc': [
-        '-q64',
-        '-qexportall',
-        '-qascii',
-        '-qstrict',
-        '-qnocsect',
-        '-Wa,asa,goff',
-        '-Wa,xplink',
-        '-qgonumber',
-        '-qenum=int',
-        '-Wc,DLL',
-        '-qlanglvl=extc99',
+    "ibm-xlc": [
+        "-q64",
+        "-qexportall",
+        "-qascii",
+        "-qstrict",
+        "-qnocsect",
+        "-Wa,asa,goff",
+        "-Wa,xplink",
+        "-qgonumber",
+        "-qenum=int",
+        "-Wc,DLL",
+        "-qlanglvl=extc99",
     ],
 }
 
 _cxx_args = {
-    'ibm-openxl': [
-        '-m64',
-        '-fvisibility=default',
-        '-fzos-le-char-mode=ascii',
-        '-fno-short-enums',
+    "ibm-openxl": [
+        "-m64",
+        "-fvisibility=default",
+        "-fzos-le-char-mode=ascii",
+        "-fno-short-enums",
     ],
-    'ibm-xlclang': [
-        '-q64',
-        '-qexportall',
-        '-qascii',
-        '-qstrict',
-        '-qnocsect',
-        '-Wa,asa,goff',
-        '-Wa,xplink',
-        '-qgonumber',
-        '-qenum=int',
-        '-Wc,DLL',
+    "ibm-xlclang": [
+        "-q64",
+        "-qexportall",
+        "-qascii",
+        "-qstrict",
+        "-qnocsect",
+        "-Wa,asa,goff",
+        "-Wa,xplink",
+        "-qgonumber",
+        "-qenum=int",
+        "-Wc,DLL",
     ],
-    'ibm-xlc': [
-        '-q64',
-        '-qexportall',
-        '-qascii',
-        '-qstrict',
-        '-qnocsect',
-        '-Wa,asa,goff',
-        '-Wa,xplink',
-        '-qgonumber',
-        '-qenum=int',
-        '-Wc,DLL',
-        '-qlanglvl=extended0x',
+    "ibm-xlc": [
+        "-q64",
+        "-qexportall",
+        "-qascii",
+        "-qstrict",
+        "-qnocsect",
+        "-Wa,asa,goff",
+        "-Wa,xplink",
+        "-qgonumber",
+        "-qenum=int",
+        "-Wc,DLL",
+        "-qlanglvl=extended0x",
     ],
 }
 
 _asm_args = {
-    'ibm-openxl': ['-fasm', '-fno-integrated-as', '-Wa,--ASA', '-Wa,--GOFF'],
-    'ibm-xlclang': [],
-    'ibm-xlc': [],
+    "ibm-openxl": ["-fasm", "-fno-integrated-as", "-Wa,--ASA", "-Wa,--GOFF"],
+    "ibm-xlclang": [],
+    "ibm-xlc": [],
 }
 
 _ld_args = {
-    'ibm-openxl': [],
-    'ibm-xlclang': ['-Wl,dll', '-q64'],
-    'ibm-xlc': ['-Wl,dll', '-q64'],
+    "ibm-openxl": [],
+    "ibm-xlclang": ["-Wl,dll", "-q64"],
+    "ibm-xlc": ["-Wl,dll", "-q64"],
 }
 
 
@@ -103,38 +103,38 @@ _ld_args = {
 # But each compiler requires it's own specific options to build successfully,
 # though some of the options are common between them
 class Compiler(unix.Compiler):
-    src_extensions = ['.c', '.C', '.cc', '.cxx', '.cpp', '.m', '.s']
-    _cpp_extensions = ['.cc', '.cpp', '.cxx', '.C']
-    _asm_extensions = ['.s']
+    src_extensions = [".c", ".C", ".cc", ".cxx", ".cpp", ".m", ".s"]
+    _cpp_extensions = [".cc", ".cpp", ".cxx", ".C"]
+    _asm_extensions = [".s"]
 
     def _get_zos_compiler_name(self):
         zos_compiler_names = [
             os.path.basename(binary)
-            for envvar in ('CC', 'CXX', 'LDSHARED')
+            for envvar in ("CC", "CXX", "LDSHARED")
             if (binary := os.environ.get(envvar, None))
         ]
         if len(zos_compiler_names) == 0:
-            return 'ibm-openxl'
+            return "ibm-openxl"
 
         zos_compilers = {}
         for compiler in (
-            'ibm-clang',
-            'ibm-clang64',
-            'ibm-clang++',
-            'ibm-clang++64',
-            'clang',
-            'clang++',
-            'clang-14',
+            "ibm-clang",
+            "ibm-clang64",
+            "ibm-clang++",
+            "ibm-clang++64",
+            "clang",
+            "clang++",
+            "clang-14",
         ):
-            zos_compilers[compiler] = 'ibm-openxl'
+            zos_compilers[compiler] = "ibm-openxl"
 
-        for compiler in ('xlclang', 'xlclang++', 'njsc', 'njsc++'):
-            zos_compilers[compiler] = 'ibm-xlclang'
+        for compiler in ("xlclang", "xlclang++", "njsc", "njsc++"):
+            zos_compilers[compiler] = "ibm-xlclang"
 
-        for compiler in ('xlc', 'xlC', 'xlc++'):
-            zos_compilers[compiler] = 'ibm-xlc'
+        for compiler in ("xlc", "xlC", "xlc++"):
+            zos_compilers[compiler] = "ibm-xlc"
 
-        return zos_compilers.get(zos_compiler_names[0], 'ibm-openxl')
+        return zos_compilers.get(zos_compiler_names[0], "ibm-openxl")
 
     def __init__(self, verbose=False, dry_run=False, force=False):
         super().__init__(verbose, dry_run, force)
@@ -156,12 +156,12 @@ class Compiler(unix.Compiler):
         local_args.extend(cc_args)
 
         try:
-            self.spawn(compiler + local_args + [src, '-o', obj] + extra_postargs)
+            self.spawn(compiler + local_args + [src, "-o", obj] + extra_postargs)
         except DistutilsExecError as msg:
             raise CompileError(msg)
 
     def runtime_library_dir_option(self, dir):
-        return '-L' + dir
+        return "-L" + dir
 
     def link(
         self,
@@ -181,17 +181,17 @@ class Compiler(unix.Compiler):
     ):
         # For a built module to use functions from cpython, it needs to use Pythons
         # side deck file. The side deck is located beside the libpython3.xx.so
-        ldversion = sysconfig.get_config_var('LDVERSION')
+        ldversion = sysconfig.get_config_var("LDVERSION")
         if sysconfig.python_build:
             side_deck_path = os.path.join(
-                sysconfig.get_config_var('abs_builddir'),
-                f'libpython{ldversion}.x',
+                sysconfig.get_config_var("abs_builddir"),
+                f"libpython{ldversion}.x",
             )
         else:
             side_deck_path = os.path.join(
-                sysconfig.get_config_var('installed_base'),
-                sysconfig.get_config_var('platlibdir'),
-                f'libpython{ldversion}.x',
+                sysconfig.get_config_var("installed_base"),
+                sysconfig.get_config_var("platlibdir"),
+                f"libpython{ldversion}.x",
             )
 
         if os.path.exists(side_deck_path):
@@ -204,7 +204,7 @@ class Compiler(unix.Compiler):
         if runtime_library_dirs:
             for dir in runtime_library_dirs:
                 for library in libraries[:]:
-                    library_side_deck = os.path.join(dir, f'{library}.x')
+                    library_side_deck = os.path.join(dir, f"{library}.x")
                     if os.path.exists(library_side_deck):
                         libraries.remove(library)
                         extra_postargs.append(library_side_deck)

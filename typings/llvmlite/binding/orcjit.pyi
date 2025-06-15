@@ -8,10 +8,8 @@ from llvmlite.binding import ffi
 class _LinkElement(ctypes.Structure):
     _fields_ = ...
 
-
 class _SymbolAddress(ctypes.Structure):
     _fields_ = ...
-
 
 class JITLibraryBuilder:
     """
@@ -33,10 +31,9 @@ class JITLibraryBuilder:
     valid. Once the resource tracker is garbage collected, the static
     destructors will run and library will be unloaded from memory.
     """
-    def __init__(self) -> None:
-        ...
-    
-    def add_ir(self, llvmir): # -> Self:
+
+    def __init__(self) -> None: ...
+    def add_ir(self, llvmir):  # -> Self:
         """
         Adds a compilation unit to the library using LLVM IR as the input
         format.
@@ -45,8 +42,7 @@ class JITLibraryBuilder:
         including IRBuilder, that contains LLVM IR.
         """
         ...
-    
-    def add_native_assembly(self, asm): # -> Self:
+    def add_native_assembly(self, asm):  # -> Self:
         """
         Adds a compilation unit to the library using native assembly as the
         input format.
@@ -56,8 +52,7 @@ class JITLibraryBuilder:
         parsed by LLVM.
         """
         ...
-    
-    def add_object_img(self, data): # -> Self:
+    def add_object_img(self, data):  # -> Self:
         """
         Adds a compilation unit to the library using pre-compiled object code.
 
@@ -65,8 +60,7 @@ class JITLibraryBuilder:
         loaded by LLVM.
         """
         ...
-    
-    def add_object_file(self, file_path): # -> Self:
+    def add_object_file(self, file_path):  # -> Self:
         """
         Adds a compilation unit to the library using pre-compiled object file.
 
@@ -74,8 +68,7 @@ class JITLibraryBuilder:
         which will be loaded by LLVM.
         """
         ...
-    
-    def add_jit_library(self, name): # -> Self:
+    def add_jit_library(self, name):  # -> Self:
         """
         Adds an existing JIT library as prerequisite.
 
@@ -83,8 +76,7 @@ class JITLibraryBuilder:
         command.
         """
         ...
-    
-    def add_current_process(self): # -> Self:
+    def add_current_process(self):  # -> Self:
         """
         Allows the JITted library to access symbols in the current binary.
 
@@ -93,15 +85,13 @@ class JITLibraryBuilder:
         library.
         """
         ...
-    
-    def import_symbol(self, name, address): # -> Self:
+    def import_symbol(self, name, address):  # -> Self:
         """
         Register the *address* of global symbol *name*.  This will make
         it usable (e.g. callable) from LLVM-compiled functions.
         """
         ...
-    
-    def export_symbol(self, name): # -> Self:
+    def export_symbol(self, name):  # -> Self:
         """
         During linking, extract the address of a symbol that was defined in one
         of the compilation units.
@@ -111,8 +101,7 @@ class JITLibraryBuilder:
         available when the link method is called.
         """
         ...
-    
-    def link(self, lljit, library_name): # -> ResourceTracker:
+    def link(self, lljit, library_name):  # -> ResourceTracker:
         """
         Link all the current compilation units into a JITted library and extract
         the address of exported symbols.
@@ -132,8 +121,6 @@ class JITLibraryBuilder:
         however, the name of the library cannot be reused.
         """
         ...
-    
-
 
 class ResourceTracker(ffi.ObjectRef):
     """
@@ -152,20 +139,15 @@ class ResourceTracker(ffi.ObjectRef):
     LLVM internally tracks references between different libraries, so only
     "leaf" libraries need to be tracked.
     """
-    def __init__(self, ptr, name, addresses) -> None:
-        ...
-    
+
+    def __init__(self, ptr, name, addresses) -> None: ...
     def __getitem__(self, item):
         """
         Get the address of an exported symbol as an integer
         """
         ...
-    
     @property
-    def name(self): # -> Any:
-        ...
-    
-
+    def name(self): ...
 
 class LLJIT(ffi.ObjectRef):
     """
@@ -179,10 +161,9 @@ class LLJIT(ffi.ObjectRef):
     provide access to the main library. Use the JITLibraryBuilder to create a
     new named library instead.
     """
-    def __init__(self, ptr) -> None:
-        ...
-    
-    def lookup(self, dylib, fn): # -> ResourceTracker:
+
+    def __init__(self, ptr) -> None: ...
+    def lookup(self, dylib, fn):  # -> ResourceTracker:
         """
         Find a function in this dynamic library and construct a new tracking
         object for it
@@ -197,19 +178,17 @@ class LLJIT(ffi.ObjectRef):
            the name of the function to get
         """
         ...
-    
     @property
-    def target_data(self): # -> TargetData:
+    def target_data(self):  # -> TargetData:
         """
         The TargetData for this LLJIT instance.
         """
         ...
-    
 
-
-def create_lljit_compiler(target_machine=..., *, use_jit_link=..., suppress_errors=...): # -> LLJIT:
+def create_lljit_compiler(
+    target_machine=..., *, use_jit_link=..., suppress_errors=...
+):  # -> LLJIT:
     """
     Create an LLJIT instance
     """
     ...
-

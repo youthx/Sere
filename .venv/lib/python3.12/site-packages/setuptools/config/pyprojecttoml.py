@@ -310,7 +310,9 @@ class _ConfigExpander:
         if "version" in self.dynamic and "version" in self.dynamic_cfg:
             return _expand.version(
                 # We already do an early check for the presence of "version"
-                self._obtain(dist, "version", package_dir)  # pyright: ignore[reportArgumentType]
+                self._obtain(
+                    dist, "version", package_dir
+                )  # pyright: ignore[reportArgumentType]
             )
         return None
 

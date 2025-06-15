@@ -13,7 +13,7 @@ from .._modified import newer
 from ..core import Command
 from ..util import convert_path
 
-shebang_pattern = re.compile('^#!.*python[0-9.]*([ \t].*)?$')
+shebang_pattern = re.compile("^#!.*python[0-9.]*([ \t].*)?$")
 """
 Pattern matching a Python interpreter indicated in first line of a script.
 """
@@ -23,15 +23,15 @@ first_line_re = shebang_pattern
 
 
 class build_scripts(Command):
-    description = "\"build\" scripts (copy and fixup #! line)"
+    description = '"build" scripts (copy and fixup #! line)'
 
     user_options: ClassVar[list[tuple[str, str, str]]] = [
-        ('build-dir=', 'd', "directory to \"build\" (copy) to"),
-        ('force', 'f', "forcibly build everything (ignore file timestamps"),
-        ('executable=', 'e', "specify final destination interpreter path"),
+        ("build-dir=", "d", 'directory to "build" (copy) to'),
+        ("force", "f", "forcibly build everything (ignore file timestamps"),
+        ("executable=", "e", "specify final destination interpreter path"),
     ]
 
-    boolean_options: ClassVar[list[str]] = ['force']
+    boolean_options: ClassVar[list[str]] = ["force"]
 
     def initialize_options(self):
         self.build_dir = None
@@ -41,10 +41,10 @@ class build_scripts(Command):
 
     def finalize_options(self):
         self.set_undefined_options(
-            'build',
-            ('build_scripts', 'build_dir'),
-            ('force', 'force'),
-            ('executable', 'executable'),
+            "build",
+            ("build_scripts", "build_dir"),
+            ("force", "force"),
+            ("executable", "executable"),
         )
         self.scripts = self.distribution.scripts
 
@@ -105,7 +105,7 @@ class build_scripts(Command):
         if shebang_match:
             log.info("copying and adjusting %s -> %s", script, self.build_dir)
             if not self.dry_run:
-                post_interp = shebang_match.group(1) or ''
+                post_interp = shebang_match.group(1) or ""
                 shebang = "#!" + self.executable + post_interp + "\n"
                 self._validate_shebang(shebang, f.encoding)
                 with open(outfile, "w", encoding=f.encoding) as outf:
@@ -119,7 +119,7 @@ class build_scripts(Command):
             self.copy_file(script, outfile)
 
     def _change_modes(self, outfiles):
-        if os.name != 'posix':
+        if os.name != "posix":
             return
 
         for file in outfiles:
@@ -144,7 +144,7 @@ class build_scripts(Command):
         # written before. So the shebang has to be encodable to
         # UTF-8.
         try:
-            shebang.encode('utf-8')
+            shebang.encode("utf-8")
         except UnicodeEncodeError:
             raise ValueError(f"The shebang ({shebang!r}) is not encodable to utf-8")
 

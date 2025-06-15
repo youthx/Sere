@@ -17,8 +17,8 @@ class TestBuildPy(support.TempdirManager):
         sources = self.mkdtemp()
         jaraco.path.build(
             {
-                '__init__.py': "# Pretend this is a package.",
-                'README.txt': 'Info about this package',
+                "__init__.py": "# Pretend this is a package.",
+                "README.txt": "Info about this package",
             },
             sources,
         )
@@ -60,14 +60,16 @@ class TestBuildPy(support.TempdirManager):
     def test_empty_package_dir(self):
         # See bugs #1668596/#1720897
         sources = self.mkdtemp()
-        jaraco.path.build({'__init__.py': '', 'doc': {'testfile': ''}}, sources)
+        jaraco.path.build({"__init__.py": "", "doc": {"testfile": ""}}, sources)
 
         os.chdir(sources)
-        dist = Distribution({
-            "packages": ["pkg"],
-            "package_dir": {"pkg": ""},
-            "package_data": {"pkg": ["doc/*"]},
-        })
+        dist = Distribution(
+            {
+                "packages": ["pkg"],
+                "package_dir": {"pkg": ""},
+                "package_data": {"pkg": ["doc/*"]},
+            }
+        )
         # script_name need not exist, it just need to be initialized
         dist.script_name = os.path.join(sources, "setup.py")
         dist.script_args = ["build"]
@@ -78,38 +80,38 @@ class TestBuildPy(support.TempdirManager):
         except DistutilsFileError:
             self.fail("failed package_data test when package_dir is ''")
 
-    @pytest.mark.skipif('sys.dont_write_bytecode')
+    @pytest.mark.skipif("sys.dont_write_bytecode")
     def test_byte_compile(self):
-        project_dir, dist = self.create_dist(py_modules=['boiledeggs'])
+        project_dir, dist = self.create_dist(py_modules=["boiledeggs"])
         os.chdir(project_dir)
-        self.write_file('boiledeggs.py', 'import antigravity')
+        self.write_file("boiledeggs.py", "import antigravity")
         cmd = build_py(dist)
         cmd.compile = True
-        cmd.build_lib = 'here'
+        cmd.build_lib = "here"
         cmd.finalize_options()
         cmd.run()
 
         found = os.listdir(cmd.build_lib)
-        assert sorted(found) == ['__pycache__', 'boiledeggs.py']
-        found = os.listdir(os.path.join(cmd.build_lib, '__pycache__'))
-        assert found == [f'boiledeggs.{sys.implementation.cache_tag}.pyc']
+        assert sorted(found) == ["__pycache__", "boiledeggs.py"]
+        found = os.listdir(os.path.join(cmd.build_lib, "__pycache__"))
+        assert found == [f"boiledeggs.{sys.implementation.cache_tag}.pyc"]
 
-    @pytest.mark.skipif('sys.dont_write_bytecode')
+    @pytest.mark.skipif("sys.dont_write_bytecode")
     def test_byte_compile_optimized(self):
-        project_dir, dist = self.create_dist(py_modules=['boiledeggs'])
+        project_dir, dist = self.create_dist(py_modules=["boiledeggs"])
         os.chdir(project_dir)
-        self.write_file('boiledeggs.py', 'import antigravity')
+        self.write_file("boiledeggs.py", "import antigravity")
         cmd = build_py(dist)
         cmd.compile = False
         cmd.optimize = 1
-        cmd.build_lib = 'here'
+        cmd.build_lib = "here"
         cmd.finalize_options()
         cmd.run()
 
         found = os.listdir(cmd.build_lib)
-        assert sorted(found) == ['__pycache__', 'boiledeggs.py']
-        found = os.listdir(os.path.join(cmd.build_lib, '__pycache__'))
-        expect = f'boiledeggs.{sys.implementation.cache_tag}.opt-1.pyc'
+        assert sorted(found) == ["__pycache__", "boiledeggs.py"]
+        found = os.listdir(os.path.join(cmd.build_lib, "__pycache__"))
+        expect = f"boiledeggs.{sys.implementation.cache_tag}.opt-1.pyc"
         assert sorted(found) == [expect]
 
     def test_dir_in_package_data(self):
@@ -120,12 +122,12 @@ class TestBuildPy(support.TempdirManager):
         sources = self.mkdtemp()
         jaraco.path.build(
             {
-                'pkg': {
-                    '__init__.py': '',
-                    'doc': {
-                        'testfile': '',
+                "pkg": {
+                    "__init__.py": "",
+                    "doc": {
+                        "testfile": "",
                         # create a directory that could be incorrectly detected as a file
-                        'otherdir': {},
+                        "otherdir": {},
                     },
                 }
             },
@@ -158,7 +160,7 @@ class TestBuildPy(support.TempdirManager):
         finally:
             sys.dont_write_bytecode = old_dont_write_bytecode
 
-        assert 'byte-compiling is disabled' in caplog.records[0].message
+        assert "byte-compiling is disabled" in caplog.records[0].message
 
     def test_namespace_package_does_not_warn(self, caplog):
         """
@@ -170,7 +172,7 @@ class TestBuildPy(support.TempdirManager):
         """
         # Create a fake project structure with a package namespace:
         tmp = self.mkdtemp()
-        jaraco.path.build({'ns': {'pkg': {'module.py': ''}}}, tmp)
+        jaraco.path.build({"ns": {"pkg": {"module.py": ""}}}, tmp)
         os.chdir(tmp)
 
         # Configure the package:

@@ -13,7 +13,7 @@ import pytest
 from more_itertools import always_iterable
 
 
-@pytest.mark.usefixtures('distutils_managed_tempdir')
+@pytest.mark.usefixtures("distutils_managed_tempdir")
 class TempdirManager:
     """
     Mix-in class that handles temporary directories for test cases.
@@ -28,14 +28,14 @@ class TempdirManager:
         self.tempdirs.append(d)
         return d
 
-    def write_file(self, path, content='xxx'):
+    def write_file(self, path, content="xxx"):
         """Writes a file in the given path.
 
         path can be a string or a sequence.
         """
-        pathlib.Path(*always_iterable(path)).write_text(content, encoding='utf-8')
+        pathlib.Path(*always_iterable(path)).write_text(content, encoding="utf-8")
 
-    def create_dist(self, pkg_name='foo', **kw):
+    def create_dist(self, pkg_name="foo", **kw):
         """Will generate a test environment.
 
         This function creates:
@@ -75,11 +75,11 @@ def copy_xxmodule_c(directory):
     If the source file can be found, it will be copied to *directory*.  If not,
     the test will be skipped.  Errors during copy are not caught.
     """
-    shutil.copy(_get_xxmodule_path(), os.path.join(directory, 'xxmodule.c'))
+    shutil.copy(_get_xxmodule_path(), os.path.join(directory, "xxmodule.c"))
 
 
 def _get_xxmodule_path():
-    source_name = 'xxmodule.c' if sys.version_info > (3, 9) else 'xxmodule-3.8.c'
+    source_name = "xxmodule.c" if sys.version_info > (3, 9) else "xxmodule-3.8.c"
     return os.path.join(os.path.dirname(__file__), source_name)
 
 
@@ -103,20 +103,20 @@ def fixup_build_ext(cmd):
     Unlike most other Unix platforms, Mac OS X embeds absolute paths
     to shared libraries into executables, so the fixup is not needed there.
     """
-    if os.name == 'nt':
-        cmd.debug = sys.executable.endswith('_d.exe')
-    elif sysconfig.get_config_var('Py_ENABLE_SHARED'):
+    if os.name == "nt":
+        cmd.debug = sys.executable.endswith("_d.exe")
+    elif sysconfig.get_config_var("Py_ENABLE_SHARED"):
         # To further add to the shared builds fun on Unix, we can't just add
         # library_dirs to the Extension() instance because that doesn't get
         # plumbed through to the final compiler command.
-        runshared = sysconfig.get_config_var('RUNSHARED')
+        runshared = sysconfig.get_config_var("RUNSHARED")
         if runshared is None:
-            cmd.library_dirs = ['.']
+            cmd.library_dirs = ["."]
         else:
-            if sys.platform == 'darwin':
+            if sys.platform == "darwin":
                 cmd.library_dirs = []
             else:
-                name, equals, value = runshared.partition('=')
+                name, equals, value = runshared.partition("=")
                 cmd.library_dirs = [d for d in value.split(os.pathsep) if d]
 
 
@@ -129,6 +129,6 @@ def combine_markers(cls):
     cls.pytestmark = [
         mark
         for base in itertools.chain([cls], cls.__bases__)
-        for mark in getattr(base, 'pytestmark', [])
+        for mark in getattr(base, "pytestmark", [])
     ]
     return cls

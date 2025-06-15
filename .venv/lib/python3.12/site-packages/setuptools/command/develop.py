@@ -11,14 +11,14 @@ class develop(Command):
 
     user_options = [
         ("install-dir=", "d", "install package to DIR"),
-        ('no-deps', 'N', "don't install dependencies"),
-        ('user', None, f"install in user site-package '{site.USER_SITE}'"),
-        ('prefix=', None, "installation prefix"),
+        ("no-deps", "N", "don't install dependencies"),
+        ("user", None, f"install in user site-package '{site.USER_SITE}'"),
+        ("prefix=", None, "installation prefix"),
         ("index-url=", "i", "base URL of Python Package Index"),
     ]
     boolean_options = [
-        'no-deps',
-        'user',
+        "no-deps",
+        "user",
     ]
 
     install_dir = None
@@ -29,12 +29,12 @@ class develop(Command):
 
     def run(self):
         cmd = (
-            [sys.executable, '-m', 'pip', 'install', '-e', '.', '--use-pep517']
-            + ['--target', self.install_dir] * bool(self.install_dir)
-            + ['--no-deps'] * self.no_deps
-            + ['--user'] * self.user
-            + ['--prefix', self.prefix] * bool(self.prefix)
-            + ['--index-url', self.index_url] * bool(self.index_url)
+            [sys.executable, "-m", "pip", "install", "-e", ".", "--use-pep517"]
+            + ["--target", self.install_dir] * bool(self.install_dir)
+            + ["--no-deps"] * self.no_deps
+            + ["--user"] * self.user
+            + ["--prefix", self.prefix] * bool(self.prefix)
+            + ["--index-url", self.index_url] * bool(self.index_url)
         )
         subprocess.check_call(cmd)
 

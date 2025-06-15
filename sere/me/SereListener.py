@@ -81,7 +81,7 @@ class SemanticAnalyzer(SereParserListener):
 
     def enterExpr_stmt(self, ctx: SereParser.Expr_stmtContext):
         lhs = ctx.testlist_star_expr(0)
-        
+
         if ctx.annassign():
             name = lhs.getText()
             annotation = ctx.annassign().test(0).getText()

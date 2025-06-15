@@ -6,7 +6,7 @@ from setuptools.warnings import SetuptoolsDeprecationWarning
 
 # Would restrict to Literal["test"], but mypy doesn't support it: https://github.com/python/mypy/issues/8203
 def __getattr__(name: str) -> type[_test]:
-    if name == 'test':
+    if name == "test":
         SetuptoolsDeprecationWarning.emit(
             "The test command is disabled and references to it are deprecated.",
             "Please remove any references to `setuptools.command.test` in all "
@@ -26,13 +26,13 @@ class _test(Command):
     description = "stub for old test command (do not use)"
 
     user_options = [
-        ('test-module=', 'm', "Run 'test_suite' in specified module"),
+        ("test-module=", "m", "Run 'test_suite' in specified module"),
         (
-            'test-suite=',
-            's',
+            "test-suite=",
+            "s",
             "Run single test, case or suite (e.g. 'module.test_suite')",
         ),
-        ('test-runner=', 'r', "Test runner to use"),
+        ("test-runner=", "r", "Test runner to use"),
     ]
 
     def initialize_options(self):

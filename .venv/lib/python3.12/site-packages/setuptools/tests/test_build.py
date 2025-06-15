@@ -11,10 +11,10 @@ def test_distribution_gives_setuptools_build_obj(tmpdir_cwd):
 
     dist = Distribution(
         dict(
-            script_name='setup.py',
-            script_args=['build'],
+            script_name="setup.py",
+            script_args=["build"],
             packages=[],
-            package_data={'': ['path/*']},
+            package_data={"": ["path/*"]},
         )
     )
     assert isinstance(dist.get_command_obj("build"), build)

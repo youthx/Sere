@@ -37,8 +37,8 @@ class install_scripts(orig.install_scripts):
 
         ei_cmd = self.get_finalized_command("egg_info")
         dist = metadata.Distribution.at(path=ei_cmd.egg_info)
-        bs_cmd = self.get_finalized_command('build_scripts')
-        exec_param = getattr(bs_cmd, 'executable', None)
+        bs_cmd = self.get_finalized_command("build_scripts")
+        exec_param = getattr(bs_cmd, "executable", None)
         writer = _scripts.ScriptWriter
         if exec_param == sys.executable:
             # In case the path to the Python executable contains a space, wrap

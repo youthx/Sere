@@ -28,9 +28,9 @@ def test_clean_env_install(venv_without_setuptools, setuptools_wheel):
 
 def access_pypi():
     # Detect if tests are being run without connectivity
-    if not os.environ.get('NETWORK_REQUIRED', False):  # pragma: nocover
+    if not os.environ.get("NETWORK_REQUIRED", False):  # pragma: nocover
         try:
-            urlopen('https://pypi.org', timeout=1)
+            urlopen("https://pypi.org", timeout=1)
         except URLError:
             # No network, disable most of these tests
             return False
@@ -46,40 +46,40 @@ def access_pypi():
 # ^-- Even when it is not necessary to install a different version of `pip`
 #     the build process will still try to download `wheel`, see #3147 and #2986.
 @pytest.mark.parametrize(
-    'pip_version',
+    "pip_version",
     [
         None,
         pytest.param(
-            'pip<20.1',
+            "pip<20.1",
             marks=pytest.mark.xfail(
-                'sys.version_info >= (3, 12)',
+                "sys.version_info >= (3, 12)",
                 reason="pip 23.1.2 required for Python 3.12 and later",
             ),
         ),
         pytest.param(
-            'pip<21',
+            "pip<21",
             marks=pytest.mark.xfail(
-                'sys.version_info >= (3, 12)',
+                "sys.version_info >= (3, 12)",
                 reason="pip 23.1.2 required for Python 3.12 and later",
             ),
         ),
         pytest.param(
-            'pip<22',
+            "pip<22",
             marks=pytest.mark.xfail(
-                'sys.version_info >= (3, 12)',
+                "sys.version_info >= (3, 12)",
                 reason="pip 23.1.2 required for Python 3.12 and later",
             ),
         ),
         pytest.param(
-            'pip<23',
+            "pip<23",
             marks=pytest.mark.xfail(
-                'sys.version_info >= (3, 12)',
+                "sys.version_info >= (3, 12)",
                 reason="pip 23.1.2 required for Python 3.12 and later",
             ),
         ),
         pytest.param(
-            'https://github.com/pypa/pip/archive/main.zip',
-            marks=pytest.mark.xfail(reason='#2975'),
+            "https://github.com/pypa/pip/archive/main.zip",
+            marks=pytest.mark.xfail(reason="#2975"),
         ),
     ],
 )
@@ -110,4 +110,4 @@ def test_no_missing_dependencies(bare_venv, request):
     Quick and dirty test to ensure all external dependencies are vendored.
     """
     setuptools_dir = request.config.rootdir
-    bare_venv.run(['python', 'setup.py', '--help'], cwd=setuptools_dir)
+    bare_venv.run(["python", "setup.py", "--help"], cwd=setuptools_dir)
