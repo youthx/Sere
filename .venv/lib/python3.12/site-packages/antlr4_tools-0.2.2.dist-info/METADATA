@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: antlr4-tools
+Version: 0.2.2
+Summary: Tools to run ANTLR4 tool and grammar interpreter/profiler
+Home-page: http://www.antlr.org
+Author: Terence Parr
+Author-email: parrt@antlr.org
+License: MIT
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+License-File: LICENSE
+Requires-Dist: install-jdk
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: summary

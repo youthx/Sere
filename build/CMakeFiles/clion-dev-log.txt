@@ -1,4 +1,0 @@
-/home/vscode/.cache/JetBrains/RemoteDev/dist/366b89b420705_CLion-252.19874.7/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug --preset dev -S /workspaces/Sere -B /workspaces/Sere
-CMake Error: Error: generator : Ninja
-Does not match the generator used previously: Unix Makefiles
-Either remove the CMakeCache.txt file and CMakeFiles directory or choose a different binary directory.

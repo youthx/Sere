@@ -1,0 +1,31 @@
+[project]
+name = "sere"
+version = "0.1.0"
+description = "Sere Prototype Compiler"
+authors = [
+    {name = "JJ",email = "youthxf@gmail.com"}
+]
+packages = [
+    { include = "sere" }
+]
+readme = "README.md"
+requires-python = "^3.10"
+dependencies = [
+    "llvmlite (>=0.44.0,<0.45.0)",
+    "antlr4-python3-runtime (>=4.13.2,<5.0.0)",
+    "python-tools (>=0.0.1,<0.0.2)",
+    "antlr4-tools (>=0.2.2,<0.3.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+isort = "^6.0.1"
+flake8 = "^7.2.0"
+pytest = "^8.4.0"
+pre-commit = "^4.2.0"
+
